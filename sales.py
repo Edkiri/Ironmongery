@@ -25,6 +25,7 @@ class PaymentBaseModel(BaseModel):
 class Sale(BaseModel):
     """Sale Model."""
     date = DateField()
+    description = CharField(255)
 
 class Account(BaseModel):
     """Account Model."""
