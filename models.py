@@ -21,26 +21,20 @@ class PaymentBaseModel(BaseModel):
         ('ft', 'efectivo'),)
     type = CharField(max_length=30, choices=TYPES)
     rate = FloatField()
+    account = CharField(max_length=100)
     
 class Sale(BaseModel):
     """Sale Model."""
     date = DateField()
     description = CharField(255)
 
-class Account(BaseModel):
-    """Account Model."""
-    owner = CharField(max_length=255)
-    bank = CharField(max_length=255)
-
 class Payment(PaymentBaseModel):
     """Payment Model."""
     sale = ForeignKeyField(Sale, backref='payments')
-    account = ForeignKeyField(Account, backref='accounts')
 
 class Return(PaymentBaseModel):
     """Return Model."""
     sale = ForeignKeyField(Sale, backref='returns')
-    account = ForeignKeyField(Account, backref='accounts')
 
 class Vale(BaseModel):
     """Vale means a pending client's return."""
@@ -57,5 +51,5 @@ class Credit(BaseModel):
     amount = FloatField()
 
 db.connect()
-db.create_tables([Sale, Payment, Account, Return, Vale, Credit])
+db.create_tables([Sale, Payment, Return, Vale, Credit])
 db.close()
