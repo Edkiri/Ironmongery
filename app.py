@@ -24,7 +24,7 @@ class App():
         # Menu bar
         self.display_menu_bar()
         # window canvas
-        self.canvas = tk.Canvas(self.root, width=350, height=80)
+        self.canvas = tk.Canvas(self.root, width=380, height=80)
         self.canvas.grid(columnspan=3)
         # Current day
         self.display_entry_date()
@@ -89,6 +89,19 @@ class App():
         day_up_button.grid(row=0, column=3, padx=(5,0), pady=(0,2))
         day_down_button.grid(row=0, column=0, padx=(10,5), pady=(0,2))
         show_button.grid(row=0, column=4, pady=(0,5), padx=(35,0))
+        # Rate
+        rate_label = tk.Label(
+            date_frame,
+            text="Tasa del día",
+            font=('calibri', 12))
+        rate_label.grid(row=1, column=2, columnspan=3, sticky=tk.W, pady=(15,0))
+        self.rate = tk.Entry(
+            date_frame, 
+            width=9, 
+            borderwidth=2, 
+            font=('calibri', 12))
+        self.rate.insert(0, 0)
+        self.rate.grid(row=1, column=1, sticky=tk.W, pady=(15,0))
 
     def display_tree_day(self):
         # Styling tree
@@ -106,23 +119,26 @@ class App():
             self.root, 
             height=10, 
             selectmode ='browse',
-            columns=('Bolívares', 'Dólares'),
+            columns=('Bolívares', 'Dólares', 'Total'),
             style="mystyle.Treeview")
         day_tree.column("#0", width=0, stretch=tk.NO)
         for col in day_tree['columns']:
-            day_tree.column(col, width=110, minwidth=25)
+            if col == 'Total':
+                day_tree.column(col, width=70, minwidth=25)
+            else:
+                day_tree.column(col, width=110, minwidth=25)
             day_tree.heading(col, text=col, anchor=tk.W)
         day_tree.grid(row=2, column=1, padx=(0,5))
         # Constructing vertical scrollbar 
         verscrlbar = ttk.Scrollbar(self.root,  
                                 orient ="vertical",  
                                 command = day_tree.yview)
-        verscrlbar.grid(row=2, column=1, sticky=tk.E, padx=(0,20))
+        verscrlbar.grid(row=2, column=1, sticky=tk.E, padx=(70,0))
         day_tree.configure(xscrollcommand = verscrlbar.set) 
         # Insert sales to day_tree body
-        day_tree.insert("",index='end', value=('5,325,000', '10.0'))
-        day_tree.insert("",index='end', value=('11,200,500', '112.0'))
-        day_tree.insert("",index='end', value=('17,335,000', '57.0'))
+        day_tree.insert("",index='end', value=('5,325,000', '10.0', '15.23'))
+        day_tree.insert("",index='end', value=('11,200,500', '112.0', '45.12'))
+        day_tree.insert("",index='end', value=('17,335,000', '57.0', '100.56'))
         # Display buttons
         buttons_frame = tk.LabelFrame(self.root, bd=0)
         buttons_frame.grid(row=3, column=1, padx=(0,5), pady=(0,0), sticky=tk.N)
@@ -187,8 +203,8 @@ class App():
         new_sale_window = tk.Toplevel(
             width=350, 
             height=350,
-            padx=20, 
-            pady=20)
+            padx=30, 
+            pady=30)
         new_sale_window.title("Agregar venta")
         # Title
         title_label = tk.Label(
@@ -208,40 +224,118 @@ class App():
             borderwidth=1, 
             font=('calibri', 12))
         date_entry.insert(0, TODAY)
-        date_entry.grid(row=1, column=0, sticky=tk.E, pady=(2,0))
-        # Payments
+        date_entry.grid(row=1, column=0, sticky=tk.E, pady=(3,0))
+        # Rate
+        rate_label = tk.Label(
+            new_sale_window,
+            text="Tasa del día",
+            font=('calibri', 12))
+        rate_label.grid(row=2, column=0, sticky= tk.W, pady=(10,0))
+        rate_entry = tk.Entry(
+            new_sale_window, 
+            width=11, 
+            borderwidth=1, 
+            font=('calibri', 12))
+        rate_entry.insert(0, self.rate.get())
+        rate_entry.grid(row=2, column=0, sticky=tk.E, pady=(13,0))
+        # Payments And returns
         pay_label = tk.Label(
             new_sale_window,
-            text="Pagos",
+            text="Pagos y vueltos",
             font=('calibri', 13, 'bold')
         )
-        pay_label.grid(row=2, column=0, pady=(15,15))
+        pay_label.grid(row=3, column=0, pady=(15,15))
         # Pay Tree
         pay_tree = ttk.Treeview(
             new_sale_window, 
-            height=3, 
+            height=4, 
             selectmode ='browse',
-            columns=('Cantidad', 'Moneda', 'Tipo'),
+            columns=('Tipo', 'Cantidad', 'Moneda', 'Tasa', 'Metodo'),
             style="mystyle.Treeview")
         # HEADING
         pay_tree.column("#0", width=0, stretch=tk.NO)
         # Cantidad
-        pay_tree.column('Cantidad', width=80, minwidth=25)
+        pay_tree.column('Tipo', width=55, minwidth=25)
+        pay_tree.heading('Tipo', text='Tipo', anchor=tk.W)
+        # Cantidad
+        pay_tree.column('Cantidad', width=90, minwidth=25)
         pay_tree.heading('Cantidad', text='Cantidad', anchor=tk.W)
         # Moneda
-        pay_tree.column('Moneda', width=60, minwidth=25)
+        pay_tree.column('Moneda', width=65, minwidth=25)
         pay_tree.heading('Moneda', text='Moneda', anchor=tk.W)
+        # Tasa
+        pay_tree.column('Tasa', width=70, minwidth=25)
+        pay_tree.heading('Tasa', text='Tasa', anchor=tk.W)
         # Tipo
-        pay_tree.column('Tipo', width=50, minwidth=25)
-        pay_tree.heading('Tipo', text='Tipo', anchor=tk.W)
+        pay_tree.column('Metodo', width=100, minwidth=25)
+        pay_tree.heading('Metodo', text='Método', anchor=tk.W)
         # Grid tree
-        pay_tree.grid(row=3, column=0, padx=(0,5))
+        pay_tree.grid(row=4, column=0)
+        # Insert into tree
+        pay_tree.insert("",index='end', value=('Vuelto', '11,200,500', 'Bolívares', '1,750,000', 'Transferencia'))
+        pay_tree.insert("",index='end', value=('Pago', '968,200,500', 'Bolívares', '1,750,000', 'Pago móvil'))
+        # Display buttons
+        buttons_frame = tk.LabelFrame(new_sale_window, bd=0)
+        buttons_frame.grid(row=5, column=0, padx=(0,5), pady=(0,25), sticky=tk.N)
+        add_payment_button = tk.Button(
+            buttons_frame, 
+            text="Agregar", 
+            font=('calibri', 12),
+            bd=1,
+            relief=tk.RIDGE,
+            bg='#54bf54',
+            padx=8,
+            command=self.add_payment)
+        delete_payment_button = tk.Button(
+            buttons_frame, 
+            text="Eliminar",
+            font=('calibri', 12),
+            bd=1,
+            relief=tk.RIDGE,
+            bg='#e85d5d',
+            command=None)
+        add_payment_button.grid(row=0, column=0, pady=(8,0), padx=20)
+        delete_payment_button.grid(row=0, column=1, pady=(8,0), padx=20)
         # Description
-        # desc_label = tk.Label(
-        #     new_sale_window,
-        #     text="Descripción",
-        #     font=('calibri', 12))
-        # desc_label.grid(row=2, column=0, sticky=tk.W, pady=(5,0))
+        desc_label = tk.Label(
+            new_sale_window,
+            text="Descripción",
+            font=('calibri', 12))
+        desc_label.grid(row=6, column=0, sticky=tk.W, pady=(0,0))
+        desc_text = tk.Text(
+            new_sale_window,
+            height=3,
+            width=40,
+            font=('calibri', 11))
+        desc_text.grid(row=6, sticky=tk.E)
+        # Saving sale
+        save_button = tk.Button(
+            new_sale_window,
+            text="Guardar!",
+            font=('calibri', 14, 'bold'),
+            bd=1,
+            relief=tk.RIDGE,
+            bg='#54bf54',
+            command=None)
+        save_button.grid(row=7, pady=(40,0), sticky=tk.W+tk.E)
+        cancel_button = tk.Button(
+            new_sale_window,
+            text="Cancelar",
+            font=('calibri', 12),
+            bd=1,
+            relief=tk.RIDGE,
+            bg='#e85d5d',
+            command=None)
+        cancel_button.grid(row=8, pady=(20,0))
+    
+    def add_payment(self):
+        new_payment_window = tk.Toplevel(padx=30, pady=30)
+        new_payment_window.title("Agregar pago")
+        title_label = tk.Label(
+            new_payment_window,
+            text="Agregar pago",
+            font=('calibri', 14, 'bold'))
+        title_label.grid(row=0, column=0)
 
 if __name__ == '__main__':
     root = tk.Tk()

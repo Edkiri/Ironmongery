@@ -7,31 +7,33 @@ class BaseModel(Model):
     class Meta:
         database = db
 
-class PaymentBaseModel(BaseModel):
-    """All payments going to inherit from this, include returns."""
-    amount = FloatField()
-    CURRENCIES = (
-        (0, 'Bolívares'),
-        (1, 'Dólares'),)
-    currency = IntegerField(choices=CURRENCIES)
-    TYPES = (
-        ('punto', 'Punto de venta'),
-        ('pm', 'Pago móvil'),
-        ('trans', 'Transferencia'),
-        ('ft', 'Efectivo'),
-        ('zelle', 'Zelle'))
-    type = CharField(max_length=10, choices=TYPES)
-    rate = FloatField()
-    account = CharField(max_length=100)
-    
 class Sale(BaseModel):
     """Sale Model."""
     date = DateField()
     description = CharField(255)
 
-class Payment(PaymentBaseModel):
+class Payment(BaseModel):
     """Payment Model."""
     sale = ForeignKeyField(Sale, backref='payments')
+    amount = FloatField()
+    CURRENCIES = (
+        (0, 'Bolívares'),
+        (1, 'Dólares'),)
+    currency = IntegerField(choices=CURRENCIES)
+    METHODS = (
+        ('punto', 'Punto de venta'),
+        ('pm', 'Pago móvil'),
+        ('trans', 'Transferencia'),
+        ('ft', 'Efectivo'),
+        ('zelle', 'Zelle'))
+    method = CharField(max_length=10, choices=METHODS)
+    rate = FloatField()
+    account = CharField(max_length=100)
+    TYPES = (
+        ('pago', 'Pago'),
+        ('vuelto', 'Vuelto')
+    )
+    type = CharField(max_length=10, choices=TYPES)
 
 class Return(PaymentBaseModel):
     """Return Model."""
@@ -40,7 +42,7 @@ class Return(PaymentBaseModel):
 class Vale(BaseModel):
     """Vale means a pending client's return."""
     date = DateField()
-    nombre = CharField(max_length=255)
+    name = CharField(max_length=255)
     identity_card = IntegerField()
     amount = FloatField()
 
