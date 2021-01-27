@@ -3,7 +3,7 @@ import tkinter as tk
 from tkinter import ttk
 
 # Utils
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 DATE_FORMAT = "%d-%m-%Y"
 TODAY = date.today().strftime(DATE_FORMAT)
@@ -133,7 +133,7 @@ class App():
             bd=1,
             relief=tk.RIDGE,
             bg='#54bf54',
-            command=None)
+            command=self.add_sale)
         detail_sale_button = tk.Button(
             buttons_frame, 
             text="Detalle", 
@@ -181,6 +181,67 @@ class App():
         summary_tree.insert("",index='end', text="Día", value=('5,325,000', '10.0', '13.67'))
         summary_tree.insert("",index='end', text="Semana", value=('120,000,000', '200.0', '350.89'),)
         summary_tree.insert("",index='end', text="Mes", value=('100,123,654,000', '400.0', '1,789.0'))
+
+    def add_sale(self):
+        # New Window
+        new_sale_window = tk.Toplevel(
+            width=350, 
+            height=350,
+            padx=20, 
+            pady=20)
+        new_sale_window.title("Agregar venta")
+        # Title
+        title_label = tk.Label(
+            new_sale_window,
+            text="Agrega una nueva venta",
+            font=('calibri', 14, 'bold'))
+        title_label.grid(row=0, column=0, sticky=tk.N, pady=(0,20))
+        # Date
+        date_label = tk.Label(
+            new_sale_window,
+            text="Fecha",
+            font=('calibri', 12))
+        date_label.grid(row=1, column=0, sticky=tk.W)
+        date_entry = tk.Entry(
+            new_sale_window, 
+            width=11, 
+            borderwidth=1, 
+            font=('calibri', 12))
+        date_entry.insert(0, TODAY)
+        date_entry.grid(row=1, column=0, sticky=tk.E, pady=(2,0))
+        # Payments
+        pay_label = tk.Label(
+            new_sale_window,
+            text="Pagos",
+            font=('calibri', 13, 'bold')
+        )
+        pay_label.grid(row=2, column=0, pady=(15,15))
+        # Pay Tree
+        pay_tree = ttk.Treeview(
+            new_sale_window, 
+            height=3, 
+            selectmode ='browse',
+            columns=('Cantidad', 'Moneda', 'Tipo'),
+            style="mystyle.Treeview")
+        # HEADING
+        pay_tree.column("#0", width=0, stretch=tk.NO)
+        # Cantidad
+        pay_tree.column('Cantidad', width=80, minwidth=25)
+        pay_tree.heading('Cantidad', text='Cantidad', anchor=tk.W)
+        # Moneda
+        pay_tree.column('Moneda', width=60, minwidth=25)
+        pay_tree.heading('Moneda', text='Moneda', anchor=tk.W)
+        # Tipo
+        pay_tree.column('Tipo', width=50, minwidth=25)
+        pay_tree.heading('Tipo', text='Tipo', anchor=tk.W)
+        # Grid tree
+        pay_tree.grid(row=3, column=0, padx=(0,5))
+        # Description
+        # desc_label = tk.Label(
+        #     new_sale_window,
+        #     text="Descripción",
+        #     font=('calibri', 12))
+        # desc_label.grid(row=2, column=0, sticky=tk.W, pady=(5,0))
 
 if __name__ == '__main__':
     root = tk.Tk()

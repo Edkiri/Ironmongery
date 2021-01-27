@@ -18,8 +18,9 @@ class PaymentBaseModel(BaseModel):
         ('punto', 'Punto de venta'),
         ('pm', 'Pago móvil'),
         ('trans', 'Transferencia'),
-        ('ft', 'efectivo'),)
-    type = CharField(max_length=30, choices=TYPES)
+        ('ft', 'Efectivo'),
+        ('zelle', 'Zelle'))
+    type = CharField(max_length=10, choices=TYPES)
     rate = FloatField()
     account = CharField(max_length=100)
     
