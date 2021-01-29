@@ -5,12 +5,29 @@ from tkinter import ttk
 # Utils
 from datetime import date, datetime, timedelta
 
+# Handle dates
 DATE_FORMAT = "%d-%m-%Y"
 TODAY = date.today().strftime(DATE_FORMAT)
 def get_weekday(day_str):
     weekDays = ("Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo")
     day = datetime.strptime(day_str, DATE_FORMAT)
     return weekDays[day.weekday()]
+
+# Handle float and int formats
+def string_to_float(string):
+    return float(string.replace(',',''))
+
+def number_to_str(number):
+    number = str(number).replace(',','')
+    if "." in number:
+        number = float(number)
+        if int(str(number).split(".")[1][:2]) > 0:
+            return "{:,.2f}".format(number)
+        else:
+            return "{:,.0f}".format(number)
+    else:
+        return "{:,}".format(int(number))
+
 
 class App():
 
@@ -331,7 +348,6 @@ class App():
             command=None)
         save_button.grid(row=8, pady=(20,0), sticky=tk.W+tk.E)
 
-    
     def add_payment(self):
         new_payment_window = tk.Toplevel(padx=30, pady=50)
         new_payment_window.title("Agregar pago")
@@ -424,7 +440,7 @@ class App():
                 index='end', 
                 value=(
                     type_var.get(), 
-                    amount_entry.get(), 
+                    number_to_str(amount_entry.get()), 
                     currency.get(),  
                     method.get(),
                     account.get()
