@@ -266,7 +266,7 @@ class App():
         desc_text = tk.Text(
             new_sale_window,
             height=3,
-            width=30,
+            width=25,
             font=('calibri', 11))
         desc_text.grid(row=3, sticky=tk.E, pady=(15,0))
         
@@ -291,13 +291,12 @@ class App():
         pay_tree.column('Tipo', width=55, minwidth=25)
         pay_tree.heading('Tipo', text='Tipo', anchor=tk.W)
         # Amount
-        pay_tree.column('Cantidad', width=90, minwidth=25)
+        pay_tree.column('Cantidad', width=110, minwidth=25)
         pay_tree.heading('Cantidad', text='Cantidad', anchor=tk.W)
         # Currency
-        pay_tree.column('Moneda', width=65, minwidth=25)
-        pay_tree.heading('Moneda', text='Moneda', anchor=tk.W)
+        pay_tree.column('Moneda', width=0, stretch=tk.NO)
         # Method
-        pay_tree.column('Metodo', width=100, minwidth=25)
+        pay_tree.column('Metodo', width=110, minwidth=25)
         pay_tree.heading('Metodo', text='Método', anchor=tk.W)
         # Account
         pay_tree.column('Cuenta', width=0, stretch=tk.NO)
@@ -436,17 +435,19 @@ class App():
         amount_entry.grid(row=5, pady=(0,20), sticky=tk.E)
         # Saving
         def add_payment_to_tree():
+            if currency.get() == 'Bolívares':
+                amount_currency = number_to_str(amount_entry.get()) + 'bs'
+            else:
+                amount_currency = number_to_str(amount_entry.get()) + '$'
             self.pay_tree.insert(
                 "",
                 index='end', 
                 value=(
-                    type_var.get(), 
-                    number_to_str(amount_entry.get()), 
-                    currency.get(),  
+                    type_var.get(),
+                    amount_currency,
+                    currency.get(),
                     method.get(),
-                    account.get()
-                    )
-                )
+                    account.get()))
             new_payment_window.destroy()
         save_button = tk.Button(
             new_payment_window,
