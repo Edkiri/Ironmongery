@@ -284,27 +284,28 @@ class App():
             selectmode ='browse',
             columns=('Tipo', 'Cantidad', 'Moneda', 'Metodo', 'Cuenta'),
             style="mystyle.Treeview")
+        pay_tree = self.pay_tree
         # HEADING
-        self.pay_tree.column("#0", width=0, stretch=tk.NO)
+        pay_tree.column("#0", width=0, stretch=tk.NO)
         # Type
-        self.pay_tree.column('Tipo', width=55, minwidth=25)
-        self.pay_tree.heading('Tipo', text='Tipo', anchor=tk.W)
+        pay_tree.column('Tipo', width=55, minwidth=25)
+        pay_tree.heading('Tipo', text='Tipo', anchor=tk.W)
         # Amount
-        self.pay_tree.column('Cantidad', width=90, minwidth=25)
-        self.pay_tree.heading('Cantidad', text='Cantidad', anchor=tk.W)
+        pay_tree.column('Cantidad', width=90, minwidth=25)
+        pay_tree.heading('Cantidad', text='Cantidad', anchor=tk.W)
         # Currency
-        self.pay_tree.column('Moneda', width=65, minwidth=25)
-        self.pay_tree.heading('Moneda', text='Moneda', anchor=tk.W)
+        pay_tree.column('Moneda', width=65, minwidth=25)
+        pay_tree.heading('Moneda', text='Moneda', anchor=tk.W)
         # Method
-        self.pay_tree.column('Metodo', width=100, minwidth=25)
-        self.pay_tree.heading('Metodo', text='Método', anchor=tk.W)
+        pay_tree.column('Metodo', width=100, minwidth=25)
+        pay_tree.heading('Metodo', text='Método', anchor=tk.W)
         # Account
-        self.pay_tree.column('Cuenta', width=0, stretch=tk.NO)
+        pay_tree.column('Cuenta', width=0, stretch=tk.NO)
         # Grid tree
-        self.pay_tree.grid(row=5, column=0)
+        pay_tree.grid(row=5, column=0)
         # Insert into tree
-        self.pay_tree.insert('',index='end', value=('Vuelto', '11,200,500', 'Bolívares', 'Transferencia', 'Comercial Guerra'))
-        self.pay_tree.insert('',index='end', value=('Pago', '968,200,500', 'Bolívares', 'Pago móvil', 'Comercial Guerra'))
+        pay_tree.insert('',index='end', value=('Vuelto', '11,200,500', 'Bolívares', 'Transferencia', 'Comercial Guerra'))
+        pay_tree.insert('',index='end', value=('Pago', '968,200,500', 'Bolívares', 'Pago móvil', 'Comercial Guerra'))
         
         # Display buttons
         def delete_payment_row():
