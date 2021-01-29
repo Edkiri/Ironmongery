@@ -1,6 +1,7 @@
 # Tkinter
 import tkinter as tk
 from tkinter import ttk
+from tkinter import messagebox
 
 # Utils
 from datetime import date, datetime, timedelta
@@ -302,10 +303,7 @@ class App():
         pay_tree.column('Cuenta', width=0, stretch=tk.NO)
         # Grid tree
         pay_tree.grid(row=5, column=0)
-        # Insert into tree
-        pay_tree.insert('',index='end', value=('Vuelto', '11,200,500', 'Bolívares', 'Transferencia', 'Comercial Guerra'))
-        pay_tree.insert('',index='end', value=('Pago', '968,200,500', 'Bolívares', 'Pago móvil', 'Comercial Guerra'))
-        
+
         # Display buttons
         def delete_payment_row():
             if self.pay_tree.focus():
@@ -331,11 +329,11 @@ class App():
         delete_payment_button.grid(row=6, sticky=tk.E, pady=(5,20))
         
         # Total
-        total_label = tk.Label(
+        self.total_label = tk.Label(
             new_sale_window,
-            text="Total {}$".format("12.56"),
+            text="0$",
             font=('calibri', 16, 'bold'))
-        total_label.grid(row=7, pady=(20,20))
+        self.total_label.grid(row=7, pady=(20,20))
         
         # Saving sale
         save_button = tk.Button(
@@ -435,20 +433,30 @@ class App():
         amount_entry.grid(row=5, pady=(0,20), sticky=tk.E)
         # Saving
         def add_payment_to_tree():
-            if currency.get() == 'Bolívares':
-                amount_currency = number_to_str(amount_entry.get()) + 'bs'
-            else:
-                amount_currency = number_to_str(amount_entry.get()) + '$'
-            self.pay_tree.insert(
-                "",
-                index='end', 
-                value=(
-                    type_var.get(),
-                    amount_currency,
-                    currency.get(),
-                    method.get(),
-                    account.get()))
-            new_payment_window.destroy()
+            try:
+                if currency.get() == 'Bolívares':
+                    amount_currency = number_to_str(amount_entry.get()) + 'bs'
+                    if string_to_float(self.rate.get()) == 0:
+                        raise Exception("Debes especificar una tasa para agregar una venta en Bolívares.")
+                else:
+                    amount_currency = number_to_str(amount_entry.get()) + '$'
+                
+                self.pay_tree.insert(
+                    "",
+                    index='end', 
+                    value=(
+                        type_var.get(),
+                        amount_currency,
+                        currency.get(),
+                        method.get(),
+                        account.get()))
+                new_payment_window.destroy()
+            except ValueError:
+                messagebox.showerror("Error", "Debes ingresar una cantidad")
+            except Exception as Err:
+                messagebox.showerror("Error", Err)
+        def calculate_total_sale():
+            pass
         save_button = tk.Button(
             new_payment_window,
             text="Agregar",
