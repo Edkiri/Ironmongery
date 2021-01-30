@@ -16,6 +16,11 @@ def get_weekday(day_str):
 
 # Handle float and int formats
 def string_to_float(string):
+    string = string
+    if 'bs' in string:
+        string = string.rstrip('bs')
+    elif '$' in string:
+        string = string.rstrip('$')
     return float(string.replace(',',''))
 
 def number_to_str(number):
@@ -28,7 +33,6 @@ def number_to_str(number):
             return "{:,.0f}".format(number)
     else:
         return "{:,}".format(int(number))
-
 
 class App():
 
@@ -245,19 +249,6 @@ class App():
         date_entry.insert(0, TODAY)
         date_entry.grid(row=1, column=0, sticky=tk.E, pady=(3,0))
         
-        # Rate
-        rate_label = tk.Label(
-            new_sale_window,
-            text="Tasa del día",
-            font=('calibri', 12))
-        rate_label.grid(row=2, column=0, sticky= tk.W, pady=(15,0))
-        rate_entry = ttk.Entry(
-            new_sale_window, 
-            width=12, 
-            font=('calibri', 12))
-        rate_entry.insert(0, self.rate.get())
-        rate_entry.grid(row=2, column=0, sticky=tk.E, pady=(15,0))
-        
         # Description
         desc_label = tk.Label(
             new_sale_window,
@@ -283,7 +274,7 @@ class App():
             new_sale_window, 
             height=4, 
             selectmode ='browse',
-            columns=('Tipo', 'Cantidad', 'Moneda', 'Metodo', 'Cuenta'),
+            columns=('Tipo', 'Cantidad', 'Moneda', 'Metodo', 'Tasa', 'Cuenta'),
             style="mystyle.Treeview")
         pay_tree = self.pay_tree
         # HEADING
@@ -299,6 +290,8 @@ class App():
         # Method
         pay_tree.column('Metodo', width=110, minwidth=25)
         pay_tree.heading('Metodo', text='Método', anchor=tk.W)
+        # Tasa
+        pay_tree.column('Tasa', width=0, stretch=tk.NO)
         # Account
         pay_tree.column('Cuenta', width=0, stretch=tk.NO)
         # Grid tree
@@ -307,7 +300,27 @@ class App():
         # Display buttons
         def delete_payment_row():
             if self.pay_tree.focus():
-                self.pay_tree.delete(self.pay_tree.focus())
+                index = self.pay_tree.focus()
+                payment = self.pay_tree.item(index)
+                pay_type = payment['values'][0]
+                amount = payment['values'][1]
+                currency = payment['values'][2]
+                rate = string_to_float(str(payment['values'][4]))
+                total_actual_value = string_to_float(self.total_sale_label['text'])
+                if currency == 'Dólares':
+                    if pay_type == 'Pago':
+                        total = total_actual_value - string_to_float(amount)
+                    else:
+                        total = total_actual_value + string_to_float(amount)
+                    self.total_sale_label['text'] = number_to_str(total) + '$'
+                else:
+                    if pay_type == 'Pago':
+                        total = total_actual_value - (string_to_float(amount) / rate)
+                    else:
+                        pass
+                        total = total_actual_value + (string_to_float(amount) / rate)
+                    self.total_sale_label['text'] = number_to_str(total) + '$'
+                self.pay_tree.delete(index)
         delete_payment_button = tk.Button(
             new_sale_window, 
             text="Eliminar Pago",
@@ -329,13 +342,26 @@ class App():
         delete_payment_button.grid(row=6, sticky=tk.E, pady=(5,20))
         
         # Total
-        self.total_label = tk.Label(
+        self.total_sale_label = tk.Label(
             new_sale_window,
             text="0$",
             font=('calibri', 16, 'bold'))
-        self.total_label.grid(row=7, pady=(20,20))
+        self.total_sale_label.grid(row=7, pady=(20,20))
         
+        # Rows sales iid
+        self.row_indexes = []
         # Saving sale
+        def save_sale_to_db():
+            for index in self.row_indexes:
+                payment_values = self.pay_tree.item(index)['values']
+                payment_data = {
+                    'type': payment_values[0],
+                    'amount': string_to_float(payment_values[1]),
+                    'currency': payment_values[2],
+                    'method': payment_values[3],
+                    'rate': string_to_float(payment_values[4]),
+                    'account': payment_values[5]}
+                
         save_button = tk.Button(
             new_sale_window,
             text="Guardar!",
@@ -343,7 +369,7 @@ class App():
             bd=1,
             relief=tk.RIDGE,
             bg='#54bf54',
-            command=None)
+            command=save_sale_to_db)
         save_button.grid(row=8, pady=(20,0), sticky=tk.W+tk.E)
 
     def add_payment(self):
@@ -354,6 +380,7 @@ class App():
             text="Agregar pago",
             font=('calibri', 14, 'bold'))
         title_label.grid(row=0, column=0, pady=(0,30))
+        
         # Type
         type_label = tk.Label(
             new_payment_window,
@@ -368,6 +395,7 @@ class App():
             type_var,
             *type_choices)
         type_option.grid(row=1, column=0, sticky=tk.E, pady=(0,20))
+        
         # Currency
         curr_label = tk.Label(
             new_payment_window,
@@ -382,6 +410,7 @@ class App():
             currency,
             *currency_choices)
         curr_option.grid(row=2, pady=(0,20), sticky=tk.E)
+        
         # Method
         method_label = tk.Label(
             new_payment_window,
@@ -402,6 +431,7 @@ class App():
             method,
             *method_choices)
         method_option.grid(row=3, sticky=tk.E, pady=(0,20))
+        
         # Account
         account_label = tk.Label(
             new_payment_window,
@@ -419,29 +449,45 @@ class App():
             new_payment_window,
             account,
             *account_choices)
-        account_option.grid(row=4, sticky=tk.E, pady=(0,20))
+        account_option.grid(row=4, sticky=tk.E, pady=(0,20))        
+        
+        # Rate
+        rate_label = tk.Label(
+            new_payment_window,
+            text="Tasa del día",
+            font=('calibri', 12))
+        rate_label.grid(row=5, column=0, sticky= tk.W, pady=(0,20))
+        rate_entry = ttk.Entry(
+            new_payment_window, 
+            width=13, 
+            font=('calibri', 12))
+        rate_entry.insert(0, self.rate.get())
+        rate_entry.grid(row=5, column=0, sticky=tk.E, pady=(0,20))  
+        
         # Amount
         amount_label = tk.Label(
             new_payment_window,
             text="Monto",
             font=('calibri', 12))
-        amount_label.grid(row=5, pady=(0,20), sticky=tk.W)
+        amount_label.grid(row=6, pady=(0,20), sticky=tk.W)
         amount_entry = ttk.Entry(
             new_payment_window, 
             width=13, 
             font=('calibri', 12))
-        amount_entry.grid(row=5, pady=(0,20), sticky=tk.E)
+        amount_entry.grid(row=6, pady=(0,20), sticky=tk.E)
+        
         # Saving
         def add_payment_to_tree():
             try:
+                if not (amount_entry.get()) or (amount_entry.get() == '0'):
+                    raise Exception("Debes agregar el monto.")
                 if currency.get() == 'Bolívares':
                     amount_currency = number_to_str(amount_entry.get()) + 'bs'
-                    if string_to_float(self.rate.get()) == 0:
-                        raise Exception("Debes especificar una tasa para agregar una venta en Bolívares.")
+                    if not (rate_entry.get()) or (string_to_float(rate_entry.get()) == 0):
+                        raise Exception("Debes especificar la tasa.")
                 else:
                     amount_currency = number_to_str(amount_entry.get()) + '$'
-                
-                self.pay_tree.insert(
+                index = self.pay_tree.insert(
                     "",
                     index='end', 
                     value=(
@@ -449,14 +495,35 @@ class App():
                         amount_currency,
                         currency.get(),
                         method.get(),
+                        rate_entry.get(),
                         account.get()))
+                calculate_total_sale(index)
+                self.row_indexes.append(index)
                 new_payment_window.destroy()
-            except ValueError:
-                messagebox.showerror("Error", "Debes ingresar una cantidad")
-            except Exception as Err:
-                messagebox.showerror("Error", Err)
-        def calculate_total_sale():
-            pass
+            except Exception as err:
+                messagebox.showerror("Error", err)
+        
+        def calculate_total_sale(index):
+            payment = self.pay_tree.item(index)
+            currency = payment['values'][2]
+            amount = payment['values'][1]
+            sale_type = payment['values'][0]
+            rate = string_to_float(str(payment['values'][4]))
+            total_actual_value = string_to_float(self.total_sale_label['text'])
+            if currency == 'Dólares':
+                if sale_type == 'Pago':
+                    total = total_actual_value + string_to_float(amount)
+                else:
+                    total = total_actual_value - string_to_float(amount)
+                self.total_sale_label['text'] = number_to_str(total) + '$'
+            else:
+                if sale_type == 'Pago':
+                    total = total_actual_value + (string_to_float(amount) / rate)
+                else:
+                    pass 
+                    total = total_actual_value - (string_to_float(amount) / rate)
+                self.total_sale_label['text'] = number_to_str(total) + '$'
+
         save_button = tk.Button(
             new_payment_window,
             text="Agregar",
@@ -465,7 +532,7 @@ class App():
             relief=tk.RIDGE,
             bg='#54bf54',
             command=add_payment_to_tree)
-        save_button.grid(row=6, pady=(20,0), sticky=tk.W+tk.E)
+        save_button.grid(row=7, pady=(20,0), sticky=tk.W+tk.E)
 
 if __name__ == '__main__':
     root = tk.Tk()
