@@ -9,14 +9,16 @@ from models import Sale, Payment
 # Utils
 from datetime import date, datetime, timedelta
 
-
 # Handle dates
 DATE_FORMAT = "%d-%m-%Y"
 TODAY = date.today().strftime(DATE_FORMAT)
 def get_weekday(day_str):
-    weekDays = ("Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo")
+    WEEKDAYS = ("Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo")
     day = datetime.strptime(day_str, DATE_FORMAT)
-    return weekDays[day.weekday()]
+    return WEEKDAYS[day.weekday()]
+def get_month_name(day_str):
+    MONTHS = ("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre")
+    return MONTHS[int(day_str.split('-')[1])-1]
 
 # Handle float and int formats
 def string_to_float(string):
@@ -26,7 +28,6 @@ def string_to_float(string):
     elif '$' in string:
         string = string.rstrip('$')
     return float(string.replace(',',''))
-
 def number_to_str(number):
     number = str(number).replace(',','')
     if "." in number:
@@ -37,6 +38,28 @@ def number_to_str(number):
             return "{:,.0f}".format(number)
     else:
         return "{:,}".format(int(number))
+
+def get_summary(payments):
+    bs = 0
+    usd = 0
+    total = 0 
+    for payment in payments:
+        rate = payment.rate
+        if payment.currency == 'Bolívares':
+            if payment.type == 'Pago':  
+                bs += payment.amount
+                total += (payment.amount / rate)
+            else:
+                bs -= payment.amount
+                total -= (payment.amount / rate)
+        else:
+            if payment.type == 'Pago':
+                usd += payment.amount
+                total += payment.amount
+            else:
+                usd += payment.amount
+                total += payment.amount
+    return (bs, usd, total)
 
 class App():
 
@@ -84,7 +107,16 @@ class App():
             borderwidth=0, 
             font=('calibri', 12))
         self.query_date.insert(0, TODAY)
+        
         # Buttons
+        def change_day(sign):
+            current_date = datetime.strptime(self.query_date.get(), DATE_FORMAT)
+            if sign == ">":
+                new_date = current_date + timedelta(days=1)
+            else:
+                new_date = current_date + timedelta(days=-1)
+            self.query_date.delete(0, tk.END)
+            self.query_date.insert(0, new_date.strftime(DATE_FORMAT))
         day_down_button = tk.Button(
             date_frame, 
             text="<",
@@ -93,7 +125,7 @@ class App():
             bd=1,
             relief=tk.RIDGE,
             bg='#a3b3a5',
-            command=None)
+            command=lambda: change_day("<"))
         day_up_button = tk.Button(
             date_frame, 
             text=">", 
@@ -102,7 +134,7 @@ class App():
             bd=1,
             bg='#a3b3a5',
             relief=tk.RIDGE,
-            command=None)
+            command=lambda: change_day(">"))
         show_button = tk.Button(
             date_frame, 
             text="Mostrar", 
@@ -110,7 +142,7 @@ class App():
             bd=1,
             relief=tk.RIDGE,
             bg='#54bf54',
-            command=None)
+            command=self.insert_into_tree_day)
         self.query_date.grid(row=0, column=1, sticky=tk.W)
         day_up_button.grid(row=0, column=3, padx=(5,0), pady=(0,2))
         day_down_button.grid(row=0, column=0, padx=(10,5), pady=(0,2))
@@ -131,40 +163,43 @@ class App():
 
     def display_tree_day(self):
         # Title tree
-        tree_label = tk.Label(
+        day = self.query_date.get()
+        self.day_tree_label = tk.Label(
             self.root, 
-            text="Miércoles 21 Septiembre - 2021", 
+            text="{} {} {} - {}".format(
+                get_weekday(day),
+                day.split('-')[0],
+                get_month_name(day),
+                day.split('-')[2]), 
             font=('calibri', 14, 'bold'))
-        tree_label.grid(row=1, column=1, pady=(0,20))
+        self.day_tree_label.grid(row=1, column=1, pady=(0,20))
         
         # Styling tree
         style = ttk.Style()
         style.configure("mystyle.Treeview", highlightthickness=0, bd=0, font=('Calibri', 11)) # Modify the font of the body
         style.configure("mystyle.Treeview.Heading", font=('Calibri', 11,'bold')) # Modify the font of the headings
         # Creating tree
-        day_tree = ttk.Treeview(
+        self.day_tree = ttk.Treeview(
             self.root, 
             height=10, 
             selectmode ='browse',
             columns=('Bolívares', 'Dólares', 'Total'),
             style="mystyle.Treeview")
-        day_tree.column("#0", width=0, stretch=tk.NO)
-        for col in day_tree['columns']:
-            if col == 'Total':
-                day_tree.column(col, width=70, minwidth=25)
+        self.day_tree.column("#0", width=0, stretch=tk.NO)
+        for col in self.day_tree['columns']:
+            if col == 'Bolívares':
+                self.day_tree.column(col, width=100, minwidth=25)
             else:
-                day_tree.column(col, width=110, minwidth=25)
-            day_tree.heading(col, text=col, anchor=tk.W)
-        day_tree.grid(row=2, column=1, padx=(0,5))
+                self.day_tree.column(col, width=65, minwidth=25)
+            self.day_tree.heading(col, text=col, anchor=tk.W)
+        self.day_tree.grid(row=2, column=1, padx=(0,5))
         # Constructing vertical scrollbar 
         verscrlbar = ttk.Scrollbar(self.root,  
                                 orient ="vertical",  
-                                command = day_tree.yview)
+                                command = self.day_tree.yview)
         verscrlbar.grid(row=2, column=1, sticky=tk.E, padx=(70,0))
-        day_tree.configure(xscrollcommand = verscrlbar.set) 
-        # Insert sales to day_tree body
-        day_tree.insert("",index='end', value=('11,200,500', '112.0', '45.12'))
-        
+        self.day_tree.configure(xscrollcommand = verscrlbar.set) 
+                
         # Display buttons
         buttons_frame = tk.LabelFrame(self.root, bd=0)
         buttons_frame.grid(row=3, column=1, padx=(0,5), pady=(0,0), sticky=tk.N)
@@ -207,26 +242,50 @@ class App():
         summary_title.grid(row=0, column=1, pady=(20,20))
         
         # Summary Tree
-        summary_tree = ttk.Treeview(
+        self.summary_tree = ttk.Treeview(
             summary_frame, 
             height=3, 
             selectmode ='browse',
             columns=('Fecha', 'Bolívares', 'Dólares', 'Total'),
             style="mystyle.Treeview")
-        summary_tree.column("#0", width=0, stretch=tk.NO)
-        summary_tree.heading('#1', text='Fecha', anchor=tk.W)
-        summary_tree.heading('#2', text='Bolívares', anchor=tk.W)
-        summary_tree.heading('#3', text='Dólares', anchor=tk.W)
-        summary_tree.heading('#4', text='Total', anchor=tk.W)
-        summary_tree.column('#1', stretch=tk.YES, width=65)
-        summary_tree.column('#2', stretch=tk.YES, width=110)
-        summary_tree.column('#3', stretch=tk.YES, width=55)
-        summary_tree.column('#4', stretch=tk.YES, width=55)
-        summary_tree.grid(row=1, column=1, pady=(0,30))
-        summary_tree.insert("",index='end', value=('Día', '5,325,000', '10.0', '13.67'))
-        summary_tree.insert("",index='end', value=('Semana', '200.0', '350.89'),)
-        summary_tree.insert("",index='end', value=('Febrero', '400.0', '1,789.0'))
+        self.summary_tree.column("#0", width=0, stretch=tk.NO)
+        self.summary_tree.heading('#1', text='Fecha', anchor=tk.W)
+        self.summary_tree.heading('#2', text='Bolívares', anchor=tk.W)
+        self.summary_tree.heading('#3', text='Dólares', anchor=tk.W)
+        self.summary_tree.heading('#4', text='Total', anchor=tk.W)
+        self.summary_tree.column('#1', stretch=tk.YES, width=65)
+        self.summary_tree.column('#2', stretch=tk.YES, width=110)
+        self.summary_tree.column('#3', stretch=tk.YES, width=55)
+        self.summary_tree.column('#4', stretch=tk.YES, width=55)
+        self.summary_tree.grid(row=1, column=1, pady=(0,30))
 
+        # Insert into tree
+        self.insert_into_tree_day()
+        self.insert_into_summary_day()
+
+    def insert_into_tree_day(self):
+        # Update title
+        day = self.query_date.get()
+        self.day_tree_label['text'] = "{} {} {} - {}".format(
+                get_weekday(day),
+                day.split('-')[0],
+                get_month_name(day),
+                day.split('-')[2])
+        self.day_tree.delete(*self.day_tree.get_children())
+        day_date = datetime.strptime(self.query_date.get(), DATE_FORMAT)
+        day_sales = Sale.select().where(Sale.date==day_date)
+        for sale in day_sales:
+            bs, usd, total = get_summary(sale.payments)
+            self.day_tree.insert(
+                "",
+                index='end', 
+                value=(
+                    number_to_str(bs),
+                    number_to_str(usd),
+                    number_to_str(total)))
+        self.insert_into_summary_day()
+
+    def insert_into_summary_day(self):
         # Getting sales and payments
         def get_month_payments():
                 day = int(self.query_date.get().split("-")[0])
@@ -244,11 +303,60 @@ class App():
                             .select()
                             .join(Sale)
                             .where(Sale.date.between(first_day_of_month, day_date)))
-
+        def get_week_payments():
+            day_date = datetime.strptime(self.query_date.get(), DATE_FORMAT)
+            if get_weekday(self.query_date.get()) == 'Lunes':
+                return (Payment
+                        .select()
+                        .join(Sale)
+                        .where(Sale.date==day_date))
+            else:
+                prev_monday = None
+                for i in range(7):
+                    new_date = day_date + timedelta(days=-1)
+                    if get_weekday(new_date.strftime(DATE_FORMAT)) == 'Lunes':
+                        prev_monday = new_date
+                        break
+                return (Payment
+                        .select()
+                        .join(Sale)
+                        .where(Sale.date.between(prev_monday, day_date)))
         month_payments = get_month_payments()
-        [print(payment.amount) for payment in month_payments]
-        # Insert into tree
-
+        week_payments = get_month_payments()
+        day_payments = Payment.select().join(Sale).where(Sale.date==datetime.strptime(self.query_date.get(), DATE_FORMAT))
+        
+        self.summary_tree.delete(*self.summary_tree.get_children())
+        # Summary day
+        bs_day, usd_day, total_day = get_summary(day_payments)
+        self.summary_tree.insert(
+            "",
+            index='end',
+             value=(
+                 'Día',
+                 number_to_str(bs_day), 
+                 number_to_str(usd_day), 
+                 number_to_str(total_day)))
+        # Sumary week
+        bs_week, usd_week, total_week = get_summary(week_payments)
+        self.summary_tree.insert(
+            "",
+            index='end',
+             value=(
+                 'Semana',
+                 number_to_str(bs_week), 
+                 number_to_str(usd_week), 
+                 number_to_str(total_week)))
+        # Sumary month
+        bs_month, usd_month, total_month = get_summary(month_payments)
+        self.summary_tree.insert(
+            "",
+            index='end',
+             value=(
+                 'Mes',
+                 number_to_str(bs_month), 
+                 number_to_str(usd_month), 
+                 number_to_str(total_month)))
+        
     def add_sale(self):
         # New Window
         new_sale_window = tk.Toplevel(
@@ -396,8 +504,8 @@ class App():
                     'rate': string_to_float(payment_values[4]),
                     'account': payment_values[5]}
                 Payment.create(**payment_data)
-                self.display_tree_day()
-                new_sale_window.destroy()
+            self.insert_into_tree_day()
+            new_sale_window.destroy()
                 
         save_button = tk.Button(
             new_sale_window,
