@@ -10,7 +10,7 @@ class BaseModel(Model):
 class Sale(BaseModel):
     """Sale Model."""
     date = DateField()
-    description = CharField(255)
+    description = CharField(255, null=True)
 
 class Payment(BaseModel):
     """Payment Model."""
@@ -35,10 +35,6 @@ class Payment(BaseModel):
     )
     type = CharField(max_length=10, choices=TYPES)
 
-class Return(PaymentBaseModel):
-    """Return Model."""
-    sale = ForeignKeyField(Sale, backref='returns')
-
 class Vale(BaseModel):
     """Vale means a pending client's return."""
     date = DateField()
@@ -54,5 +50,5 @@ class Credit(BaseModel):
     amount = FloatField()
 
 db.connect()
-db.create_tables([Sale, Payment, Return, Vale, Credit])
+db.create_tables([Sale, Payment, Vale, Credit])
 db.close()

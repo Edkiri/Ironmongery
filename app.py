@@ -3,8 +3,12 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 
+# Models
+from models import Sale, Payment
+
 # Utils
 from datetime import date, datetime, timedelta
+
 
 # Handle dates
 DATE_FORMAT = "%d-%m-%Y"
@@ -16,7 +20,7 @@ def get_weekday(day_str):
 
 # Handle float and int formats
 def string_to_float(string):
-    string = string
+    string = str(string)
     if 'bs' in string:
         string = string.rstrip('bs')
     elif '$' in string:
@@ -126,16 +130,17 @@ class App():
         self.rate.grid(row=1, column=1, sticky=tk.W, pady=(15,0))
 
     def display_tree_day(self):
-        # Styling tree
-        style = ttk.Style()
-        style.configure("mystyle.Treeview", highlightthickness=0, bd=0, font=('Calibri', 11)) # Modify the font of the body
-        style.configure("mystyle.Treeview.Heading", font=('Calibri', 11,'bold')) # Modify the font of the headings
         # Title tree
         tree_label = tk.Label(
             self.root, 
             text="Miércoles 21 Septiembre - 2021", 
             font=('calibri', 14, 'bold'))
         tree_label.grid(row=1, column=1, pady=(0,20))
+        
+        # Styling tree
+        style = ttk.Style()
+        style.configure("mystyle.Treeview", highlightthickness=0, bd=0, font=('Calibri', 11)) # Modify the font of the body
+        style.configure("mystyle.Treeview.Heading", font=('Calibri', 11,'bold')) # Modify the font of the headings
         # Creating tree
         day_tree = ttk.Treeview(
             self.root, 
@@ -158,9 +163,8 @@ class App():
         verscrlbar.grid(row=2, column=1, sticky=tk.E, padx=(70,0))
         day_tree.configure(xscrollcommand = verscrlbar.set) 
         # Insert sales to day_tree body
-        day_tree.insert("",index='end', value=('5,325,000', '10.0', '15.23'))
         day_tree.insert("",index='end', value=('11,200,500', '112.0', '45.12'))
-        day_tree.insert("",index='end', value=('17,335,000', '57.0', '100.56'))
+        
         # Display buttons
         buttons_frame = tk.LabelFrame(self.root, bd=0)
         buttons_frame.grid(row=3, column=1, padx=(0,5), pady=(0,0), sticky=tk.N)
@@ -192,6 +196,7 @@ class App():
         add_sale_button.grid(row=0, column=0, pady=(8,0), padx=7)
         detail_sale_button.grid(row=0, column=1, pady=(8,0), padx=7)
         delete_sale_button.grid(row=0, column=2, pady=(8,0), padx=7)
+        
         # Display Summary
         summary_frame = tk.LabelFrame(self.root, bd=0)
         summary_frame.grid(row=4, column=1)
@@ -200,25 +205,49 @@ class App():
             text="Resumen",
             font=('calibri', 13, 'bold'))
         summary_title.grid(row=0, column=1, pady=(20,20))
+        
         # Summary Tree
         summary_tree = ttk.Treeview(
             summary_frame, 
             height=3, 
             selectmode ='browse',
-            columns=('Bolívares', 'Dólares', 'Total'),
+            columns=('Fecha', 'Bolívares', 'Dólares', 'Total'),
             style="mystyle.Treeview")
-        summary_tree.heading('#0', text='Fecha', anchor=tk.W)
-        summary_tree.heading('#1', text='Bolívares', anchor=tk.W)
-        summary_tree.heading('#2', text='Dólares', anchor=tk.W)
-        summary_tree.heading('#3', text='Total', anchor=tk.W)
-        summary_tree.column('#0', stretch=tk.YES, width=80)
-        summary_tree.column('#1', stretch=tk.YES, width=110)
-        summary_tree.column('#2', stretch=tk.YES, width=55)
+        summary_tree.column("#0", width=0, stretch=tk.NO)
+        summary_tree.heading('#1', text='Fecha', anchor=tk.W)
+        summary_tree.heading('#2', text='Bolívares', anchor=tk.W)
+        summary_tree.heading('#3', text='Dólares', anchor=tk.W)
+        summary_tree.heading('#4', text='Total', anchor=tk.W)
+        summary_tree.column('#1', stretch=tk.YES, width=65)
+        summary_tree.column('#2', stretch=tk.YES, width=110)
         summary_tree.column('#3', stretch=tk.YES, width=55)
+        summary_tree.column('#4', stretch=tk.YES, width=55)
         summary_tree.grid(row=1, column=1, pady=(0,30))
-        summary_tree.insert("",index='end', text="Día", value=('5,325,000', '10.0', '13.67'))
-        summary_tree.insert("",index='end', text="Semana", value=('120,000,000', '200.0', '350.89'),)
-        summary_tree.insert("",index='end', text="Mes", value=('100,123,654,000', '400.0', '1,789.0'))
+        summary_tree.insert("",index='end', value=('Día', '5,325,000', '10.0', '13.67'))
+        summary_tree.insert("",index='end', value=('Semana', '200.0', '350.89'),)
+        summary_tree.insert("",index='end', value=('Febrero', '400.0', '1,789.0'))
+
+        # Getting sales and payments
+        def get_month_payments():
+                day = int(self.query_date.get().split("-")[0])
+                month = int(self.query_date.get().split("-")[1])
+                year = int(self.query_date.get().split("-")[2])
+                day_date = datetime.strptime(self.query_date.get(), DATE_FORMAT)
+                if day == 1:
+                    return (Payment
+                            .select()
+                            .join(Sale)
+                            .where(Sale.date==day_date))
+                else:
+                    first_day_of_month = datetime(year, month, 1)
+                    return (Payment
+                            .select()
+                            .join(Sale)
+                            .where(Sale.date.between(first_day_of_month, day_date)))
+
+        month_payments = get_month_payments()
+        [print(payment.amount) for payment in month_payments]
+        # Insert into tree
 
     def add_sale(self):
         # New Window
@@ -246,7 +275,7 @@ class App():
             new_sale_window, 
             width=12, 
             font=('calibri', 12))
-        date_entry.insert(0, TODAY)
+        date_entry.insert(0, self.query_date.get())
         date_entry.grid(row=1, column=0, sticky=tk.E, pady=(3,0))
         
         # Description
@@ -257,8 +286,8 @@ class App():
         desc_label.grid(row=3, column=0, sticky=tk.W, pady=(15,0))
         desc_text = tk.Text(
             new_sale_window,
-            height=3,
             width=25,
+            height=3,
             font=('calibri', 11))
         desc_text.grid(row=3, sticky=tk.E, pady=(15,0))
         
@@ -352,15 +381,23 @@ class App():
         self.row_indexes = []
         # Saving sale
         def save_sale_to_db():
+            date = datetime.strptime(date_entry.get(), DATE_FORMAT)
+            desc = desc_text.get(1.0, tk.END)
+
+            sale = Sale.create(date=date, description=desc)
             for index in self.row_indexes:
                 payment_values = self.pay_tree.item(index)['values']
                 payment_data = {
+                    'sale': sale,
                     'type': payment_values[0],
                     'amount': string_to_float(payment_values[1]),
                     'currency': payment_values[2],
                     'method': payment_values[3],
                     'rate': string_to_float(payment_values[4]),
                     'account': payment_values[5]}
+                Payment.create(**payment_data)
+                self.display_tree_day()
+                new_sale_window.destroy()
                 
         save_button = tk.Button(
             new_sale_window,
