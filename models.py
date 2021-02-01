@@ -14,26 +14,26 @@ class Sale(BaseModel):
 
 class Payment(BaseModel):
     """Payment Model."""
-    sale = ForeignKeyField(Sale, backref='payments')
+    sale = ForeignKeyField(Sale, backref='payments', on_delete='CASCADE')
     amount = FloatField()
-    CURRENCIES = (
-        (0, 'Bolívares'),
-        (1, 'Dólares'),)
+    CURRENCIES = {'Bolívares': 0, 'Dólares': 1}
     currency = IntegerField(choices=CURRENCIES)
-    METHODS = (
-        ('punto', 'Punto de venta'),
-        ('pm', 'Pago móvil'),
-        ('trans', 'Transferencia'),
-        ('ft', 'Efectivo'),
-        ('zelle', 'Zelle'))
-    method = CharField(max_length=10, choices=METHODS)
+    METHODS = {
+        'Punto': 0,
+        'Pago móvil': 1,
+        'Transferencia': 2,
+        'Efectivo': 3,
+        'Zelle': 4}
+    method = IntegerField(choices=METHODS)
     rate = FloatField()
-    account = CharField(max_length=100)
-    TYPES = (
-        ('pago', 'Pago'),
-        ('vuelto', 'Vuelto')
-    )
-    type = CharField(max_length=10, choices=TYPES)
+    ACCOUNTS = {
+        'Comercial Guerra': 0,
+        'Ivan': 1,
+        'Jesús Daniel': 2,
+        'Jesús Guerra': 3}
+    account = IntegerField()
+    TYPES = {'Pago': 0, 'Vuelto': 1}
+    type = IntegerField(choices=TYPES)
 
 class Vale(BaseModel):
     """Vale means a pending client's return."""
