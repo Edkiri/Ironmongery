@@ -1,5 +1,6 @@
 """Sales models."""
 from peewee import *
+from datetime import datetime
 
 db = SqliteDatabase('example.db')
 
@@ -14,7 +15,7 @@ class Sale(BaseModel):
 
 class Payment(BaseModel):
     """Payment Model."""
-    sale = ForeignKeyField(Sale, backref='payments', on_delete='CASCADE')
+    sale = ForeignKeyField(Sale, backref='payments')
     amount = FloatField()
     CURRENCIES = {'Bolívares': 0, 'Dólares': 1}
     currency = IntegerField(choices=CURRENCIES)
@@ -35,20 +36,20 @@ class Payment(BaseModel):
     TYPES = {'Pago': 0, 'Vuelto': 1}
     type = IntegerField(choices=TYPES)
 
-class Vale(BaseModel):
-    """Vale means a pending client's return."""
-    date = DateField()
-    name = CharField(max_length=255)
-    identity_card = IntegerField()
-    amount = FloatField()
-
 class Credit(BaseModel):
-    date = DateField()
+    date = DateField(default=datetime.now)
+    CREDIT_TYPES = {'Vale': 0, 'Crédito': 1}
+    type = IntegerField(choices=CREDIT_TYPES)
     name = CharField(max_length=255)
     identity_card = IntegerField()
     phone_number = CharField(max_length=60)
     amount = FloatField()
 
+    # Meta data
+    finished_date = DateField(null=True)
+    is_finished = BooleanField(default=False)
+    
+
 db.connect()
-db.create_tables([Sale, Payment, Vale, Credit])
+db.create_tables([Sale, Payment, Credit])
 db.close()
