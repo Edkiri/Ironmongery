@@ -580,7 +580,7 @@ class App():
         account_label.grid(row=4, sticky=tk.W, pady=(0,20))
         account = tk.StringVar()
         account_choices = ['',*[acc for acc in Payment.ACCOUNTS.keys()]]
-        account.set(account_choices[4])
+        account.set(account_choices[1])
         account_option = ttk.OptionMenu(
             new_payment_window,
             account,
@@ -638,7 +638,7 @@ class App():
                     self.row_indexes.append(index)
                     new_payment_window.destroy()
                 else:
-                    Payment.create(
+                    payment = Payment.create(
                         sale = sale,
                         amount = string_to_float(amount_entry.get()),
                         currency = Payment.CURRENCIES[currency.get()],
@@ -646,6 +646,17 @@ class App():
                         rate = string_to_float(rate_entry.get()),
                         account = Payment.ACCOUNTS[account.get()],
                         type = Payment.TYPES[type_var.get()])
+                    self.payment_tree.insert(
+                        "",
+                        index='end',
+                        values=(
+                            payment.sale,
+                            payment.sale.date.strftime(DATE_FORMAT),
+                            type_var.get(),
+                            amount_entry.get(),
+                            rate_entry.get(),
+                            method.get(),
+                            account.get()))
                     new_payment_window.destroy()
             except Exception as err:
                 messagebox.showerror("Error", err, parent=new_payment_window)  
