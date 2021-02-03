@@ -29,7 +29,7 @@ class Payment(BaseModel):
     rate = FloatField()
     ACCOUNTS = {
         'Comercial Guerra': 0,
-        'Ivan': 1,
+        'Ivan Guerra': 1,
         'Jesús Daniel': 2,
         'Jesús Guerra': 3}
     account = IntegerField()
