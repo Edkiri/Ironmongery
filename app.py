@@ -83,23 +83,24 @@ class App():
     def display_menu_bar(self):
         menubar = tk.Menu(self.root)
         # Sumary menu
-        summary_menu = tk.Menu(menubar, tearoff=0, font=('arial', 12))
+        summary_menu = tk.Menu(menubar, tearoff=0, font=('arial', 15))
         summary_menu.add_command(label="Pagos", command=self.filters_window)
         menubar.add_cascade(label="Resumen", menu=summary_menu)
         # Credit menu
-        credit_menu = tk.Menu(menubar, tearoff=0, font=('arial', 12))
-        credit_menu.add_command(label="Vales y Créditos", command=self.display_credit_window)
+        credit_menu = tk.Menu(menubar, tearoff=0, font=('arial', 15))
+        credit_menu.add_command(label="Vales", command=lambda: self.display_credit_window('Vale'))
+        credit_menu.add_command(label="Créditos", command=lambda: self.display_credit_window('Crédito'))
         menubar.add_cascade(label="Créditos", menu=credit_menu)
         self.root.config(menu=menubar)
 
     def display_entry_date(self):
         date_frame = tk.LabelFrame(self.root, bd=0)
-        date_frame.grid(row=0, column=1, sticky=tk.W, padx=30, pady=15)
+        date_frame.grid(row=0, column=1, pady=15)
         self.query_date = tk.Entry(
             date_frame, 
             width=12, 
             borderwidth=0, 
-            font=('calibri', 12))
+            font=('calibri', 15))
         self.query_date.insert(0, TODAY)
         
         # Buttons
@@ -114,7 +115,7 @@ class App():
         day_down_button = tk.Button(
             date_frame, 
             text="<",
-            font=('calibri', 10, 'bold'), 
+            font=('calibri', 12, 'bold'), 
             padx=5, 
             bd=1,
             relief=tk.RIDGE,
@@ -123,7 +124,7 @@ class App():
         day_up_button = tk.Button(
             date_frame, 
             text=">", 
-            font=('calibri', 10, 'bold'),
+            font=('calibri', 12, 'bold'),
             padx=5, 
             bd=1,
             bg='#a3b3a5',
@@ -132,7 +133,7 @@ class App():
         show_button = tk.Button(
             date_frame, 
             text="Mostrar", 
-            font=('calibri', 12), 
+            font=('calibri', 18), 
             bd=1,
             relief=tk.RIDGE,
             bg='#54bf54',
@@ -145,13 +146,13 @@ class App():
         rate_label = tk.Label(
             date_frame,
             text="Tasa del día",
-            font=('calibri', 12))
+            font=('calibri', 15))
         rate_label.grid(row=1, column=2, columnspan=3, sticky=tk.W, pady=(15,0))
         self.rate = tk.Entry(
             date_frame, 
             width=9, 
             borderwidth=2, 
-            font=('calibri', 12))
+            font=('calibri', 15))
         self.rate.insert(0, 0)
         self.rate.grid(row=1, column=1, sticky=tk.W, pady=(15,0))
 
@@ -160,47 +161,48 @@ class App():
         day = self.query_date.get()
         self.day_tree_label = tk.Label(
             self.root, 
-            text="{} {} {} - {}".format(
+            text="Ventas del {}assd {} {} - {}".format(
                 get_weekday(datetime.strptime(day, DATE_FORMAT)),
                 day.split('-')[0],
                 get_month_name(day),
-                day.split('-')[2]), 
-            font=('calibri', 14, 'bold'))
-        self.day_tree_label.grid(row=1, column=1, pady=(0,20))
+                day.split('-')[2]),
+            font=('calibri', 18, 'bold'))
+        self.day_tree_label.grid(row=1, column=1, pady=(10,30))
         
         # Styling tree
         style = ttk.Style()
-        style.configure("mystyle.Treeview", highlightthickness=0, bd=0, font=('Calibri', 11)) # Modify the font of the body
-        style.configure("mystyle.Treeview.Heading", font=('Calibri', 11,'bold')) # Modify the font of the headings
+        style.configure("mystyle.Treeview", highlightthickness=0, bd=0, font=('Calibri', 13)) # Modify the font of the body
+        style.configure("mystyle.Treeview.Heading", font=('Calibri', 14,'bold')) # Modify the font of the headings
         # Creating tree
         self.day_tree = ttk.Treeview(
             self.root, 
             height=6, 
             selectmode ='browse',
             columns=('sale_id', 'Bolívares', 'Dólares', 'Total $'),
-            style="mystyle.Treeview")
+            style="mystyle.Treeview",
+            padding=4)
         self.day_tree.column("#0", width=0, stretch=tk.NO)
         for col in self.day_tree['columns']:
             if col == 'Bolívares':
-                self.day_tree.column(col, width=100, minwidth=25)
+                self.day_tree.column(col, width=165, minwidth=25)
             elif col == 'sale_id':
                 self.day_tree.column(col, width=0, stretch=tk.NO)
             else:
-                self.day_tree.column(col, width=80, minwidth=25)
+                self.day_tree.column(col, width=100, minwidth=25)
             self.day_tree.heading(col, text=col, anchor=tk.W)
-        self.day_tree.grid(row=2, column=1, padx=(0,5))
+        self.day_tree.grid(row=2, column=1, padx=65)
         # Constructing vertical scrollbar 
         verscrlbar = ttk.Scrollbar(self.root,  
                                 orient ="vertical",  
                                 command = self.day_tree.yview)
-        verscrlbar.grid(row=2, column=1, sticky=tk.E, padx=(70,0))
+        verscrlbar.grid(row=2, column=1, sticky=tk.E, padx=(0,30))
         self.day_tree.configure(xscrollcommand = verscrlbar.set) 
                 
         # Display buttons
         add_sale_button = tk.Button(
             self.root, 
             text="Agregar Venta", 
-            font=('calibri', 12),
+            font=('calibri', 15),
             bd=1,
             relief=tk.RIDGE,
             bg='#54bf54',
@@ -211,7 +213,6 @@ class App():
                 if response:
                     index = self.day_tree.focus()
                     sale_id = self.day_tree.item(index)['values'][0]
-                    print("Sale id: ", sale_id)
                     sale = Sale.get(Sale.id==sale_id)
                     for payment in Payment.select().join(Sale).where(Sale.id==sale_id):
                         payment.delete_instance()
@@ -222,13 +223,13 @@ class App():
         delete_sale_button = tk.Button(
             self.root, 
             text="Eliminar",
-            font=('calibri', 12),
+            font=('calibri', 15),
             bd=1,
             relief=tk.RIDGE,
             bg='#e85d5d',
             command=delete_sale)
-        add_sale_button.grid(row=3, column=1, pady=(8,0), padx=(34,0),sticky=tk.W)
-        delete_sale_button.grid(row=3, column=1, pady=(8,0), padx=(0,41),sticky=tk.E)
+        add_sale_button.grid(row=3, column=1, pady=(8,0), padx=(65,0),sticky=tk.W)
+        delete_sale_button.grid(row=3, column=1, pady=(8,0), padx=(0,65),sticky=tk.E)
 
         # Display Summary
         summary_frame = tk.LabelFrame(self.root, bd=0)
@@ -236,8 +237,8 @@ class App():
         summary_title = tk.Label(
             summary_frame,
             text="Resumen",
-            font=('calibri', 13, 'bold'))
-        summary_title.grid(row=0, column=1, pady=(20,20))
+            font=('calibri', 18, 'bold'))
+        summary_title.grid(row=0, column=1, pady=35)
         
         # Summary Tree
         self.summary_tree = ttk.Treeview(
@@ -245,16 +246,17 @@ class App():
             height=3, 
             selectmode ='browse',
             columns=('Fecha', 'Bolívares', 'Dólares', 'Total'),
-            style="mystyle.Treeview")
+            style="mystyle.Treeview",
+            padding=4)
         self.summary_tree.column("#0", width=0, stretch=tk.NO)
         self.summary_tree.heading('#1', text='Fecha', anchor=tk.W)
         self.summary_tree.heading('#2', text='Bolívares', anchor=tk.W)
         self.summary_tree.heading('#3', text='Dólares', anchor=tk.W)
         self.summary_tree.heading('#4', text='Total $', anchor=tk.W)
         self.summary_tree.column('#1', stretch=tk.YES, width=65)
-        self.summary_tree.column('#2', stretch=tk.YES, width=110)
-        self.summary_tree.column('#3', stretch=tk.YES, width=55)
-        self.summary_tree.column('#4', stretch=tk.YES, width=75)
+        self.summary_tree.column('#2', stretch=tk.YES, width=125)
+        self.summary_tree.column('#3', stretch=tk.YES, width=90)
+        self.summary_tree.column('#4', stretch=tk.YES, width=90)
         self.summary_tree.grid(row=1, column=1, pady=(0,30))
 
         # Insert into tree
@@ -264,7 +266,7 @@ class App():
     def insert_into_tree_day(self):
         # Update title
         day = self.query_date.get()
-        self.day_tree_label['text'] = "{} {} {} - {}".format(
+        self.day_tree_label['text'] = "Ventas del {} {} {} - {}".format(
                 get_weekday(datetime.strptime(day, DATE_FORMAT)),
                 day.split('-')[0],
                 get_month_name(day),
@@ -364,20 +366,20 @@ class App():
         # Title
         title_label = tk.Label(
             new_sale_window,
-            text="Agrega una nueva venta",
-            font=('calibri', 14, 'bold'))
+            text="Nueva venta",
+            font=('calibri', 18, 'bold'))
         title_label.grid(row=0, column=0, sticky=tk.N, pady=(0,20))
         
         # Date
         date_label = tk.Label(
             new_sale_window,
             text="Fecha",
-            font=('calibri', 12))
+            font=('calibri', 15))
         date_label.grid(row=1, column=0, sticky=tk.W)
         date_entry = ttk.Entry(
             new_sale_window, 
             width=12, 
-            font=('calibri', 12))
+            font=('calibri', 15))
         date_entry.insert(0, self.query_date.get())
         date_entry.grid(row=1, column=0, sticky=tk.E, pady=(3,0))
         
@@ -385,21 +387,21 @@ class App():
         desc_label = tk.Label(
             new_sale_window,
             text="Descripción",
-            font=('calibri', 12))
-        desc_label.grid(row=3, column=0, sticky=tk.W, pady=(15,0))
+            font=('calibri', 15))
+        desc_label.grid(row=3, column=0, pady=(15,0), sticky=tk.W)
         desc_text = tk.Text(
             new_sale_window,
-            width=25,
-            height=3,
-            font=('calibri', 11))
-        desc_text.grid(row=3, sticky=tk.E, pady=(15,0))
+            width=30,
+            height=4,
+            font=('calibri', 15))
+        desc_text.grid(row=4, sticky=tk.E, pady=(15,0))
         
         # Payments And returns
         pay_label = tk.Label(
             new_sale_window,
             text="Pagos y vueltos",
-            font=('calibri', 13, 'bold'))
-        pay_label.grid(row=4, column=0, pady=(15,15))
+            font=('calibri', 16, 'bold'))
+        pay_label.grid(row=5, column=0, pady=(20,15))
         
         # Pay Tree
         self.pay_tree = ttk.Treeview(
@@ -412,22 +414,22 @@ class App():
         # HEADING
         pay_tree.column("#0", width=0, stretch=tk.NO)
         # Type
-        pay_tree.column('Tipo', width=55, minwidth=25)
+        pay_tree.column('Tipo', width=65, minwidth=25)
         pay_tree.heading('Tipo', text='Tipo', anchor=tk.W)
         # Amount
-        pay_tree.column('Cantidad', width=110, minwidth=25)
+        pay_tree.column('Cantidad', width=120, minwidth=25)
         pay_tree.heading('Cantidad', text='Cantidad', anchor=tk.W)
         # Currency
         pay_tree.column('Moneda', width=0, stretch=tk.NO)
         # Method
-        pay_tree.column('Metodo', width=110, minwidth=25)
+        pay_tree.column('Metodo', width=120, minwidth=25)
         pay_tree.heading('Metodo', text='Método', anchor=tk.W)
         # Tasa
         pay_tree.column('Tasa', width=0, stretch=tk.NO)
         # Account
         pay_tree.column('Cuenta', width=0, stretch=tk.NO)
         # Grid tree
-        pay_tree.grid(row=5, column=0)
+        pay_tree.grid(row=6, column=0)
 
         # Display buttons
         def delete_payment_row():
@@ -438,7 +440,7 @@ class App():
                 amount = payment['values'][1]
                 currency = payment['values'][2]
                 rate = string_to_float(str(payment['values'][4]))
-                total_actual_value = string_to_float(self.total_sale_label['text'])
+                total_actual_value = string_to_float(self.total_sale_label['text'].lstrip("Total"))
                 if currency == 'Dólares':
                     if pay_type == 'Pago':
                         total = total_actual_value - string_to_float(amount)
@@ -455,30 +457,40 @@ class App():
                 self.pay_tree.delete(index)
         delete_payment_button = tk.Button(
             new_sale_window, 
-            text="Eliminar Pago",
-            font=('calibri', 12),
+            text="Eliminar",
+            font=('calibri', 15),
             bd=1,
             relief=tk.RIDGE,
             bg='#e85d5d',
             command=delete_payment_row)
         add_payment_button = tk.Button(
             new_sale_window, 
-            text="Agregar Pago", 
-            font=('calibri', 12),
+            text="+ Pago", 
+            font=('calibri', 15),
             bd=1,
             relief=tk.RIDGE,
             bg='#54bf54',
             padx=8,
             command=lambda: self.add_payment(None))
-        add_payment_button.grid(row=6, sticky=tk.W, pady=(5,20))
-        delete_payment_button.grid(row=6, sticky=tk.E, pady=(5,20))
+        add_return_button = tk.Button(
+            new_sale_window, 
+            text="+ Vuelto", 
+            font=('calibri', 15),
+            bd=1,
+            relief=tk.RIDGE,
+            bg='#54bf54',
+            padx=8,
+            command=lambda: self.add_payment(None, True))
+        add_payment_button.grid(row=7, sticky=tk.W, pady=(3,15))
+        add_return_button.grid(row=7, pady=(3,15))
+        delete_payment_button.grid(row=7, sticky=tk.E, pady=(3,15))
         
         # Total
         self.total_sale_label = tk.Label(
             new_sale_window,
-            text="0$",
-            font=('calibri', 16, 'bold'))
-        self.total_sale_label.grid(row=7, pady=(20,20))
+            text="Total 0$",
+            font=('calibri', 18, 'bold'))
+        self.total_sale_label.grid(row=8, pady=(15,15))
         
         # Rows sales iid
         self.row_indexes = []
@@ -486,62 +498,52 @@ class App():
         def save_sale_to_db():
             date = datetime.strptime(date_entry.get(), DATE_FORMAT)
             desc = desc_text.get(1.0, tk.END)
-
-            sale = Sale.create(date=date, description=desc)
-            for index in self.row_indexes:
-                payment_values = self.pay_tree.item(index)['values']
-                payment_data = {
-                    'sale': sale,
-                    'type': Payment.TYPES[payment_values[0]],
-                    'amount': string_to_float(payment_values[1]),
-                    'currency': Payment.CURRENCIES[payment_values[2]],
-                    'method': Payment.METHODS[payment_values[3]],
-                    'rate': string_to_float(payment_values[4]),
-                    'account': Payment.ACCOUNTS[payment_values[5]]}
-                Payment.create(**payment_data)
-            self.insert_into_tree_day()
-            new_sale_window.destroy()
+            if len(self.pay_tree.get_children()) < 1:
+                messagebox.showerror("Error", "No puedes crear una venta sin pagos.", parent=new_sale_window)
+            else:
+                sale = Sale.create(date=date, description=desc)
+                for index in self.row_indexes:
+                    payment_values = self.pay_tree.item(index)['values']
+                    payment_data = {
+                        'sale': sale,
+                        'type': Payment.TYPES[payment_values[0]],
+                        'amount': string_to_float(payment_values[1]),
+                        'currency': Payment.CURRENCIES[payment_values[2]],
+                        'method': Payment.METHODS[payment_values[3]],
+                        'rate': string_to_float(payment_values[4]),
+                        'account': Payment.ACCOUNTS[payment_values[5]]}
+                    Payment.create(**payment_data)
+                self.insert_into_tree_day()
+                new_sale_window.destroy()
                 
         save_button = tk.Button(
             new_sale_window,
             text="Guardar!",
-            font=('calibri', 14, 'bold'),
+            font=('calibri', 18, 'bold'),
             bd=1,
             relief=tk.RIDGE,
             bg='#54bf54',
             command=save_sale_to_db)
-        save_button.grid(row=8, pady=(20,0), sticky=tk.W+tk.E)
+        save_button.grid(row=9, pady=(20,0), sticky=tk.W+tk.E)
 
-    def add_payment(self, sale):
+    def add_payment(self, sale, is_return = False):
         new_payment_window = tk.Toplevel(padx=30, pady=50)
-        new_payment_window.title("Agregar pago")
+        title = 'Agregar Pago'
+        if is_return:
+            title = 'Agregar Vuelto'
+        new_payment_window.title(title)
         title_label = tk.Label(
             new_payment_window,
-            text="Agregar pago",
-            font=('calibri', 14, 'bold'))
+            text=title,
+            font=('calibri', 18, 'bold'))
         title_label.grid(row=0, column=0, pady=(0,30))
-        
-        # Type
-        type_label = tk.Label(
-            new_payment_window,
-            text="Tipo",
-            font=('calibri', 12))
-        type_label.grid(row=1, column=0, sticky=tk.W, pady=(0,20), padx=(0,200))
-        type_var = tk.StringVar()
-        type_choices = ('', 'Pago', 'Vuelto')
-        type_var.set(type_choices[1])
-        type_option = ttk.OptionMenu(
-            new_payment_window,
-            type_var,
-            *type_choices)
-        type_option.grid(row=1, column=0, sticky=tk.E, pady=(0,20))
         
         # Currency
         curr_label = tk.Label(
             new_payment_window,
             text="Moneda",
-            font=('calibri', 12))
-        curr_label.grid(row=2, column=0, pady=(0,20), sticky=tk.W)
+            font=('calibri', 15))
+        curr_label.grid(row=2, column=0, pady=(0,20), padx=(0,200), sticky=tk.W)
         currency = tk.StringVar()
         currency_choices = ('', 'Bolívares', 'Dólares')
         currency.set(currency_choices[1])
@@ -555,7 +557,7 @@ class App():
         method_label = tk.Label(
             new_payment_window,
             text="Método Pago",
-            font=('calibri', 12))
+            font=('calibri', 15))
         method_label.grid(row=3, sticky=tk.W, pady=(0,20))
         method = tk.StringVar()
         method_choices = (
@@ -566,6 +568,8 @@ class App():
             'Efectivo',
             'Zelle')
         method.set(method_choices[1])
+        if is_return:
+            method.set(method_choices[3])
         method_option = ttk.OptionMenu(
             new_payment_window,
             method,
@@ -576,7 +580,7 @@ class App():
         account_label = tk.Label(
             new_payment_window,
             text="Cuenta",
-            font=('calibri', 12))
+            font=('calibri', 15))
         account_label.grid(row=4, sticky=tk.W, pady=(0,20))
         account = tk.StringVar()
         account_choices = ['',*[acc for acc in Payment.ACCOUNTS.keys()]]
@@ -591,12 +595,12 @@ class App():
         rate_label = tk.Label(
             new_payment_window,
             text="Tasa del día",
-            font=('calibri', 12))
+            font=('calibri', 15))
         rate_label.grid(row=5, column=0, sticky= tk.W, pady=(0,20))
         rate_entry = ttk.Entry(
             new_payment_window, 
             width=13, 
-            font=('calibri', 12))
+            font=('calibri', 15))
         rate_entry.insert(0, self.rate.get())
         rate_entry.grid(row=5, column=0, sticky=tk.E, pady=(0,20))  
         
@@ -604,12 +608,12 @@ class App():
         amount_label = tk.Label(
             new_payment_window,
             text="Monto",
-            font=('calibri', 12))
+            font=('calibri', 15))
         amount_label.grid(row=6, pady=(0,20), sticky=tk.W)
         amount_entry = ttk.Entry(
             new_payment_window, 
             width=13, 
-            font=('calibri', 12))
+            font=('calibri', 15))
         amount_entry.grid(row=6, pady=(0,20), sticky=tk.E)
         
         # Saving
@@ -623,12 +627,15 @@ class App():
                         raise Exception("Debes especificar la tasa.")
                 else:
                     amount_currency = number_to_str(amount_entry.get()) + '$'
+                type = 'Pago'
+                if is_return:
+                    type = 'Vuelto'
                 if not sale:
                     index = self.pay_tree.insert(
                         "",
                         index='end', 
                         value=(
-                            type_var.get(),
+                            type,
                             amount_currency,
                             currency.get(),
                             method.get(),
@@ -638,26 +645,29 @@ class App():
                     self.row_indexes.append(index)
                     new_payment_window.destroy()
                 else:
-                    payment = Payment.create(
+                    # self.update_sale_tree.insert(
+                    #     "",
+                    #     index='end',
+                    #     values=(
+                    #         None,
+                    #         type,
+                    #         amount_entry.get(),
+                    #         method.get(),
+                    #         currency.get(),
+                    #         rate_entry.get(),
+                    #         account.get()))
+                    # new_payment_window.destroy()
+                    Payment.create(
                         sale = sale,
+                        type = Payment.TYPES[type],
                         amount = string_to_float(amount_entry.get()),
-                        currency = Payment.CURRENCIES[currency.get()],
                         method = Payment.METHODS[method.get()],
+                        currency = Payment.CURRENCIES[currency.get()],
                         rate = string_to_float(rate_entry.get()),
-                        account = Payment.ACCOUNTS[account.get()],
-                        type = Payment.TYPES[type_var.get()])
-                    self.payment_tree.insert(
-                        "",
-                        index='end',
-                        values=(
-                            payment.sale,
-                            payment.sale.date.strftime(DATE_FORMAT),
-                            type_var.get(),
-                            amount_entry.get(),
-                            rate_entry.get(),
-                            method.get(),
-                            account.get()))
+                        account = Payment.ACCOUNTS[account.get()]
+                    )
                     new_payment_window.destroy()
+                    self.insert_into_detail_sale_tree(sale.id)
             except Exception as err:
                 messagebox.showerror("Error", err, parent=new_payment_window)  
         
@@ -667,25 +677,25 @@ class App():
             amount = payment['values'][1]
             sale_type = payment['values'][0]
             rate = string_to_float(str(payment['values'][4]))
-            total_actual_value = string_to_float(self.total_sale_label['text'])
+            total_actual_value = string_to_float(self.total_sale_label['text'].lstrip("Total"))
             if currency == 'Dólares':
                 if sale_type == 'Pago':
                     total = total_actual_value + string_to_float(amount)
                 else:
                     total = total_actual_value - string_to_float(amount)
-                self.total_sale_label['text'] = number_to_str(total) + '$'
+                self.total_sale_label['text'] = "Total " + number_to_str(total) + '$'
             else:
                 if sale_type == 'Pago':
                     total = total_actual_value + (string_to_float(amount) / rate)
                 else:
                     pass 
                     total = total_actual_value - (string_to_float(amount) / rate)
-                self.total_sale_label['text'] = number_to_str(total) + '$'
+                self.total_sale_label['text'] = "Total " + number_to_str(total) + '$'
 
         save_button = tk.Button(
             new_payment_window,
             text="Agregar",
-            font=('calibri', 14, 'bold'),
+            font=('calibri', 18, 'bold'),
             bd=1,
             relief=tk.RIDGE,
             bg='#54bf54',
@@ -708,41 +718,41 @@ class App():
             # Title
             title_label = tk.Label(
                 update_sale_window,
-                text="Editar venta",
-                font=('calibri', 14, 'bold'))
+                text="Editar Venta",
+                font=('calibri', 18, 'bold'))
             title_label.grid(row=0, column=0, sticky=tk.N, pady=(0,20))
             # Date
             date_label = tk.Label(
                 update_sale_window,
                 text="Fecha",
-                font=('calibri', 12))
+                font=('calibri', 15))
             date_label.grid(row=1, column=0, sticky=tk.W)
             date_entry = ttk.Entry(
                 update_sale_window, 
                 width=12, 
-                font=('calibri', 12))
+                font=('calibri', 15))
             date_entry.insert(0, sale.date.strftime(DATE_FORMAT))
             date_entry.grid(row=1, column=0, sticky=tk.E, pady=(3,0))
             # Description
             desc_label = tk.Label(
                 update_sale_window,
                 text="Descripción",
-                font=('calibri', 12))
-            desc_label.grid(row=3, column=0, sticky=tk.W, pady=(15,0))
+                font=('calibri', 15))
+            desc_label.grid(row=3, column=0, pady=(15,0))
             desc_text = tk.Text(
                 update_sale_window,
-                width=25,
-                height=3,
-                font=('calibri', 11))
+                width=33,
+                height=5,
+                font=('calibri', 14))
             desc_text.insert('1.0', sale.description)
-            desc_text.grid(row=3, sticky=tk.E, pady=(15,0))
+            desc_text.grid(row=4, sticky=tk.E, pady=(15,0))
             
             # Payments And returns
             pay_label = tk.Label(
                 update_sale_window,
                 text="Pagos y vueltos",
-                font=('calibri', 13, 'bold'))
-            pay_label.grid(row=4, column=0, pady=(15,15))
+                font=('calibri', 15, 'bold'))
+            pay_label.grid(row=5, column=0, pady=(15,15))
 
             # Pay Tree
             self.update_sale_tree = ttk.Treeview(
@@ -758,22 +768,22 @@ class App():
             # Payment_id
             update_sale_tree.column('Id', width=0, stretch=tk.NO)
             # Type
-            update_sale_tree.column('Tipo', width=55, minwidth=25)
+            update_sale_tree.column('Tipo', width=65, minwidth=25)
             update_sale_tree.heading('Tipo', text='Tipo', anchor=tk.W)
             # Amount
-            update_sale_tree.column('Cantidad', width=110, minwidth=25)
+            update_sale_tree.column('Cantidad', width=130, minwidth=25)
             update_sale_tree.heading('Cantidad', text='Cantidad', anchor=tk.W)
             # Currency
             update_sale_tree.column('Moneda', width=0, stretch=tk.NO)
             # Method
-            update_sale_tree.column('Metodo', width=110, minwidth=25)
+            update_sale_tree.column('Metodo', width=130, minwidth=25)
             update_sale_tree.heading('Metodo', text='Método', anchor=tk.W)
             # Tasa
             update_sale_tree.column('Tasa', width=0, stretch=tk.NO)
             # Account
             update_sale_tree.column('Cuenta', width=0, stretch=tk.NO)
             # Grid tree
-            update_sale_tree.grid(row=5, column=0)
+            update_sale_tree.grid(row=6, column=0)
 
             # Display buttons
             def delete_payment():
@@ -783,29 +793,54 @@ class App():
                         index = self.update_sale_tree.focus()
                         payment_id = self.update_sale_tree.item(self.update_sale_tree.focus())['values'][0]
                         Payment.get(Payment.id==payment_id).delete_instance()
-                        self.update_sale_tree.delete(index)
+                        
+                        self.insert_into_detail_sale_tree(sale_id)
             delete_payment_button = tk.Button(
                 update_sale_window, 
-                text="Eliminar Pago",
-                font=('calibri', 12),
+                text="Eliminar",
+                font=('calibri', 15),
                 bd=1,
                 relief=tk.RIDGE,
                 bg='#e85d5d',
                 command=delete_payment)
             add_payment_button = tk.Button(
                 update_sale_window, 
-                text="Agregar Pago", 
-                font=('calibri', 12),
+                text="+ Pago", 
+                font=('calibri', 15),
                 bd=1,
                 relief=tk.RIDGE,
                 bg='#54bf54',
                 padx=8,
                 command=lambda: self.add_payment(sale))
-            add_payment_button.grid(row=6, sticky=tk.W, pady=(5,20))
-            delete_payment_button.grid(row=6, sticky=tk.E, pady=(5,20))
+            add_return_button = tk.Button(
+                update_sale_window, 
+                text="+ Vuelto", 
+                font=('calibri', 15),
+                bd=1,
+                relief=tk.RIDGE,
+                bg='#54bf54',
+                padx=8,
+                command=lambda: self.add_payment(sale, True))
+            add_payment_button.grid(row=7, sticky=tk.W, pady=(5,20))
+            delete_payment_button.grid(row=7, sticky=tk.E, pady=(5,20))
+            add_return_button.grid(row=7, pady=(5,20))
             def save_sale():
                 sale.date = datetime.strptime(date_entry.get(), DATE_FORMAT)
                 sale.description = desc_text.get('1.0', tk.END)
+                # Add payments
+                payments_index = update_sale_tree.get_children()
+                for index in payments_index:
+                    payment_values = update_sale_tree.item(index)['values']
+                    if payment_values[0] == 'None':
+                        Payment.create(
+                            sale = sale,
+                            type = Payment.TYPES[payment_values[1]],
+                            amount = string_to_float(payment_values[2]),
+                            currency = Payment.CURRENCIES[payment_values[4]],
+                            method = Payment.METHODS[payment_values[3]],
+                            rate = string_to_float(payment_values[5]),
+                            account = Payment.ACCOUNTS[payment_values[6]],
+                        )
                 sale.save()
                 update_sale_window.destroy()                
                 # sale.description = desc_text.get('1.0')
@@ -817,14 +852,23 @@ class App():
                 relief=tk.RIDGE,
                 bg='#54bf54',
                 command=save_sale)
-            save_button.grid(row=7, pady=(20,0), sticky=tk.W+tk.E)
+            save_button.grid(row=9, pady=(20,0), sticky=tk.W+tk.E)
             # Geting payments
-            payments = Payment.select().join(Sale).where(Sale.id==sale_id)
-            def insert_payments_to_tree(payments):
-                for payment in payments:
+            
+            # Total
+            self.detail_total_label = tk.Label(
+                update_sale_window,
+                text="Total 0$",
+                font=('calibri', 18, 'bold'))
+            self.detail_total_label.grid(row=8, pady=(15,15))
+            self.insert_into_detail_sale_tree(sale_id)
+
+    def insert_into_detail_sale_tree(self, sale_id):
+        payments = Payment.select().join(Sale).where(Sale.id==sale_id)
+        self.update_sale_tree.delete(*self.update_sale_tree.get_children())
+        for payment in payments:
                     curren_sign = 'bs'
                     methods = [method for method in payment.METHODS.keys()]
-                    print(methods)
                     if payment.currency == 1:
                         curren_sign = "$"
                     index = self.update_sale_tree.insert(
@@ -838,30 +882,88 @@ class App():
                             methods[payment.method],
                             payment.rate,
                             payment.account))
-            insert_payments_to_tree(payments)
+        total = get_summary(payments)[2]
+        self.detail_total_label['text'] = "Total " + number_to_str(total) + "$" 
 
-    def display_credit_window(self):
+    def display_credit_window(self, type):
         # Display Credit window
         credit_window = tk.Toplevel(
             width=350, 
             height=350,
-            padx=30, 
+            padx=45, 
             pady=30)
-        credit_window.title("Créditos")
-
+        if type == 'Crédito':
+            credit_window.title("Créditos")
+        else:
+            credit_window.title("Vales")
+        
+        # Filters Frame
+        filters_frame = tk.LabelFrame(credit_window,padx=10, pady=10)
+        filters_frame.grid(row=1, column=0, padx=(0,25))
+        # Title
+        filters_title = tk.Label(
+            filters_frame,
+            text="Filtrar {}s".format(type),
+            font=('calibri', 18, 'bold'))
+        filters_title.grid(row=0, pady=(0,20)) 
+        # Name
+        name_label = tk.Label(
+            filters_frame,
+            text="Nombre",
+            font=('calibri', 16, 'bold'))
+        name_label.grid(row=4, column=0, pady=(20,3))
+        name_entry = ttk.Entry(
+            filters_frame,
+            width=20,
+            font=('calibri', 14)
+        )
+        name_entry.grid(row=5)
+        # Identity Card
+        identity_label = tk.Label(
+            filters_frame,
+            text="Cédula",
+            font=('calibri', 16, 'bold'))
+        identity_label.grid(row=6, column=0, pady=(20,3))
+        identity_entry = ttk.Entry(
+            filters_frame,
+            width=20,
+            font=('calibri', 14)
+        )
+        identity_entry.grid(row=7)
+        def get_params():
+            print("GETTING PARAMS")
+            return {
+                'name': name_entry.get(),
+                'identity': identity_entry.get()
+            }
+        show_button = tk.Button(
+            filters_frame,
+            text="Buscar",
+            font=('calibri', 18, 'bold'),
+            bd=1,
+            relief=tk.RIDGE,
+            bg='#54bf54',
+            command=lambda: self.insert_into_credit_tree(type, get_params()))
+        show_button.grid(row=8, pady=(30,10), sticky=tk.W+tk.E)
+        
+        # Tree Frame
+        tree_frame = tk.LabelFrame(credit_window,borderwidth=0)
+        tree_frame.grid(row=1, column=1, sticky=tk.N)
         # Credit title
+        title = 'Vales por pagar'
+        if type == 'Crédito':
+            title = 'Créditos por cobrar'
         title_label = tk.Label(
-            credit_window,
-            text="Créditos",
-            font=('calibri', 14, 'bold'))
+            tree_frame,
+            text=title,
+            font=('calibri', 18, 'bold'))
         title_label.grid(row=0, column=0, sticky=tk.N, pady=(0,20))
-
         # Credit tree
         self.credit_tree = ttk.Treeview(
-            credit_window, 
-            height=8, 
+            tree_frame, 
+            height=15, 
             selectmode ='browse',
-            columns=('credit_id', 'date', 'type', 'name', 'identity_card', 'phone_number', 'amount'),
+            columns=('credit_id', 'date', 'name', 'identity_card', 'amount', 'description'),
             style="mystyle.Treeview")
         credit_tree = self.credit_tree
         # HEADING
@@ -869,184 +971,254 @@ class App():
         # credit_id
         credit_tree.column("credit_id", width=0, stretch=tk.NO)
         # Date
-        credit_tree.column('date', width=80, minwidth=25)
-        credit_tree.heading('date', text='Fecha', anchor=tk.W)
-        # Date
-        credit_tree.column('type', width=55, minwidth=25)
-        credit_tree.heading('type', text='Tipo', anchor=tk.W)
+        credit_tree.column('date', width=60, minwidth=25)
+        credit_tree.heading('date', text='Días', anchor=tk.W)
         # Name
-        credit_tree.column('name', width=150, minwidth=25)
+        credit_tree.column('name', width=160, minwidth=25)
         credit_tree.heading('name', text='Nombre', anchor=tk.W)
         # Identity card
-        credit_tree.column('identity_card', width=80, minwidth=25)
+        credit_tree.column('identity_card', width=100, minwidth=25)
         credit_tree.heading('identity_card', text='Cédula', anchor=tk.W)
-        # Phone number
-        credit_tree.column('phone_number', width=100, minwidth=25)
-        credit_tree.heading('phone_number', text='Teléfono', anchor=tk.W)
         # Amount
-        credit_tree.column('amount', width=80, minwidth=25)
+        credit_tree.column('amount', width=100, minwidth=25)
         credit_tree.heading('amount', text='Cantidad $', anchor=tk.W)
+        # Description
+        credit_tree.column('description', width=150, minwidth=25)
+        credit_tree.heading('description', text='Descripción', anchor=tk.W)
         # Grid tree
         credit_tree.grid(row=1, column=0)
         # Constructing vertical scrollbar 
-        verscrlbar = ttk.Scrollbar(credit_window,  
+        verscrlbar = ttk.Scrollbar(tree_frame,  
                                 orient ="vertical",  
                                 command = credit_tree.yview)
-        verscrlbar.grid(row=1, column=1, sticky=tk.E, padx=(10,0))
+        verscrlbar.grid(row=1, column=0, sticky=tk.E, padx=(100,0))
         credit_tree.configure(xscrollcommand = verscrlbar.set) 
 
         # buttons
         def delete_credit():
             if credit_tree.focus():
-                response = messagebox.askyesno("Atención!", "Quieres finalizar este Crédito?", parent=credit_window)
+                response = messagebox.askyesno("Atención!", "Quieres finalizar este {}?".format(type), parent=credit_window)
                 if response:
                     credit_id = credit_tree.item(credit_tree.focus())['values'][0]
                     credit = Credit.get(Credit.id==credit_id)
                     credit.is_finished = True
                     credit.finished_date = datetime.now()
                     credit.save()
-                    self.insert_into_credit_tree()
+                    self.insert_into_credit_tree(type)
         delete_credit_button = tk.Button(
-            credit_window, 
+            tree_frame, 
             text="Eliminar",
-            font=('calibri', 12),
+            font=('calibri', 16),
             bd=1,
             relief=tk.RIDGE,
             bg='#e85d5d',
             command=delete_credit)
         add_credit_button = tk.Button(
-            credit_window, 
-            text="Agregar credit", 
-            font=('calibri', 12),
+            tree_frame, 
+            text="Agregar {}".format(type), 
+            font=('calibri', 16),
             bd=1,
             relief=tk.RIDGE,
             bg='#54bf54',
             padx=8,
-            command=self.add_credit)
+            command=lambda: self.add_credit(type))
+        # Getting credit id
+        def display_credit_detail():
+            if credit_tree.focus():
+                credit_id = credit_tree.item(credit_tree.focus())['values'][0]
+                self.add_credit(type, credit_id)
+        detail_credit_button = tk.Button(
+            tree_frame, 
+            text="Ver Detalle", 
+            font=('calibri', 16),
+            bd=1,
+            relief=tk.RIDGE,
+            bg='#54bf54',
+            padx=8,
+            command=display_credit_detail)
         add_credit_button.grid(row=2, sticky=tk.W, pady=(5,20))
-        delete_credit_button.grid(row=2, sticky=tk.E, pady=(5,20))
+        delete_credit_button.grid(row=2, column=0, sticky=tk.E, pady=(5,20))
+        detail_credit_button.grid(row=2, column=0, pady=(5,20))
 
-        self.insert_into_credit_tree()
+        self.insert_into_credit_tree(type)
     
-    def add_credit(self):
+    def add_credit(self, type, credit_id = None):
         new_credit_window = tk.Toplevel(padx=30,pady=30)
-        new_credit_window.title("Agregar Crédito")
-        
+        if type == 'Crédito':
+            new_credit_window.title("Agregar Crédito")
+        else:
+            new_credit_window.title("Agregar Vale")
+        title = 'Nuevo Vale'
+        if credit_id:
+            title = 'Vale {}'.format(credit_id)
+        if type == 'Crédito':
+            title = 'Nuevo Crédito'
+            if credit_id:
+                title = 'Crédito {}'.format(credit_id)
         title_label = tk.Label(
             new_credit_window,
-            text="Agregar Crédito",
-            font=('calibri', 14, 'bold'))
+            text=title,
+            font=('calibri', 18, 'bold'))
         title_label.grid(row=0, pady=(0,20))
 
         # Date
         date_label = tk.Label(
             new_credit_window,
             text="Fecha",
-            font=('calibri', 12))
+            font=('calibri', 15))
         date_label.grid(row=1, column=0, sticky= tk.W,padx=(0,100), pady=(0,20))
         date_entry = ttk.Entry(
             new_credit_window, 
-            width=15, 
-            font=('calibri', 12))
-        date_entry.insert(0, self.query_date.get())
+            width=18, 
+            font=('calibri', 15))
+        if not credit_id:
+            date_entry.insert(0, self.query_date.get())
         date_entry.grid(row=1, column=0, sticky=tk.E, pady=(0,20))
-        # Type
-        type_label = tk.Label(
-            new_credit_window,
-            text="Tipo",
-            font=('calibri', 12))
-        type_label.grid(row=2, column=0, sticky=tk.W, pady=(0,20), padx=(0,200))
-        type_var = tk.StringVar()
-        type_choices = ('', 'Vale', 'Crédito')
-        type_var.set(type_choices[1])
-        type_option = ttk.OptionMenu(
-            new_credit_window,
-            type_var,
-            *type_choices)
-        type_option.grid(row=2, column=0, sticky=tk.E, pady=(0,20))
         # Name
         name_label = tk.Label(
             new_credit_window,
             text="Nombre",
-            font=('calibri', 12))
+            font=('calibri', 15))
         name_label.grid(row=3, column=0, sticky= tk.W, pady=(0,20))
         name_entry = ttk.Entry(
             new_credit_window, 
-            width=15, 
-            font=('calibri', 12))
+            width=18, 
+            font=('calibri', 15))
         name_entry.grid(row=3, column=0, sticky=tk.E, pady=(0,20))
         # Identity card
         identity_label = tk.Label(
             new_credit_window,
             text="Cédula",
-            font=('calibri', 12))
+            font=('calibri', 15))
         identity_label.grid(row=4, column=0, sticky= tk.W, pady=(0,20))
         identity_entry = ttk.Entry(
             new_credit_window, 
-            width=15, 
-            font=('calibri', 12))
+            width=18, 
+            font=('calibri', 15))
         identity_entry.grid(row=4, column=0, sticky=tk.E, padx=(100,0),pady=(0,20))
         # Phone number
         phone_label = tk.Label(
             new_credit_window,
             text="Teléfono",
-            font=('calibri', 12))
+            font=('calibri', 15))
         phone_label.grid(row=5, column=0, sticky= tk.W, pady=(0,20))
         phone_entry = ttk.Entry(
             new_credit_window, 
-            width=15, 
-            font=('calibri', 12))
+            width=18, 
+            font=('calibri', 15))
         phone_entry.grid(row=5, column=0, sticky=tk.E, pady=(0,20))
         # Amount $
         amount_label = tk.Label(
             new_credit_window,
             text="Cantidad $",
-            font=('calibri', 12))
+            font=('calibri', 15))
         amount_label.grid(row=6, column=0, sticky= tk.W, pady=(0,20))
         amount_entry = ttk.Entry(
             new_credit_window, 
-            width=15, 
-            font=('calibri', 12))
+            width=18, 
+            font=('calibri', 15))
         amount_entry.grid(row=6, column=0, sticky=tk.E, pady=(0,20))
         
+        # Description
+        desc_label = tk.Label(
+            new_credit_window,
+            text="Descripción",
+            font=('calibri', 15))
+        desc_label.grid(row=7, column=0, pady=(20,0), sticky= tk.W)
+        desc_text = tk.Text(
+            new_credit_window,
+            width=35,
+            height=7,
+            font=('calibri', 14),
+            bd=3)
+        desc_text.grid(row=8, sticky=tk.E, pady=(10,0))
+
+        credit = None
+        # Inserting to tree
+        if credit_id:
+            credit = Credit.get(Credit.id == credit_id)
+            # Date
+            date_entry.delete(0,tk.END)
+            date_entry.insert(0, credit.date.strftime(DATE_FORMAT))
+            # Name
+            name_entry.insert(0, credit.name)
+            # Indentity Card
+            identity_entry.insert(0, credit.identity_card)
+            # Phone
+            phone_entry.insert(0, credit.phone_number)
+            # Amount
+            amount_entry.insert(0, number_to_str(credit.amount))
+            # Description
+            desc_text.insert('1.0', str(credit.description))
+            
+            
         # Saving
         def save_credit():
             credit_dict_values = {
                 'date': datetime.strptime(date_entry.get(), DATE_FORMAT),
-                'type': Credit.CREDIT_TYPES[type_var.get()],
+                'type': Credit.CREDIT_TYPES[type],
                 'name': name_entry.get(),
                 'identity_card': identity_entry.get(),
                 'phone_number': phone_entry.get(),
-                'amount': string_to_float(amount_entry.get()) 
+                'amount': string_to_float(amount_entry.get()),
+                'description':  desc_text.get('1.0', tk.END)
             }
-            Credit.create(**credit_dict_values)
-            self.insert_into_credit_tree()
+            if not credit_id:
+                Credit.create(**credit_dict_values)
+                self.insert_into_credit_tree(type)
+            else:
+                credit.date = datetime.strptime(date_entry.get(), DATE_FORMAT)
+                credit.type = Credit.CREDIT_TYPES[type]
+                credit.name = name_entry.get()
+                credit.identity_card = identity_entry.get()
+                credit.phone_number = phone_entry.get()
+                credit.amount = string_to_float(amount_entry.get())
+                credit.description = desc_text.get('1.0', tk.END)
+                credit.save()
+                self.insert_into_credit_tree(type)
             new_credit_window.destroy()
+
         save_button = tk.Button(
             new_credit_window,
             text="Guardar",
-            font=('calibri', 14, 'bold'),
+            font=('calibri', 18, 'bold'),
             bd=1,
             relief=tk.RIDGE,
             bg='#54bf54',
             command=save_credit)
-        save_button.grid(row=7, pady=(20,0), sticky=tk.W+tk.E)
+        save_button.grid(row=9, pady=(20,0), sticky=tk.W+tk.E)
 
-    def insert_into_credit_tree(self):
-        credits = Credit.select().where(Credit.is_finished==False)
+    def insert_into_credit_tree(self, type, params = None):
         self.credit_tree.delete(*self.credit_tree.get_children())
+        credits = []
+        if type == 'Vale':
+            credits = Credit.select().where(Credit.is_finished==False, Credit.type == 0).order_by(Credit.date)
+            if params:
+                if params['name'] != '':
+                    credits = credits.select().where(Credit.name.contains(params['name']))
+                if params['identity'] != '':
+                    credits = credits.select().where(Credit.identity_card.contains(params['identity']))
+        if type == 'Crédito':
+            credits = Credit.select().where(Credit.is_finished==False, Credit.type == 1).order_by(Credit.date)
+            if params:
+                if params['name'] != '':
+                    credits = credits.select().where(Credit.name.contains(params['name']))
+                if params['identity'] != '':
+                    credits = credits.select().where(Credit.identity_card.contains(params['identity']))
         credit_types = [type for type in Credit.CREDIT_TYPES.keys()]
         
-        print(credit_types)
         for credit in credits:
+            credit_days = (date.today() - credit.date).days
+            description = ''
+            if credit.description:
+                description = credit.description[:17]
             self.credit_tree.insert("", index='end',values=(
                 credit.id,
-                credit.date.strftime(DATE_FORMAT),
-                credit_types[credit.type],
+                credit_days,
                 credit.name,
                 credit.identity_card,
-                credit.phone_number,
-                credit.amount
+                credit.amount,
+                description
             ))
 
     def filters_window(self):
@@ -1060,41 +1232,41 @@ class App():
         filters_title = tk.Label(
             filters_frame,
             text="Filtrar Pagos",
-            font=('calibri', 14, 'bold'))
+            font=('calibri', 18, 'bold'))
         filters_title.grid(row=0, columnspan=2, pady=(10,20)) 
         # Date
         date_label = tk.Label(
             filters_frame,
             text="Fecha",
-            font=('calibri', 12, 'bold'))
+            font=('calibri', 15, 'bold'))
         date_label.grid(row=1, column=0, columnspan=2)
         from_label = tk.Label(
             filters_frame,
             text="Desde:",
-            font=('calibri', 10))
+            font=('calibri', 14))
         from_label.grid(row=2, column=0, padx=(10,0))
         to_label = tk.Label(
             filters_frame,
             text="Hasta:",
-            font=('calibri', 10))
+            font=('calibri', 14))
         to_label.grid(row=3, column=0, padx=(10,0))
         from_date_entry = ttk.Entry(
             filters_frame, 
             width=10, 
-            font=('calibri', 12))
+            font=('calibri', 15))
         from_date_entry.insert(0, self.query_date.get())
         from_date_entry.grid(row=2, column=1, padx=(0,10))
         to_date_entry = ttk.Entry(
             filters_frame, 
             width=10, 
-            font=('calibri', 12))
+            font=('calibri', 15))
         to_date_entry.insert(0, self.query_date.get())
         to_date_entry.grid(row=3, column=1, padx=(0,10))
         # Type
         type_label = tk.Label(
             filters_frame,
             text="Tipo",
-            font=('calibri', 12, 'bold'))
+            font=('calibri', 16, 'bold'))
         type_label.grid(row=4, column=0, columnspan=2, pady=(20,3))
         type_var = tk.StringVar()
         types = [m for m in Payment.TYPES.keys()]
@@ -1109,7 +1281,7 @@ class App():
         currency_label = tk.Label(
             filters_frame,
             text="Moneda",
-            font=('calibri', 12, 'bold'))
+            font=('calibri', 16, 'bold'))
         currency_label.grid(row=6, column=0, columnspan=2, pady=(20,3))
         currency_var = tk.StringVar()
         currency_choices = ('', 'Todo', 'Bolívares', 'Dólares')
@@ -1123,7 +1295,7 @@ class App():
         method_label = tk.Label(
             filters_frame,
             text="Método Pago",
-            font=('calibri', 12, 'bold'))
+            font=('calibri', 16, 'bold'))
         method_label.grid(row=8, column=0, columnspan=2, pady=(20,3))
         method_var = tk.StringVar()
         methods = [m for m in Payment.METHODS.keys()]
@@ -1138,7 +1310,7 @@ class App():
         account_label = tk.Label(
             filters_frame,
             text="Cuenta",
-            font=('calibri', 12, 'bold'))
+            font=('calibri', 16, 'bold'))
         account_label.grid(row=10, column=0, columnspan=2, pady=(20,3))
         account_var = tk.StringVar()
         accounts = [m for m in Payment.ACCOUNTS.keys()]
@@ -1162,7 +1334,7 @@ class App():
         search_button = tk.Button(
             filters_frame,
             text="Buscar",
-            font=('calibri', 14, 'bold'),
+            font=('calibri', 18, 'bold'),
             bd=1,
             relief=tk.RIDGE,
             bg='#54bf54',
@@ -1175,8 +1347,8 @@ class App():
         # Title
         tree_title = tk.Label(
             payments_frame,
-            text="Pagos",
-            font=('calibri', 14, 'bold'))
+            text="Pagos y Vueltos",
+            font=('calibri', 18, 'bold'))
         tree_title.grid(row=0, column=0, pady=(0,15), columnspan=4)
         # Payment tree
         self.payment_tree = ttk.Treeview(
@@ -1189,25 +1361,25 @@ class App():
         # HEADING
         payment_tree.column("#0", width=0, stretch=tk.NO)
         # Sale
-        payment_tree.column("sale_id", width=50, minwidth=25)
+        payment_tree.column("sale_id", width=65, minwidth=25)
         payment_tree.heading('sale_id', text='Venta', anchor=tk.W)
         # Date
-        payment_tree.column('date', width=80, minwidth=25)
+        payment_tree.column('date', width=90, minwidth=25)
         payment_tree.heading('date', text='Fecha', anchor=tk.W)
         # Type
         payment_tree.column('type', width=60, minwidth=25)
         payment_tree.heading('type', text='Tipo', anchor=tk.W)
         # Amount 
-        payment_tree.column('amount', width=90, minwidth=25)
+        payment_tree.column('amount', width=130, minwidth=25)
         payment_tree.heading('amount', text='Cantidad', anchor=tk.W)
         # Rate
-        payment_tree.column('rate', width=80, minwidth=25)
+        payment_tree.column('rate', width=100, minwidth=25)
         payment_tree.heading('rate', text='Tasa', anchor=tk.W)
         # Method
-        payment_tree.column('method', width=95, minwidth=25)
+        payment_tree.column('method', width=110, minwidth=25)
         payment_tree.heading('method', text='Método', anchor=tk.W)
         # Account
-        payment_tree.column('account', width=120, minwidth=25)
+        payment_tree.column('account', width=140, minwidth=25)
         payment_tree.heading('account', text='Cuenta', anchor=tk.W)
         # Grid tree
         payment_tree.grid(row=1, column=0, columnspan=4)
@@ -1220,8 +1392,8 @@ class App():
         # Button
         detail_button = tk.Button(
             payments_frame,
-            text="Detalle",
-            font=('calibri', 14, 'bold'),
+            text="Mostrar Venta",
+            font=('calibri', 18, 'bold'),
             bd=1,
             relief=tk.RIDGE,
             bg='#54bf54',
@@ -1233,19 +1405,19 @@ class App():
         self.bs_label = tk.Label(
             payments_frame,
             text="",
-            font=('calibri', 14, 'bold'))
+            font=('calibri', 16, 'bold'))
         self.bs_label.grid(row=2, column=0, pady=(15,10))
         # usd
         self.usd_label = tk.Label(
             payments_frame,
             text="",
-            font=('calibri', 14, 'bold'))
+            font=('calibri', 16, 'bold'))
         self.usd_label.grid(row=2, column=1, pady=(15,10))
         # total usd
         self.total_label = tk.Label(
             payments_frame,
             text="",
-            font=('calibri', 14, 'bold'))
+            font=('calibri', 16, 'bold'))
         self.total_label.grid(row=2, column=2, pady=(15,10))
 
     def insert_into_payment_tree(self, params):
@@ -1290,6 +1462,7 @@ class App():
         self.bs_label['text'] = number_to_str(bs) + "bs"
         self.usd_label['text'] = number_to_str(usd) + "$"
         self.total_label['text'] = "Total " + number_to_str(total) + "$"
+
 
 if __name__ == '__main__':
     root = tk.Tk()

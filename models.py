@@ -36,6 +36,7 @@ class Payment(BaseModel):
     TYPES = {'Pago': 0, 'Vuelto': 1}
     type = IntegerField(choices=TYPES)
 
+
 class Credit(BaseModel):
     date = DateField(default=datetime.now)
     CREDIT_TYPES = {'Vale': 0, 'Crédito': 1}
@@ -44,12 +45,16 @@ class Credit(BaseModel):
     identity_card = IntegerField()
     phone_number = CharField(max_length=60)
     amount = FloatField()
-
+    description = CharField(max_length=255, null=True)
     # Meta data
     finished_date = DateField(null=True)
     is_finished = BooleanField(default=False)
+
+class CreditSale(BaseModel):
+    sale = ForeignKeyField(Sale, backref='sales')
+    credit = ForeignKeyField(Credit, backref='credits')
     
 
 db.connect()
-db.create_tables([Sale, Payment, Credit])
+db.create_tables([Sale, Payment, Credit, CreditSale])
 db.close()
