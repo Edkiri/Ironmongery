@@ -501,7 +501,7 @@ class App():
             if len(self.pay_tree.get_children()) < 1:
                 messagebox.showerror("Error", "No puedes crear una venta sin pagos.", parent=new_sale_window)
             else:
-                sale = Sale.create(date=date, description=desc)
+                sale = Sale.create(date=date, description=desc.replace('\n', ''))
                 for index in self.row_indexes:
                     payment_values = self.pay_tree.item(index)['values']
                     payment_data = {
@@ -645,18 +645,6 @@ class App():
                     self.row_indexes.append(index)
                     new_payment_window.destroy()
                 else:
-                    # self.update_sale_tree.insert(
-                    #     "",
-                    #     index='end',
-                    #     values=(
-                    #         None,
-                    #         type,
-                    #         amount_entry.get(),
-                    #         method.get(),
-                    #         currency.get(),
-                    #         rate_entry.get(),
-                    #         account.get()))
-                    # new_payment_window.destroy()
                     Payment.create(
                         sale = sale,
                         type = Payment.TYPES[type],
@@ -826,7 +814,7 @@ class App():
             add_return_button.grid(row=7, pady=(5,20))
             def save_sale():
                 sale.date = datetime.strptime(date_entry.get(), DATE_FORMAT)
-                sale.description = desc_text.get('1.0', tk.END)
+                sale.description = desc_text.get('1.0', tk.END).replace('\n', '')
                 # Add payments
                 payments_index = update_sale_tree.get_children()
                 for index in payments_index:
@@ -843,7 +831,6 @@ class App():
                         )
                 sale.save()
                 update_sale_window.destroy()                
-                # sale.description = desc_text.get('1.0')
             save_button = tk.Button(
                 update_sale_window,
                 text="Guardar",
@@ -854,7 +841,6 @@ class App():
                 command=save_sale)
             save_button.grid(row=9, pady=(20,0), sticky=tk.W+tk.E)
             # Geting payments
-            
             # Total
             self.detail_total_label = tk.Label(
                 update_sale_window,
@@ -1161,7 +1147,7 @@ class App():
                 'identity_card': identity_entry.get(),
                 'phone_number': phone_entry.get(),
                 'amount': string_to_float(amount_entry.get()),
-                'description':  desc_text.get('1.0', tk.END)
+                'description':  desc_text.get('1.0', tk.END).replace('\n', '')
             }
             if not credit_id:
                 Credit.create(**credit_dict_values)
@@ -1173,7 +1159,7 @@ class App():
                 credit.identity_card = identity_entry.get()
                 credit.phone_number = phone_entry.get()
                 credit.amount = string_to_float(amount_entry.get())
-                credit.description = desc_text.get('1.0', tk.END)
+                credit.description = desc_text.get('1.0', tk.END).replace('\n', '')
                 credit.save()
                 self.insert_into_credit_tree(type)
             new_credit_window.destroy()
