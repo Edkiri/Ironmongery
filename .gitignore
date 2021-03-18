@@ -3,6 +3,6 @@
 venv/
 *.xlsx
 *.XLS
-__pycache__
 *prueba*
 *Prueba*
+*pycache*
