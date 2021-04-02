@@ -3,6 +3,9 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 
+# App
+from products import ProductWindow
+
 # Models
 from models import Sale, Payment, Credit
 
@@ -192,11 +195,11 @@ class App():
             self.day_tree.heading(col, text=col, anchor=tk.W)
         self.day_tree.grid(row=2, column=1, padx=65)
         # Constructing vertical scrollbar 
-        verscrlbar = ttk.Scrollbar(self.root,  
-                                orient ="vertical",  
-                                command = self.day_tree.yview)
-        verscrlbar.grid(row=2, column=1, sticky=tk.E, padx=(0,30))
-        self.day_tree.configure(xscrollcommand = verscrlbar.set) 
+        # verscrlbar = ttk.Scrollbar(self.root,  
+        #                         orient ="vertical",  
+        #                         command = self.day_tree.yview)
+        # verscrlbar.grid(row=2, column=1, sticky=tk.E, padx=(0,30))
+        # self.day_tree.configure(xscrollcommand = verscrlbar.set) 
                 
         # Display buttons
         add_sale_button = tk.Button(

@@ -8,14 +8,25 @@ class BaseModel(Model):
     class Meta:
         database = db
 
+class Client(BaseModel):
+    name = CharField(max_length=255)
+    identity_card = IntegerField(unique=True)
+    phone_number = CharField(max_length=60)
+    email = CharField(max_length=255, null=True)
+
 class Sale(BaseModel):
     """Sale Model."""
     date = DateField()
-    description = CharField(255, null=True)
+    description = CharField(max_length=255, null=True)
+    client = ForeignKeyField(Client, backref='sales', null=True)
+    # Meta data
+    finished_date = DateField(null=True)
+    is_finished = BooleanField(default=False)
 
 class Payment(BaseModel):
     """Payment Model."""
     sale = ForeignKeyField(Sale, backref='payments')
+    date = DateField()
     amount = FloatField()
     CURRENCIES = {'Bolívares': 0, 'Dólares': 1}
     currency = IntegerField(choices=CURRENCIES)
@@ -24,7 +35,8 @@ class Payment(BaseModel):
         'Pago móvil': 1,
         'Transferencia': 2,
         'Efectivo': 3,
-        'Zelle': 4}
+        'Zelle': 4,
+        'Paypal': 5}
     method = IntegerField(choices=METHODS)
     rate = FloatField()
     ACCOUNTS = {
@@ -32,29 +44,24 @@ class Payment(BaseModel):
         'Ivan Guerra': 1,
         'Jesús Daniel': 2,
         'Jesús Guerra': 3}
-    account = IntegerField()
+    account = IntegerField(choices=ACCOUNTS)
     TYPES = {'Pago': 0, 'Vuelto': 1}
-    type = IntegerField(choices=TYPES)
+    type = IntegerField(choices=TYPES)  
 
-
-class Credit(BaseModel):
-    date = DateField(default=datetime.now)
-    CREDIT_TYPES = {'Vale': 0, 'Crédito': 1}
-    type = IntegerField(choices=CREDIT_TYPES)
+class Product(BaseModel):
+    brand = CharField(max_length=255, null=True)
+    reference = CharField(max_length=255, null=True)
+    code = CharField(max_length=100, null=True)
     name = CharField(max_length=255)
-    identity_card = IntegerField()
-    phone_number = CharField(max_length=60)
-    amount = FloatField()
-    description = CharField(max_length=255, null=True)
-    # Meta data
-    finished_date = DateField(null=True)
-    is_finished = BooleanField(default=False)
+    price = FloatField(null=True)
+    stock = IntegerField(default=0)
 
-class CreditSale(BaseModel):
-    sale = ForeignKeyField(Sale, backref='sales')
-    credit = ForeignKeyField(Credit, backref='credits')
-    
+class Order(BaseModel):
+    product = ForeignKeyField(Product, backref='orders')
+    sale = ForeignKeyField(Sale, backref='orders')
+    amount = IntegerField()
+    date = DateField()
 
 db.connect()
-db.create_tables([Sale, Payment, Credit, CreditSale])
+db.create_tables([Sale, Payment, Client, Order, Product])
 db.close()
