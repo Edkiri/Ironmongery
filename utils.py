@@ -2,7 +2,7 @@
 from datetime import date, datetime, timedelta
 
 # Handle dates.
-DATE_FORMAT = "%d-%m-%Y"
+DATE_FORMAT = "%Y-%m-%d"
 TODAY = date.today().strftime(DATE_FORMAT)
 
 def get_weekday(day):

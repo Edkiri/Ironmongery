@@ -10,7 +10,7 @@ class BaseModel(Model):
 
 class Client(BaseModel):
     name = CharField(max_length=255)
-    identity_card = IntegerField(unique=True)
+    identity_card = CharField(unique=True)
     phone_number = CharField(max_length=60)
     email = CharField(max_length=255, null=True)
 
@@ -36,7 +36,8 @@ class Payment(BaseModel):
         'Transferencia': 2,
         'Efectivo': 3,
         'Zelle': 4,
-        'Paypal': 5}
+        'Paypal': 5,
+        'Binance': 6}
     method = IntegerField(choices=METHODS)
     rate = FloatField()
     ACCOUNTS = {

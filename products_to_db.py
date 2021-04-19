@@ -20,6 +20,6 @@ with open("products.csv", encoding="utf8", mode="r") as file:
             brand = row[1],
             reference = row[2],
             code = row[3],
-            name = row[4].replace("Ð", "Ñ"),
+            name = row[4].replace("Ð", "Ñ").replace("║", "|"),
             price = format_float(float(row[5]))
         )
