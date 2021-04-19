@@ -55,7 +55,6 @@ class App():
 
         # Binding
         def PressAnyKey(event):
-            print(event.keycode)
             if event.keycode == 65:
                 self.product_handler.display_new_order_window(self.rate.get())
             elif event.keycode == 90:
@@ -606,10 +605,8 @@ class App():
         # Delete Previus Rows.
         self.day_tree.delete(*self.day_tree.get_children())
         # Date.
-        print("VIENDO")
         day_date = datetime.strptime(self.query_date.get(), DATE_FORMAT)
         day_sales = Sale.select().where(Sale.date==day_date).order_by(-Sale.is_finished)
-        print(day_date, type(day_date))
         for sale in day_sales:
             orders = (Order
             .select()
