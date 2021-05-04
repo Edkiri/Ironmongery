@@ -503,6 +503,7 @@ class App():
             self.product_handler.orders_tree.delete(*self.product_handler.orders_tree.get_children())
             self.payment_handler.payments_tree.delete(*self.payment_handler.payments_tree.get_children())
             self.product_handler.total_sale_number_label['text'] = "0$"
+            self.product_handler.total_sale_label_bs['text'] = "0bs"
             self.payment_handler.total_payments_number_label['text'] = "0$"
             self.payment_handler.total_payments = 0
 

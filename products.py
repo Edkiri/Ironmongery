@@ -260,7 +260,7 @@ class ProductHandler():
             frame, 
             height=5, 
             selectmode ='browse',
-            columns=('order_id', 'pruduct_id', 'Cantidad', 'Nombre', 'Precio'),
+            columns=('order_id', 'pruduct_id', 'Cantidad', 'Nombre', 'Precio', 'rate'),
             style="mystyle.Treeview",
             padding=4)
         self.orders_tree.column("#0", width=0, stretch=tk.NO)
@@ -269,7 +269,7 @@ class ProductHandler():
                 self.orders_tree.column(col, width=280, minwidth=25)
             elif col == 'Cantidad':
                 self.orders_tree.column(col, width=80, minwidth=25)
-            elif (col == 'pruduct_id') or (col == 'order_id'):
+            elif (col == 'pruduct_id') or (col == 'order_id') or (col == 'rate'):
                 self.orders_tree.column(col, width=0, stretch=tk.NO)
             else:
                 self.orders_tree.column(col, width=180, minwidth=25)
@@ -281,19 +281,30 @@ class ProductHandler():
             if self.orders_tree.focus():
                 index = self.orders_tree.focus()
 
-                clean_total_sale = float(self.total_sale_number_label['text'].rstrip("$"))
                 def clean_price(mess_price):
                     cleaned_price = str()
                     for char in mess_price:
-                        if char == '$':
+                        if (char == '$') or (char == 'b'):
                             break
                         cleaned_price += char
+                    if ',' in cleaned_price:
+                        return string_to_float(cleaned_price)
                     return float(cleaned_price)
                 
-                order_price = clean_price(self.orders_tree.item(index)['values'][4]) * int(self.orders_tree.item(index)['values'][2])
+                clean_total_sale = float(self.total_sale_number_label['text'].rstrip("$"))
+                clean_total_sale_bs = clean_price(self.total_sale_label_bs['text'])
+                
+                amount = int(self.orders_tree.item(index)['values'][2])
+
+                order_price = clean_price(self.orders_tree.item(index)['values'][4]) * amount
+                rate = string_to_float(self.orders_tree.item(index)['values'][5])
+                order_price_bs = order_price * rate
+
                 total_sale = clean_total_sale - order_price
+                total_sale_bs = clean_total_sale_bs - order_price_bs
 
                 self.total_sale_number_label['text'] = number_to_str(total_sale) + "$"
+                self.total_sale_label_bs['text'] = number_to_str(total_sale_bs) + "bs"
                 if self.orders_tree.item(index)['values'][0] != 'None':
                     self.orders_to_delete.append(self.orders_tree.item(index)['values'][0])
                 self.orders_tree.delete(index)
@@ -325,7 +336,8 @@ class ProductHandler():
                 product_id,
                 self.amount,
                 product_name,
-                product_price
+                product_price,
+                self.rate_entry.get()
             )
         )
 
@@ -348,6 +360,7 @@ class ProductHandler():
             def save_amount():
                 self.amount = amount_entry.get()
                 self.insert_into_orders_tree()
+
                 self.calculate_total_sale()
                 ask_window.destroy()
                 self.product_window.destroy()
@@ -387,12 +400,18 @@ class ProductHandler():
             frame,
             text="Total Venta:",
             font=('calibri', 18, 'bold'))
-        total_sale_label.grid(row=0, column=0, pady=(0,25))
+        total_sale_label.grid(row=0, column=0, pady=(50,0))
         self.total_sale_number_label = tk.Label(
             frame,
             text="0$",
             font=('calibri', 18, 'bold'))
-        self.total_sale_number_label.grid(row=0, column=1, pady=(0,25), sticky=tk.E)
+        self.total_sale_number_label.grid(row=0, column=1, pady=(50,0), sticky=tk.E)
+        self.total_sale_label_bs = tk.Label(
+            frame,
+            text="0bs",
+            font=('calibri', 18, 'bold'))
+
+        self.total_sale_label_bs.grid(row=1, column=0, columnspan=2, pady=(10,85))
 
 
 
@@ -402,21 +421,29 @@ class ProductHandler():
         def clean_price(mess_price):
             cleaned_price = str()
             for char in mess_price:
-                if char == '$':
+                if (char == '$') or (char == 'b'):
                     break
                 cleaned_price += char
+            if ',' in cleaned_price:
+                return string_to_float(cleaned_price)
             return float(cleaned_price)
         
         mess_product_price = self.product_tree.item(self.t_index)['values'][5]
         clean_product_price = clean_price(mess_product_price)
 
         mess_actual_value = self.total_sale_number_label['text']
+        mess_actual_value_bs = self.total_sale_label_bs['text']
+
         clean_actual_value = clean_price(mess_actual_value)
+        clean_actual_value_bs = clean_price(mess_actual_value_bs)
         
         amount = int(self.amount)
 
         new_total = clean_actual_value + (clean_product_price * amount)
+        new_total_bs = new_total * string_to_float(self.rate_entry.get())
+
         self.total_sale_number_label['text'] = number_to_str(new_total) + "$"
+        self.total_sale_label_bs['text'] = number_to_str(new_total_bs) + "bs"
 
 
 
