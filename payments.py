@@ -86,12 +86,12 @@ class PaymentHandler():
         payments_tree.column('Tipo', width=65, minwidth=25)
         payments_tree.heading('Tipo', text='Tipo', anchor=tk.W)
         # Amount.
-        payments_tree.column('Cantidad', width=120, minwidth=25)
+        payments_tree.column('Cantidad', width=150, minwidth=25)
         payments_tree.heading('Cantidad', text='Cantidad', anchor=tk.W)
         # Currency.
         payments_tree.column('Moneda', width=0, stretch=tk.NO)
         # Method.
-        payments_tree.column('Metodo', width=120, minwidth=25)
+        payments_tree.column('Metodo', width=150, minwidth=25)
         payments_tree.heading('Metodo', text='Método', anchor=tk.W)
         # Tasa .
         payments_tree.column('Tasa', width=0, stretch=tk.NO)
@@ -296,12 +296,12 @@ class PaymentHandler():
             frame,
             text="Total Pagos:",
             font=('calibri', 18, 'bold'))
-        total_payments_label.grid(row=1, column=0, pady=(75,0))
+        total_payments_label.grid(row=1, column=0, pady=(25,0))
         self.total_payments_number_label = tk.Label(
             frame,
             text="{}$".format(self.total_payments),
             font=('calibri', 18, 'bold'))
-        self.total_payments_number_label.grid(row=1, column=1, sticky=tk.E,pady=(75,0))
+        self.total_payments_number_label.grid(row=1, column=1, sticky=tk.E,pady=(25,0))
 
 
 

@@ -18,7 +18,7 @@ from models import Payment, Sale, Order, Client, Product
 from datetime import date, datetime, timedelta
 from utils import (
     get_weekday, get_month_name, get_summary_payments,
-    string_to_float, number_to_str, es_casi_igual,
+    string_to_float, number_to_str, es_casi_igual, get_dollars,
     DATE_FORMAT, TODAY)
 
 
@@ -366,7 +366,7 @@ class App():
         desc_label.grid(row=0, column=2, padx=(3,0))
         self.new_sale_desc_text = ttk.Entry(
             frame, 
-            width=28, 
+            width=35, 
             font=('calibri', 15))
         self.new_sale_desc_text.grid(row=0, column=3)
 
@@ -526,13 +526,19 @@ class App():
             
             def create_orders(sale):
                 for order_index in self.product_handler.orders_tree.get_children():
-                    product_id = self.product_handler.orders_tree.item(order_index)['values'][1]
-                    amount = self.product_handler.orders_tree.item(order_index)['values'][2]
+                    order_values = self.product_handler.orders_tree.item(order_index)['values']
+                    product_id = order_values[1]
+                    amount = order_values[2]
+                    price = get_dollars(order_values[4])
+                    discount = int(order_values[6])
                     Order.create(
                         product=product_id,
                         sale=sale,
                         amount=amount,
-                        date=datetime.strptime(self.new_sale_date_entry.get(), DATE_FORMAT))
+                        date=datetime.strptime(self.new_sale_date_entry.get(), DATE_FORMAT),
+                        price=price,
+                        discount=discount
+                    )
                 
             def create_payments(sale):
                 for payment_index in self.payment_handler.payments_tree.get_children():
@@ -545,7 +551,8 @@ class App():
                         currency=Payment.CURRENCIES[payment_values[5]],
                         method=Payment.METHODS[payment_values[6]],
                         rate= string_to_float(payment_values[7]),
-                        account=Payment.ACCOUNTS[payment_values[8]])
+                        account=Payment.ACCOUNTS[payment_values[8]]
+                    )
 
             if not self.product_handler.orders_tree.get_children():
                 raise Exception("No puedes crear una venta sin productos.")
@@ -615,7 +622,7 @@ class App():
             .where(Sale.id == sale))
             sale_total_orders = 0
             for order in orders:
-                sale_total_orders += (order.amount * order.product.price)
+                sale_total_orders += order.price
 
             payments = (Payment
                 .select()
@@ -733,7 +740,7 @@ class App():
         orders_frame = tk.Frame(detail_sale_window)
         orders_frame.grid(row=3, column=0, columnspan=2, pady=(20,0), sticky=tk.W)
         products_handler = ProductHandler()
-        products_handler.display_total_orders(total_frame)
+        products_handler.display_total_orders(total_frame, True)
         products_handler.display_orders_tree(orders_frame)
         products_handler.insert_into_order_sale_tree(sale_id)
 
@@ -803,8 +810,11 @@ class App():
                         Order.create(
                             product=new_order_values[1],
                             sale=sale.id,
+                            date=datetime.strptime(TODAY, DATE_FORMAT),
                             amount=new_order_values[2],
-                            date=datetime.strptime(TODAY, DATE_FORMAT))
+                            price=get_dollars(new_order_values[4]),
+                            discount=int(new_order_values[6])
+                        )
                 
                 for payment_index in payments_handler.payments_tree.get_children():
                     if payments_handler.payments_tree.item(payment_index)['values'][0] == 'None':
@@ -1326,11 +1336,12 @@ class App():
             sale_total_payments = 0
             
             orders = (Order
-            .select()
-            .join(Sale)
-            .where(Sale.id == sale))
+                .select()
+                .join(Sale)
+                .where(Sale.id == sale)
+            )
             for order in orders:
-                sale_total_orders += (order.amount * order.product.price)
+                sale_total_orders += order.price
 
             payments = (Payment
                 .select()

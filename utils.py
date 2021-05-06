@@ -69,3 +69,11 @@ def get_summary_payments(payments):
                 usd -= payment.amount
                 total -= payment.amount
     return (bs, usd, total)
+
+def get_dollars(mess_number_on_string):
+            clean_price = ""
+            for char in mess_number_on_string:
+                if char == "$":
+                    break
+                clean_price += char
+            return string_to_float(clean_price)

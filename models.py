@@ -62,6 +62,8 @@ class Order(BaseModel):
     sale = ForeignKeyField(Sale, backref='orders')
     amount = IntegerField()
     date = DateField()
+    price = FloatField()
+    discount = IntegerField(default=0) # All discont are allready included in the order price.
 
 db.connect()
 db.create_tables([Sale, Payment, Client, Order, Product])

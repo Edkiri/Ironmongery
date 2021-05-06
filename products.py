@@ -7,7 +7,7 @@ from tkinter import messagebox
 from models import Product, Order, Sale
 
 # Utils
-from utils import number_to_str, string_to_float
+from utils import number_to_str, string_to_float, get_dollars
 
 
 class ProductHandler():
@@ -163,9 +163,9 @@ class ProductHandler():
             product_tree.heading(col, text=col, anchor=tk.W)
         product_tree.grid(row=1, column=1, padx=(30,0), sticky=tk.N)
 
-        def ask_for_amount(event):
-            self.ask_for_amount()
-        product_tree.bind("<Return>", ask_for_amount)
+        def ask_for_amount_and_discont(event):
+            self.ask_for_amount_and_discont()
+        product_tree.bind("<Return>", ask_for_amount_and_discont)
 
 
         search_button = tk.Button(
@@ -176,7 +176,7 @@ class ProductHandler():
             relief=tk.RIDGE,
             bg='#54bf54',
             padx=30,
-            command=lambda: self.ask_for_amount())
+            command=lambda: self.ask_for_amount_and_discont())
         search_button.grid(row=2, column=1, pady=(30,10))
 
         create_product_button = tk.Button(
@@ -260,7 +260,7 @@ class ProductHandler():
             frame, 
             height=5, 
             selectmode ='browse',
-            columns=('order_id', 'pruduct_id', 'Cantidad', 'Nombre', 'Precio', 'rate'),
+            columns=('order_id', 'pruduct_id', 'Cantidad', 'Nombre', 'Precio', 'rate', 'discount'),
             style="mystyle.Treeview",
             padding=4)
         self.orders_tree.column("#0", width=0, stretch=tk.NO)
@@ -269,10 +269,10 @@ class ProductHandler():
                 self.orders_tree.column(col, width=280, minwidth=25)
             elif col == 'Cantidad':
                 self.orders_tree.column(col, width=80, minwidth=25)
-            elif (col == 'pruduct_id') or (col == 'order_id') or (col == 'rate'):
+            elif (col == 'pruduct_id') or (col == 'order_id') or (col == 'rate') or (col == 'discount'):
                 self.orders_tree.column(col, width=0, stretch=tk.NO)
             else:
-                self.orders_tree.column(col, width=180, minwidth=25)
+                self.orders_tree.column(col, width=250, minwidth=25)
             self.orders_tree.heading(col, text=col, anchor=tk.W)
         self.orders_tree.grid(row=1, column=0, pady=(10,0))
 
@@ -296,9 +296,12 @@ class ProductHandler():
                 
                 amount = int(self.orders_tree.item(index)['values'][2])
 
-                order_price = clean_price(self.orders_tree.item(index)['values'][4]) * amount
-                rate = string_to_float(self.orders_tree.item(index)['values'][5])
-                order_price_bs = order_price * rate
+                discount =  string_to_float(self.orders_tree.item(index)['values'][6])
+                order_price = (clean_price(self.orders_tree.item(index)['values'][4]))
+                rate = self.orders_tree.item(index)['values'][5]
+                order_price_bs = 0
+                if rate != 'None':
+                    order_price_bs = order_price * string_to_float(rate)
 
                 total_sale = clean_total_sale - order_price
                 total_sale_bs = clean_total_sale_bs - order_price_bs
@@ -323,11 +326,20 @@ class ProductHandler():
 
     # Insert into Orders Tree.
     def insert_into_orders_tree(self):
-        amount = self.amount            
+        amount = int(self.amount)
+        discount = int(self.discount)
         self.t_index = self.product_tree.focus()
         product_id = self.product_tree.item(self.t_index)['values'][0]
         product_name = self.product_tree.item(self.t_index)['values'][2]
-        product_price = self.product_tree.item(self.t_index)['values'][5]
+        
+        # Getting price.
+        product_price = string_to_float(self.price) * amount
+        product_price *= 1 - (discount/100)
+        price_to_print = f"{product_price}$"
+        if discount != 0:
+            price_to_print += f" - {discount}% (Ya incluído)"
+        
+        # Insert to Tree.
         self.orders_tree.insert(
             "",
             index=tk.END,
@@ -336,15 +348,16 @@ class ProductHandler():
                 product_id,
                 self.amount,
                 product_name,
-                product_price,
-                self.rate_entry.get()
+                price_to_print,
+                self.rate_entry.get(),
+                discount
             )
         )
 
 
 
     # Ask For amount.
-    def ask_for_amount(self):
+    def ask_for_amount_and_discont(self):
         if self.product_tree.focus():
             
             def save_amount_callback(event):
@@ -355,10 +368,14 @@ class ProductHandler():
             ask_window.bind("<Return>", save_amount_callback)
 
             self.amount = None
+            self.discount = None
+            self.price = None
 
             # Save Function.
             def save_amount():
                 self.amount = amount_entry.get()
+                self.discount = discont_entry.get()
+                self.price = price_entry.get()
                 self.insert_into_orders_tree()
 
                 self.calculate_total_sale()
@@ -380,6 +397,36 @@ class ProductHandler():
             amount_entry.focus()
             amount_entry.grid(row=1, padx=15)
 
+            # Price.
+            price_label = tk.Label(
+                ask_window,
+                text="Precio",
+                font=('calibri', 16, 'bold'))
+            price_label.grid(row=2, column=0, pady=(20,3))
+            price_entry = ttk.Entry(
+                ask_window,
+                width=15,
+                font=('calibri', 14)
+            )
+            mess_price = self.product_tree.item(self.product_tree.focus())['values'][5]
+            price =  get_dollars(mess_price) 
+            price_entry.insert(0, price)
+            price_entry.grid(row=3, padx=15)
+
+            # Discount
+            discont_label = tk.Label(
+                ask_window,
+                text="Descuento",
+                font=('calibri', 16, 'bold'))
+            discont_label.grid(row=4, column=0, pady=(20,3))
+            discont_entry = ttk.Entry(
+                ask_window,
+                width=15,
+                font=('calibri', 14)
+            )
+            discont_entry.insert(0, 0)
+            discont_entry.grid(row=5, padx=15)
+
             # Save Button
             search_button = tk.Button(
                 ask_window,
@@ -390,12 +437,12 @@ class ProductHandler():
                 bg='#54bf54',
                 padx=30,
                 command=save_amount)
-            search_button.grid(row=2, column=0, pady=(30,10))
+            search_button.grid(row=6, column=0, pady=(30,10))
 
 
 
     # Display Total Orders
-    def display_total_orders(self, frame):
+    def display_total_orders(self, frame, is_detail=False):
         total_sale_label = tk.Label(
             frame,
             text="Total Venta:",
@@ -410,8 +457,8 @@ class ProductHandler():
             frame,
             text="0bs",
             font=('calibri', 18, 'bold'))
-
-        self.total_sale_label_bs.grid(row=1, column=0, columnspan=2, pady=(10,85))
+        if not is_detail:
+            self.total_sale_label_bs.grid(row=1, column=0, columnspan=2, pady=(10,85), sticky=tk.W)
 
 
 
@@ -428,7 +475,7 @@ class ProductHandler():
                 return string_to_float(cleaned_price)
             return float(cleaned_price)
         
-        mess_product_price = self.product_tree.item(self.t_index)['values'][5]
+        mess_product_price = self.price
         clean_product_price = clean_price(mess_product_price)
 
         mess_actual_value = self.total_sale_number_label['text']
@@ -438,8 +485,9 @@ class ProductHandler():
         clean_actual_value_bs = clean_price(mess_actual_value_bs)
         
         amount = int(self.amount)
+        discount =  string_to_float(self.discount)
 
-        new_total = clean_actual_value + (clean_product_price * amount)
+        new_total = clean_actual_value + (clean_product_price * amount) * ( 1 - (discount/100))
         new_total_bs = new_total * string_to_float(self.rate_entry.get())
 
         self.total_sale_number_label['text'] = number_to_str(new_total) + "$"
@@ -451,6 +499,10 @@ class ProductHandler():
     def insert_into_order_sale_tree(self, sale_id):
         orders = Order.select().join(Sale).where(Sale.id==sale_id)
         for order in orders:
+            # Getting price.
+            order_price = str(order.price)+"$"
+            if order.discount != 0:
+                order_price += f" - {order.discount}% (Ya incluído)"
             self.orders_tree.insert(
                 "",
                 index=tk.END,
@@ -459,10 +511,12 @@ class ProductHandler():
                     order.product,
                     order.amount,
                     order.product.name,
-                    order.product.price
+                    order_price,
+                    None,
+                    order.discount
                 )
             )
-            total = float(self.total_sale_number_label['text'].rstrip("$")) + order.product.price
+            total = float(self.total_sale_number_label['text'].rstrip("$")) + order.price
             self.total_sale_number_label['text'] = number_to_str(total) + "$"
 
 
