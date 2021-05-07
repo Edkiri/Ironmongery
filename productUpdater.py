@@ -41,7 +41,6 @@ class ProductUpdater:
 
             try:
                 product = Product.get(code=code)
-                print(f"Producto {product.code}")
             except Exception:
                 Product.create(
                     brand=brand,
