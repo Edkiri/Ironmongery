@@ -71,9 +71,20 @@ def get_summary_payments(payments):
     return (bs, usd, total)
 
 def get_dollars(mess_number_on_string):
-            clean_price = ""
-            for char in mess_number_on_string:
-                if char == "$":
-                    break
-                clean_price += char
-            return string_to_float(clean_price)
+    clean_price = ""
+    for char in mess_number_on_string:
+        if char == "$":
+            break
+        clean_price += char
+    return string_to_float(clean_price)
+
+
+def format_float(float_number):
+    """Clean price from the .xls file."""
+    if int(float_number) == 0:
+        return float("{:10.4f}".format(float_number).lstrip(" "))
+
+    elif int(float_number) == 1:
+        return float("{:10.3f}".format(float_number).lstrip(" "))
+
+    return float("{:10.2f}".format(float_number).lstrip(" "))

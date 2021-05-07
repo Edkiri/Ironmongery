@@ -6,6 +6,9 @@ from tkinter import messagebox
 # Models
 from models import Product, Order, Sale
 
+# products
+from productUpdater import ProductUpdater
+
 # Utils
 from utils import number_to_str, string_to_float, get_dollars
 
@@ -202,6 +205,37 @@ class ProductHandler():
             bg='#54bf54',
             command=update_product)
         update_product_button.grid(row=2, column=1, sticky=tk.W, padx=(100,0))
+
+        def update_product_prices():
+            response = messagebox.askyesno("Actualizando precios desde excel.", "¿Estás seguro que quieres actualizar los precios?", parent=self.product_window)
+            if response:
+                # TODO: Make a backup before updating.
+
+                waitting_window = tk.Toplevel(width=150, height=50)
+                waitting_window.title = "Actualizando precios.."
+                label = tk.Label(
+                    waitting_window,
+                    text="Actualizando precios. Esto puede tardar unos minutos...",
+                    font=('calibri', 14))
+                label.pack(pady=50, padx=50)
+                try:
+                    ProductUpdater(waitting_window)
+                except Exception as err:
+                    messagebox.showerror("Error!", err, parent=self.product_window)
+                finally:
+                    self.product_window.focus()
+                    waitting_window.destroy()
+
+
+        update_product_prices_button = tk.Button(
+            self.product_window, 
+            text="Actualizar precios", 
+            font=('calibri', 15),
+            bd=1,
+            relief=tk.RIDGE,
+            bg='#54bf54',
+            command=update_product_prices)
+        update_product_prices_button.grid(row=2, column=1, sticky=tk.E, padx=(0,0))
         
 
 

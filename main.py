@@ -8,6 +8,7 @@ from peewee import IntegrityError
 
 # App.
 from products import ProductHandler
+from productUpdater import ProductUpdater
 from clients import ClientHandler
 from payments import PaymentHandler
 
