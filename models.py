@@ -1,8 +1,9 @@
 """Sales models."""
 from peewee import *
 from datetime import datetime
+from config import DATABASE_NAME
 
-db = SqliteDatabase('example.db')
+db = SqliteDatabase(DATABASE_NAME)
 
 class BaseModel(Model):
     class Meta:

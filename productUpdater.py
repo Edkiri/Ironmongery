@@ -17,10 +17,10 @@ class ProductUpdater:
 
         if self.file:
             self.df = pd.read_excel(self.file.name)
-            self.update_products()
+            self._update_products()
 
 
-    def update_products(self):
+    def _update_products(self):
         counter = 0
         for key, value in self.df.iterrows():
 
