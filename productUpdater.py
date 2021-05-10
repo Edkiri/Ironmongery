@@ -21,15 +21,15 @@ class ProductUpdater:
 
 
     def _update_products(self):
+
         counter = 0
+        updated_prices = 0
+
         for key, value in self.df.iterrows():
-
-            updated_products = 0
-
             if counter == 0:
                 counter += 1
                 continue
-
+            
             try:
                 brand = value[0]
                 refence = value[1]
@@ -54,13 +54,15 @@ class ProductUpdater:
 
             if product.name != name:
                 raise Exception(f"Los nombres del producto con código={code} no coinciden.")
-                
             if es_casi_igual(product.price, price):
                 pass
             else:
                 # Actualizar precio.
                 product.price = price
                 product.save()
-                updated_products += 1
+                updated_prices += 1
 
             counter += 1
+
+        if updated_prices:
+            messagebox.showinfo("Precios Actualizados!", f"{updated_prices} precios actualizados")

@@ -34,13 +34,20 @@ class BackUp:
         db_name = DATABASE_NAME.rstrip(".db")
         target = BACKUP_DIR + f"{db_name}_{today}.db"
 
-        # while True:
-        #     counter = 2
-        #     if target in os.listdir(BACKUP_DIR):
-        #         name, extension = target.split(".")
-        #         target = "".join(name+f"_{counter}", extension)
-        #         counter += 1
-        #     else:
-        #         break
+        counter = 1
+        while True:
+            if target.split("/")[-1] in os.listdir(BACKUP_DIR):
+
+                t_name = target.split("/")[-1].split(".")[0]
+                t_extension = target.split("/")[-1].split(".")[-1]
+
+                if "(" in target:
+                    target = BACKUP_DIR + t_name.rstrip(f"({counter})") + f"({counter+1})." + t_extension
+                else:
+                    target = BACKUP_DIR + t_name + f"({counter+1})." + t_extension
+
+                counter += 1
+            else:
+                break
 
         shutil.copyfile(original, target)

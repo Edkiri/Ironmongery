@@ -61,7 +61,7 @@ class Product(BaseModel):
 class Order(BaseModel):
     product = ForeignKeyField(Product, backref='orders')
     sale = ForeignKeyField(Sale, backref='orders')
-    amount = IntegerField()
+    amount = FloatField()
     date = DateField()
     price = FloatField()
     discount = IntegerField(default=0) # All discont are allready included in the order price.

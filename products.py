@@ -12,6 +12,9 @@ from productUpdater import ProductUpdater
 # Utils
 from utils import number_to_str, string_to_float, get_dollars
 
+# Backup
+from backUp import BackUp
+
 
 class ProductHandler():
 
@@ -209,7 +212,12 @@ class ProductHandler():
         def update_product_prices():
             response = messagebox.askyesno("Actualizando precios desde excel.", "¿Estás seguro que quieres actualizar los precios?", parent=self.product_window)
             if response:
-                # TODO: Make a backup before updating.
+                
+                # try:
+                back_up = BackUp.get_instance()
+                back_up.copy_db_to_backups_dir()
+                # except Exception as err:
+                #     messagebox.showerror("Error!", err, parent=self.product_window)
 
                 waitting_window = tk.Toplevel(width=150, height=50)
                 waitting_window.title = "Actualizando precios.."
@@ -328,7 +336,7 @@ class ProductHandler():
                 clean_total_sale = float(self.total_sale_number_label['text'].rstrip("$"))
                 clean_total_sale_bs = clean_price(self.total_sale_label_bs['text'])
                 
-                amount = int(self.orders_tree.item(index)['values'][2])
+                amount = float(self.orders_tree.item(index)['values'][2])
 
                 discount =  string_to_float(self.orders_tree.item(index)['values'][6])
                 order_price = (clean_price(self.orders_tree.item(index)['values'][4]))
@@ -360,7 +368,7 @@ class ProductHandler():
 
     # Insert into Orders Tree.
     def insert_into_orders_tree(self):
-        amount = int(self.amount)
+        amount = float(self.amount)
         discount = int(self.discount)
         self.t_index = self.product_tree.focus()
         product_id = self.product_tree.item(self.t_index)['values'][0]
@@ -518,7 +526,7 @@ class ProductHandler():
         clean_actual_value = clean_price(mess_actual_value)
         clean_actual_value_bs = clean_price(mess_actual_value_bs)
         
-        amount = int(self.amount)
+        amount = float(self.amount)
         discount =  string_to_float(self.discount)
 
         new_total = clean_actual_value + (clean_product_price * amount) * ( 1 - (discount/100))
