@@ -540,8 +540,6 @@ class ProductHandler():
         for order in orders:
             # Getting price.
             order_price = str(order.price)+"$"
-            if order.discount != 0:
-                order_price += f" - {order.discount}% (Ya incluído)"
             self.orders_tree.insert(
                 "",
                 index=tk.END,
@@ -551,8 +549,7 @@ class ProductHandler():
                     order.amount,
                     order.product.name,
                     order_price,
-                    None,
-                    order.discount
+                    None
                 )
             )
             total = float(self.total_sale_number_label['text'].rstrip("$")) + order.price
