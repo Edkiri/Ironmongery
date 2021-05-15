@@ -22,6 +22,9 @@ from utils import (
     string_to_float, number_to_str, es_casi_igual, get_dollars,
     DATE_FORMAT, TODAY)
 
+# Backups
+from backUp import BackUp, Restore
+
 
 class App():
     
@@ -84,6 +87,24 @@ class App():
         credit_menu.add_command(label="Vales", command=lambda: self.display_credit_window(True))
         credit_menu.add_command(label="Créditos", command=self.display_credit_window)
         menubar.add_cascade(label="Créditos", menu=credit_menu)
+        # Database menu
+        def backup():
+            response = messagebox.askyesno("Atención, atención!", "¿Quires hacer un respaldo de la base de datos?", parent=self.root)
+            if response:
+                try:
+                    BackUp.get_instance().copy_db_to_backups_dir(self.root)
+                except Exception as err:
+                    messagebox.showerror("Error", err, parent=self.root)
+        def restore():
+            try:
+                Restore.get_instance().restore_old_database(self.root)
+            except Exception as err:
+                    messagebox.showerror("Error", err, parent=self.root)
+        credit_menu = tk.Menu(menubar, tearoff=0, font=('arial', 15))
+        credit_menu.add_command(label="Respaldar", command=backup)
+        credit_menu.add_command(label="Restaurar", command=restore)
+        menubar.add_cascade(label="Base de datos", menu=credit_menu)
+        # Menu config
         root.config(menu=menubar)
 
 
@@ -731,7 +752,7 @@ class App():
         if not client_handler.client:
             client_handler.display_client_checker()
         else:
-            client_handler.display_client_detail()
+            client_handler.display_client_detail(sale.client)
 
         # Total
         total_frame = tk.Frame(detail_sale_window)

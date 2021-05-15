@@ -13,7 +13,7 @@ class ProductUpdater:
             parent=parent,
             mode='r',
             title="Escoge un archivo excel para actualizar los precios de los productos.",
-            filetypes=[('Excel file', '*.xls')])
+            filetypes=[('Excel file', '*.xls'), ('Excel file', '*.xlsx')])
 
         if self.file:
             self.df = pd.read_excel(self.file.name)
@@ -24,45 +24,49 @@ class ProductUpdater:
 
         counter = 0
         updated_prices = 0
+        update_names = 0
+        created_products = 0
 
         for key, value in self.df.iterrows():
             if counter == 0:
                 counter += 1
                 continue
-            
-            try:
+
+            code = value[2]
+            if str(code) != 'nan':
                 brand = value[0]
                 refence = value[1]
-                code = int(value[2])
-                price = format_float(value[4])
+                price = format_float(value[5])
                 name = value[3].replace("Ð", "Ñ").replace("║", "|")
-            except:
-                raise Exception(f"Error leyendo el archivo en la línea {counter}")
 
-            try:
-                product = Product.get(code=code)
-            except Exception:
-                Product.create(
-                    brand=brand,
-                    reference=refence,
-                    code=code,
-                    name=name,
-                    price=price
-                )
+                try:
+                    product = Product.get(code=code)
+                except Exception:
+                    Product.create(
+                        brand=brand,
+                        reference=refence,
+                        code=code,
+                        name=name,
+                        price=price
+                    )
+                    counter += 1
+                    created_products += 1
+                    continue
+
+                if product.name != name:
+                    product.name = name
+                    product.save()
+                    update_names += 1
+        
+                if es_casi_igual(product.price, price):
+                    pass
+                else:
+                    # Actualizar precio.
+                    product.price = price
+                    product.save()
+                    updated_prices += 1
+
                 counter += 1
-                continue
 
-            if product.name != name:
-                raise Exception(f"Los nombres del producto con código={code} no coinciden.")
-            if es_casi_igual(product.price, price):
-                pass
-            else:
-                # Actualizar precio.
-                product.price = price
-                product.save()
-                updated_prices += 1
-
-            counter += 1
-
-        if updated_prices:
-            messagebox.showinfo("Precios Actualizados!", f"{updated_prices} precios actualizados")
+        if updated_prices or update_names or created_products:
+            messagebox.showinfo("Precios Actualizados!", f"{updated_prices} precios actualizados, {update_names} nombre modificados, {created_products} productos nuevos.")

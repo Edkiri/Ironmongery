@@ -1,6 +1,8 @@
 import shutil
 from datetime import date
 import os
+from tkinter import messagebox
+from tkinter.filedialog import askopenfile
 from config import BASE_DIR, BACKUP_DIR, DATABASE_NAME
 
 class BackUp:
@@ -26,7 +28,7 @@ class BackUp:
             BackUp.__instance = self
 
 
-    def copy_db_to_backups_dir(self):
+    def copy_db_to_backups_dir(self, parent):
 
         original = BASE_DIR + DATABASE_NAME
 
@@ -51,3 +53,45 @@ class BackUp:
                 break
 
         shutil.copyfile(original, target)
+
+        messagebox.showinfo("Operación exitosa!", "Base de datos respaldada.", parent=parent)
+
+
+class Restore:
+
+    __instance = None
+
+    @staticmethod
+    def get_instance():
+        """static access method."""
+        if Restore.__instance == None:
+            Restore()
+        return Restore.__instance
+
+
+    def __init__(self):
+        """ Virtually private constructor. """
+        if Restore.__instance != None:
+            raise Exception("This class is a singleton!")
+        else:
+            Restore.__instance = self
+
+
+    def restore_old_database(self, parent):
+
+        self.db = askopenfile(
+            parent=parent,
+            mode='r',
+            title="Escoge un archivo excel para actualizar los precios de los productos.",
+            initialdir=BACKUP_DIR,
+            filetypes=[('Bases de datos', '*.db')])
+
+        if self.db:
+
+            old_db = self.db.name
+
+            target = BASE_DIR + DATABASE_NAME
+
+            shutil.copyfile(old_db, target)
+
+            messagebox.showinfo("Operación exitosa!", "Base de datos actualizada.", parent=parent)

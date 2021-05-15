@@ -231,7 +231,6 @@ class ProductHandler():
                 except Exception as err:
                     messagebox.showerror("Error!", err, parent=self.product_window)
                 finally:
-                    self.product_window.focus()
                     waitting_window.destroy()
 
 
@@ -245,8 +244,6 @@ class ProductHandler():
             command=update_product_prices)
         update_product_prices_button.grid(row=2, column=1, sticky=tk.E, padx=(0,0))
         
-
-
 
     # Insert Filtered Products Tree.
     def insert_into_filters_tree(self):
