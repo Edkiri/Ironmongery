@@ -8,3 +8,4 @@ venv/
 *pycache*
 *.png
 products.csv
+old_models.py

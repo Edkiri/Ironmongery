@@ -53,7 +53,7 @@ class Payment(BaseModel):
 class Product(BaseModel):
     brand = CharField(max_length=255, null=True)
     reference = CharField(max_length=255, null=True)
-    code = CharField(max_length=100, null=True)
+    code = CharField(max_length=100, null=True, unique=True)
     name = CharField(max_length=255)
     price = FloatField(null=True)
     stock = IntegerField(default=0)
