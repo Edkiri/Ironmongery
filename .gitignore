@@ -9,3 +9,4 @@ venv/
 *.png
 products.csv
 migrations/
+old_database.db
