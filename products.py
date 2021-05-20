@@ -215,7 +215,7 @@ class ProductHandler():
                 
                 # try:
                 back_up = BackUp.get_instance()
-                back_up.copy_db_to_backups_dir()
+                back_up.copy_db_to_backups_dir(self.product_window)
                 # except Exception as err:
                 #     messagebox.showerror("Error!", err, parent=self.product_window)
 
