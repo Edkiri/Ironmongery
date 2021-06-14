@@ -228,6 +228,12 @@ class App():
         # Buttons.
         def get_focus_id():
             return self.day_tree.item(self.day_tree.focus())['values'][0]
+        def delete_sale():
+            if self.day_tree.focus():
+                response = messagebox.askyesno("Atención, atención!", "¿Quieres borrar esta venta?")
+                if response:
+                    self.delete_sale(get_focus_id())
+
         detail_sale_button = tk.Button(
             daily_tree_frame, 
             text="Detalle", 
@@ -243,7 +249,7 @@ class App():
             bd=1,
             relief=tk.RIDGE,
             bg='#e85d5d',
-            command=lambda: self.delete_sale(get_focus_id()))
+            command=delete_sale)
         detail_sale_button.grid(row=1, column=0, sticky=tk.W, padx=(28,0))
         delete_sale_button.grid(row=1, column=0, sticky=tk.E, padx=(0,28))
 
@@ -677,17 +683,14 @@ class App():
 
     # Delete sale.
     def delete_sale(self, sale_id):
-        if self.day_tree.focus():
-                response = messagebox.askyesno("Atención, atención!", "¿Quieres borrar esta venta?")
-                if response:
-                    sale = Sale.get(Sale.id==sale_id)
-                    for payment in Payment.select().join(Sale).where(Sale.id==sale_id):
-                        payment.delete_instance()
-                    for order in Order.select().join(Sale).where(Sale.id==sale_id):
-                        order.delete_instance()
-                    sale.delete_instance()
-                    self.insert_into_daily_tree()
-                    self.insert_into_summary_day()
+        sale = Sale.get(sale_id)
+        for payment in Payment.select().join(Sale).where(Sale.id==sale_id):
+            payment.delete_instance()
+        for order in Order.select().join(Sale).where(Sale.id==sale_id):
+            order.delete_instance()
+        sale.delete_instance()
+        self.insert_into_daily_tree()
+        self.insert_into_summary_day()
 
 
 
@@ -1312,6 +1315,13 @@ class App():
             if credits_tree.focus():
                 sale_id = credits_tree.item(credits_tree.focus())['values'][0]
                 self.detail_sale_window(sale_id, callback_functions=[self.insert_into_credits_tree], params=[vale, get_params()])
+        def delete_credit():
+            if credits_tree.focus():
+                response = messagebox.askyesno("Atención, atención!", f"Quieres eliminar este {title.rstrip('s')}?", parent=credits_frame)
+                if response:
+                    sale_id = credits_tree.item(credits_tree.focus())['values'][0]
+                    self.delete_sale(sale_id)
+                    self.insert_into_credits_tree(vale, get_params())
         # Buttons.
         detail_button = tk.Button(
             credits_frame,
@@ -1322,6 +1332,15 @@ class App():
             bg='#54bf54',
             command=display_detail_window)
         detail_button.grid(row=2, column=0, sticky=tk.W)
+        delete_button = tk.Button(
+            credits_frame,
+            text="Eliminar",
+            font=('calibri', 18, 'bold'),
+            bd=1,
+            relief=tk.RIDGE,
+            bg='#e85d5d',
+            command=delete_credit)
+        delete_button.grid(row=2, column=3, sticky=tk.E)
 
         self.insert_into_credits_tree(vale, get_params())
 
