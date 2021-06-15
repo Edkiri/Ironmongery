@@ -166,14 +166,6 @@ class PaymentHandler():
         method_label.grid(row=3, sticky=tk.W, pady=(0,20))
         method = tk.StringVar()
         methods = [m for m in Payment.METHODS.keys()]
-        # method_choices = (
-        #     '',
-        #     'Punto', 
-        #     'Transferencia', 
-        #     'Pago móvil',
-        #     'Efectivo',
-        #     'Zelle',
-        #     'Paypal',)
         method_choices = ('', *methods)
         method.set(method_choices[1])
         if is_return:
