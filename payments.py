@@ -105,7 +105,7 @@ class PaymentHandler():
         delete_payment_button = tk.Button(
             frame, 
             text="Eliminar",
-            font=('calibri', 15),
+            font=('calibri', 12),
             bd=1,
             relief=tk.RIDGE,
             bg='#e85d5d',

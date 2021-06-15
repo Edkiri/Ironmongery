@@ -129,7 +129,7 @@ class ProductHandler():
         search_button = tk.Button(
             filters_frame,
             text="Buscar",
-            font=('calibri', 18, 'bold'),
+            font=('calibri', 15, 'bold'),
             bd=1,
             relief=tk.RIDGE,
             bg='#54bf54',
@@ -177,7 +177,7 @@ class ProductHandler():
         search_button = tk.Button(
             self.product_window,
             text="Agregar",
-            font=('calibri', 18, 'bold'),
+            font=('calibri', 15, 'bold'),
             bd=1,
             relief=tk.RIDGE,
             bg='#54bf54',
@@ -237,7 +237,7 @@ class ProductHandler():
         update_product_prices_button = tk.Button(
             self.product_window, 
             text="Actualizar precios", 
-            font=('calibri', 15),
+            font=('calibri', 12),
             bd=1,
             relief=tk.RIDGE,
             bg='#54bf54',
@@ -354,7 +354,7 @@ class ProductHandler():
         delete_order_button = tk.Button(
             frame, 
             text="Eliminar", 
-            font=('calibri', 15),
+            font=('calibri', 12),
             bd=1,
             relief=tk.RIDGE,
             bg='#e85d5d',
@@ -470,7 +470,7 @@ class ProductHandler():
             search_button = tk.Button(
                 ask_window,
                 text="Agregar",
-                font=('calibri', 15),
+                font=('calibri', 12),
                 bd=1,
                 relief=tk.RIDGE,
                 bg='#54bf54',
@@ -682,7 +682,7 @@ class ProductHandler():
             create_product_button = tk.Button(
                 detail_product_window, 
                 text="Agregar", 
-                font=('calibri', 18, 'bold'),
+                font=('calibri', 15, 'bold'),
                 bd=1,
                 relief=tk.RIDGE,
                 bg='#54bf54',
@@ -692,7 +692,7 @@ class ProductHandler():
             update_product_button = tk.Button(
                 detail_product_window, 
                 text="Guardar", 
-                font=('calibri', 18, 'bold'),
+                font=('calibri', 15, 'bold'),
                 bd=1,
                 relief=tk.RIDGE,
                 bg='#54bf54',

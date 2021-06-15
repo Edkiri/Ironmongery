@@ -149,7 +149,7 @@ class ClientHandler():
         self.search_button = tk.Button(
             self.frame, 
             text="Buscar",
-            font=('calibri', 13),
+            font=('calibri', 12),
             bd=1,
             relief=tk.RIDGE,
             bg='#54bf54',
@@ -202,7 +202,7 @@ class ClientHandler():
         self.update_button = tk.Button(
             self.frame, 
             text="Detalle",
-            font=('calibri', 13),
+            font=('calibri', 12),
             bd=1,
             relief=tk.RIDGE,
             bg='#54bf54',
@@ -215,7 +215,7 @@ class ClientHandler():
         self.cancel_button = tk.Button(
             self.frame, 
             text="Cambiar",
-            font=('calibri', 13),
+            font=('calibri', 12),
             bd=1,
             relief=tk.RIDGE,
             bg='#e85d5d',
@@ -352,7 +352,7 @@ class ClientHandler():
         cancel_button = tk.Button(
             new_client_frame, 
             text="Cancelar", 
-            font=('calibri', 15),
+            font=('calibri', 12),
             bd=1,
             relief=tk.RIDGE,
             bg='#e85d5d',
@@ -363,7 +363,7 @@ class ClientHandler():
             add_client_button = tk.Button(
                 new_client_frame, 
                 text="Agregar", 
-                font=('calibri', 15),
+                font=('calibri', 12),
                 bd=1,
                 padx=15,
                 relief=tk.RIDGE,
@@ -382,7 +382,7 @@ class ClientHandler():
             update_client_button = tk.Button(
                 new_client_frame, 
                 text="Modificar", 
-                font=('calibri', 15),
+                font=('calibri', 12),
                 bd=1,
                 padx=15,
                 relief=tk.RIDGE,

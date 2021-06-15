@@ -40,8 +40,8 @@ class App():
         # Main Frames.
         self.sales_frame = tk.Frame(root)
         self.create_sale_frame = tk.Frame(root)
-        self.sales_frame.grid(row=0, column=0, padx=(25,0), pady=(25,0))
-        self.create_sale_frame.grid(row=0, column=1, padx=(15,0), pady=(25,0), sticky=tk.N)
+        self.sales_frame.grid(row=0, column=0, padx=(25,0))
+        self.create_sale_frame.grid(row=0, column=1, padx=(15,0), sticky=tk.N)
 
         # Display Daily Sales Frame.
         self.display_daily_data()
@@ -112,7 +112,7 @@ class App():
     # Daily Data.
     def display_daily_data(self):
         date_frame = tk.LabelFrame(self.sales_frame, bd=0)
-        date_frame.grid(row=0, column=0, pady=15)
+        date_frame.grid(row=0, column=0)
         self.query_date = tk.Entry(
             date_frame, 
             width=12, 
@@ -164,7 +164,7 @@ class App():
             date_frame,
             text="Tasa",
             font=('calibri', 15))
-        rate_label.grid(row=1, column=1, columnspan=3, sticky=tk.W, pady=(15,0))
+        rate_label.grid(row=1, column=1, columnspan=3, sticky=tk.W)
         self.rate = tk.Entry(
             date_frame, 
             width=9, 
@@ -172,7 +172,7 @@ class App():
             font=('calibri', 15))
         self.rate.insert(0, 0)
         self.rate.focus()
-        self.rate.grid(row=1, column=1, columnspan=3, sticky=tk.W, pady=(15,0), padx=(50,0))
+        self.rate.grid(row=1, column=1, columnspan=3, sticky=tk.W, padx=(50,0))
 
 
 
@@ -188,8 +188,8 @@ class App():
                 day.split('-')[0],
                 get_month_name(day),
                 day.split('-')[2]),
-            font=('calibri', 18, 'bold'))
-        self.day_tree_label.grid(row=1, column=0, pady=(10,20))
+            font=('calibri', 16, 'bold'))
+        self.day_tree_label.grid(row=1, column=0, pady=(10,10))
 
         # Daily Tree Frame.
         daily_tree_frame = tk.Frame(self.sales_frame)
@@ -418,7 +418,7 @@ class App():
 
         # Frame
         products_frame = tk.Frame(self.create_sale_frame)
-        products_frame.grid(row=3, column=0, pady=(20,10), sticky=tk.W)
+        products_frame.grid(row=3, column=0, pady=(10,0), sticky=tk.W)
 
         # Product Window
         
@@ -429,7 +429,7 @@ class App():
         add_product_button = tk.Button(
             products_frame, 
             text="Agregar(A)", 
-            font=('calibri', 15),
+            font=('calibri', 12),
             bd=1,
             relief=tk.RIDGE,
             bg='#54bf54',
@@ -443,7 +443,7 @@ class App():
         
         # Payments Frame
         payments_frame =  tk.Frame(self.create_sale_frame)
-        payments_frame.grid(row=4, column=0, pady=(0,10), sticky=tk.W)
+        payments_frame.grid(row=4, column=0, sticky=tk.W)
 
         self.payment_handler = PaymentHandler()
         self.payment_handler.display_payments_tree(payments_frame)
@@ -452,7 +452,7 @@ class App():
         add_payment_button = tk.Button(
             payments_frame, 
             text="Pago(Z)", 
-            font=('calibri', 15),
+            font=('calibri', 12),
             bd=1,
             relief=tk.RIDGE,
             bg='#54bf54',
@@ -461,7 +461,7 @@ class App():
         add_return_button = tk.Button(
             payments_frame, 
             text="Vuelto(X)", 
-            font=('calibri', 15),
+            font=('calibri', 12),
             bd=1,
             relief=tk.RIDGE,
             bg='#54bf54',
@@ -489,7 +489,7 @@ class App():
     def display_create_sale_buttons(self):
         # Buttons Frame
         sale_buttons_frame = tk.Frame(self.create_sale_frame)
-        sale_buttons_frame.grid(row=5, column=0, pady=(40,0))
+        sale_buttons_frame.grid(row=5, column=0, pady=(15,0))
 
         clear_sale_frame = tk.Button(
             sale_buttons_frame, 
@@ -505,7 +505,7 @@ class App():
         add_sale_button = tk.Button(
             sale_buttons_frame, 
             text="Crear Venta", 
-            font=('calibri', 18, 'bold'),
+            font=('calibri', 15, 'bold'),
             bd=1,
             relief=tk.RIDGE,
             bg='#54bf54',
@@ -763,7 +763,7 @@ class App():
 
         # Orders
         orders_frame = tk.Frame(detail_sale_window)
-        orders_frame.grid(row=3, column=0, columnspan=2, pady=(20,0), sticky=tk.W)
+        orders_frame.grid(row=3, column=0, columnspan=2, sticky=tk.W)
         products_handler = ProductHandler()
         products_handler.display_total_orders(total_frame, True)
         products_handler.display_orders_tree(orders_frame)
@@ -771,7 +771,7 @@ class App():
 
         # Payments
         payments_frame = tk.Frame(detail_sale_window)
-        payments_frame.grid(row=4, column=0, pady=(20,0), sticky=tk.W)
+        payments_frame.grid(row=4, column=0, pady=(10,0), sticky=tk.W)
         payments_handler = PaymentHandler()
         payments_handler.display_total_payments(total_frame)
         payments_handler.display_payments_tree(payments_frame, True)
