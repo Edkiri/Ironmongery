@@ -334,8 +334,8 @@ class ProductHandler():
                 clean_total_sale_bs = clean_price(self.total_sale_label_bs['text'])
                 
                 amount = float(self.orders_tree.item(index)['values'][2])
-
-                discount =  string_to_float(self.orders_tree.item(index)['values'][6])
+                if self.orders_tree.item(index)['values'][6] != "None":
+                    discount =  string_to_float(self.orders_tree.item(index)['values'][6])
                 order_price = (clean_price(self.orders_tree.item(index)['values'][4]))
                 rate = self.orders_tree.item(index)['values'][5]
                 order_price_bs = 0
@@ -549,6 +549,7 @@ class ProductHandler():
                     order.amount,
                     order.product.name,
                     order_price,
+                    None,
                     None
                 )
             )
