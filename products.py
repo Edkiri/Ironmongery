@@ -31,7 +31,7 @@ class ProductHandler():
             height=700,
             padx=30, 
             pady=30)
-        self.product_window.title("Nueva venta")
+        self.product_window.title("Nueva Orden")
 
         # Rate
         rate_label = tk.Label(
@@ -299,20 +299,32 @@ class ProductHandler():
             frame, 
             height=5, 
             selectmode ='browse',
-            columns=('order_id', 'pruduct_id', 'Cantidad', 'Nombre', 'Precio', 'rate', 'discount'),
+            columns=('order_id', 'pruduct_id', 'name', 'amount', 'product_price', 'total', 'rate', 'discount'),
             style="mystyle.Treeview",
             padding=4)
         self.orders_tree.column("#0", width=0, stretch=tk.NO)
-        for col in self.orders_tree['columns']:
-            if col == 'Nombre':
-                self.orders_tree.column(col, width=280, minwidth=25)
-            elif col == 'Cantidad':
-                self.orders_tree.column(col, width=80, minwidth=25)
-            elif (col == 'pruduct_id') or (col == 'order_id') or (col == 'rate') or (col == 'discount'):
-                self.orders_tree.column(col, width=0, stretch=tk.NO)
-            else:
-                self.orders_tree.column(col, width=250, minwidth=25)
-            self.orders_tree.heading(col, text=col, anchor=tk.W)
+        # HEADING TREE
+        # Order Id
+        self.orders_tree.column('order_id', width=0, stretch=tk.NO)
+        # Product Id
+        self.orders_tree.column('pruduct_id', width=0, stretch=tk.NO)
+        # Name
+        self.orders_tree.column('name', width=300, minwidth=25)
+        self.orders_tree.heading('name', text='Nombre', anchor=tk.W)
+        # Amount
+        self.orders_tree.column('amount', width=80, minwidth=25)
+        self.orders_tree.heading('amount', text='Cantidad', anchor=tk.W)
+        # Price per unit
+        self.orders_tree.column('product_price', width=140, minwidth=25)
+        self.orders_tree.heading('product_price', text='Precio/Unidad', anchor=tk.W)
+        # Total
+        self.orders_tree.column('total', width=140, minwidth=25)
+        self.orders_tree.heading('total', text='Total', anchor=tk.W)
+        # Rate
+        self.orders_tree.column('rate', width=0, stretch=tk.NO)
+        # Discount
+        self.orders_tree.column('discount', width=0, stretch=tk.NO)
+        # Griding Tree
         self.orders_tree.grid(row=1, column=0, pady=(10,0))
 
         # Delete Orders
@@ -333,11 +345,11 @@ class ProductHandler():
                 clean_total_sale = float(self.total_sale_number_label['text'].rstrip("$"))
                 clean_total_sale_bs = clean_price(self.total_sale_label_bs['text'])
                 
-                amount = float(self.orders_tree.item(index)['values'][2])
-                if self.orders_tree.item(index)['values'][6] != "None":
-                    discount =  string_to_float(self.orders_tree.item(index)['values'][6])
-                order_price = (clean_price(self.orders_tree.item(index)['values'][4]))
-                rate = self.orders_tree.item(index)['values'][5]
+                amount = float(self.orders_tree.item(index)['values'][3])
+                if self.orders_tree.item(index)['values'][7] != 'None':
+                    discount =  string_to_float(self.orders_tree.item(index)['values'][7])
+                order_price = (clean_price(self.orders_tree.item(index)['values'][5]))
+                rate = self.orders_tree.item(index)['values'][6]
                 order_price_bs = 0
                 if rate != 'None':
                     order_price_bs = order_price * string_to_float(rate)
@@ -372,9 +384,10 @@ class ProductHandler():
         product_name = self.product_tree.item(self.t_index)['values'][2]
         
         # Getting price.
-        product_price = string_to_float(self.price) * amount
+        product_price = string_to_float(self.price)
         product_price *= 1 - (discount/100)
         price_to_print = f"{product_price}$"
+        total_price = f"{ product_price * amount }$"
         if discount != 0:
             price_to_print += f" - {discount}% (Ya incluído)"
         
@@ -385,9 +398,10 @@ class ProductHandler():
             values=(
                 None,
                 product_id,
-                self.amount,
                 product_name,
+                self.amount,
                 price_to_print,
+                total_price,
                 self.rate_entry.get(),
                 discount
             )
@@ -539,15 +553,17 @@ class ProductHandler():
         orders = Order.select().join(Sale).where(Sale.id==sale_id)
         for order in orders:
             # Getting price.
+            unit_price = str(order.price / order.amount)+"$"
             order_price = str(order.price)+"$"
             self.orders_tree.insert(
                 "",
                 index=tk.END,
                 values=(
                     order.id,
-                    order.product,
-                    order.amount,
+                    order.product.id,
                     order.product.name,
+                    order.amount,
+                    unit_price,
                     order_price,
                     None,
                     None

@@ -394,7 +394,7 @@ class App():
         desc_label.grid(row=0, column=2, padx=(3,0))
         self.new_sale_desc_text = ttk.Entry(
             frame, 
-            width=35, 
+            width=40, 
             font=('calibri', 15))
         self.new_sale_desc_text.grid(row=0, column=3)
 
@@ -556,9 +556,9 @@ class App():
                 for order_index in self.product_handler.orders_tree.get_children():
                     order_values = self.product_handler.orders_tree.item(order_index)['values']
                     product_id = order_values[1]
-                    amount = order_values[2]
-                    price = get_dollars(order_values[4])
-                    discount = int(order_values[6])
+                    amount = order_values[3]
+                    price = get_dollars(order_values[5])
+                    discount = int(order_values[7])
                     Order.create(
                         product=product_id,
                         sale=sale,
@@ -742,7 +742,7 @@ class App():
         desc_label.grid(row=0, column=2, padx=(3,0))
         sale_desc_text = ttk.Entry(
             frame, 
-            width=28, 
+            width=40, 
             font=('calibri', 15))
         sale_desc_text.insert(0, sale.description)
         sale_desc_text.grid(row=0, column=3)
@@ -781,7 +781,7 @@ class App():
         add_product_button = tk.Button(
             orders_frame, 
             text="Agregar", 
-            font=('calibri', 15),
+            font=('calibri', 12),
             bd=1,
             relief=tk.RIDGE,
             bg='#54bf54',
@@ -836,9 +836,9 @@ class App():
                             product=new_order_values[1],
                             sale=sale.id,
                             date=datetime.strptime(TODAY, DATE_FORMAT),
-                            amount=new_order_values[2],
-                            price=get_dollars(new_order_values[4]),
-                            discount=int(new_order_values[6])
+                            amount=new_order_values[3],
+                            price=get_dollars(new_order_values[5]),
+                            discount=int(new_order_values[7])
                         )
                 
                 for payment_index in payments_handler.payments_tree.get_children():
