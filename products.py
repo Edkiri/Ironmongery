@@ -309,16 +309,16 @@ class ProductHandler():
         # Product Id
         self.orders_tree.column('pruduct_id', width=0, stretch=tk.NO)
         # Name
-        self.orders_tree.column('name', width=300, minwidth=25)
+        self.orders_tree.column('name', width=350, minwidth=25)
         self.orders_tree.heading('name', text='Nombre', anchor=tk.W)
         # Amount
         self.orders_tree.column('amount', width=80, minwidth=25)
         self.orders_tree.heading('amount', text='Cantidad', anchor=tk.W)
         # Price per unit
-        self.orders_tree.column('product_price', width=140, minwidth=25)
+        self.orders_tree.column('product_price', width=160, minwidth=25)
         self.orders_tree.heading('product_price', text='Precio/Unidad', anchor=tk.W)
         # Total
-        self.orders_tree.column('total', width=140, minwidth=25)
+        self.orders_tree.column('total', width=160, minwidth=25)
         self.orders_tree.heading('total', text='Total', anchor=tk.W)
         # Rate
         self.orders_tree.column('rate', width=0, stretch=tk.NO)
@@ -498,20 +498,20 @@ class ProductHandler():
     def display_total_orders(self, frame, is_detail=False):
         total_sale_label = tk.Label(
             frame,
-            text="Total Venta:",
-            font=('calibri', 18, 'bold'))
-        total_sale_label.grid(row=0, column=0, pady=(50,0))
+            text="Órdenes:",
+            font=('calibri', 17, 'bold'))
+        total_sale_label.grid(row=0, column=1, sticky=tk.W)
         self.total_sale_number_label = tk.Label(
             frame,
             text="0$",
-            font=('calibri', 18, 'bold'))
-        self.total_sale_number_label.grid(row=0, column=1, pady=(50,0), sticky=tk.E)
+            font=('calibri', 17, 'bold'))
+        self.total_sale_number_label.grid(row=0, column=2, padx=10, sticky=tk.E)
         self.total_sale_label_bs = tk.Label(
             frame,
             text="0bs",
-            font=('calibri', 18, 'bold'))
+            font=('calibri', 17, 'bold'))
         if not is_detail:
-            self.total_sale_label_bs.grid(row=1, column=0, columnspan=2, pady=(10,85), sticky=tk.W)
+            self.total_sale_label_bs.grid(row=0, column=3, sticky=tk.E)
 
 
 

@@ -7,7 +7,11 @@ from tkinter import messagebox
 from models import Payment, Sale
 
 # Utils
-from utils import number_to_str, string_to_float, DATE_FORMAT
+from utils import (
+    number_to_str, 
+    string_to_float, 
+    get_summary_payments,
+    DATE_FORMAT)
 from datetime import datetime
 
 
@@ -38,18 +42,19 @@ class PaymentHandler():
                         self.total_payments -= string_to_float(amount)
                     else:
                         self.total_payments += string_to_float(amount)
-                    self.total_payments_number_label['text'] = number_to_str(self.total_payments) + '$'
-                
+                    self.total_payments_dollars_label['text'] = number_to_str(self.total_payments) + '$'
                 else:
 
                     if pay_type == 'Pago':
                         self.total_payments -= (string_to_float(amount) / rate)
                     else:
                         self.total_payments += (string_to_float(amount) / rate)
-                    self.total_payments_number_label['text'] = number_to_str(self.total_payments) + '$'
+                    self.total_payments_bs_label['text'] =  number_to_str(self.total_payments * rate) + 'bs'
                 if self.payments_tree.item(index)['values'][0] != 'None':
                     self.payments_to_delete.append(self.payments_tree.item(index)['values'][0])
                 self.payments_tree.delete(index)
+                if sale_id:
+                    self.total_payments_dollars_label['text'] = number_to_str(self.total_payments) + '$'
         
         # Title
         payments_title_label = tk.Label(
@@ -244,7 +249,7 @@ class PaymentHandler():
                         method.get(),
                         rate_entry.get(),
                         account.get()))
-                self.calculate_total_sale(index)
+                self.calculate_total_sale(index, True)
                 self.row_indexes.append(index)
                 new_payment_window.destroy()
             except Exception as err:
@@ -262,7 +267,7 @@ class PaymentHandler():
 
 
 
-    def calculate_total_sale(self, index):
+    def calculate_total_sale(self, index, is_detail=False):
         payment = self.payments_tree.item(index)
         sale_type = payment['values'][3]
         amount = payment['values'][4]
@@ -273,29 +278,36 @@ class PaymentHandler():
                 self.total_payments += string_to_float(amount)
             else:
                 self.total_payments -= string_to_float(amount)
-            self.total_payments_number_label['text'] = number_to_str(self.total_payments) + "$"
+            self.total_payments_dollars_label['text'] = number_to_str(self.total_payments) + "$"
         else:
             if sale_type == 'Pago':
                 self.total_payments += (string_to_float(amount) / rate)
             else: 
                 self.total_payments -= (string_to_float(amount) / rate)
-            self.total_payments_number_label['text'] = number_to_str(self.total_payments) + "$"
+            if is_detail:
+                self.total_payments_dollars_label['text'] = number_to_str(self.total_payments) + "$"
+            self.total_payments_bs_label['text'] = number_to_str(self.total_payments * rate) + "bs"
 
 
-
-    def display_total_payments(self, frame):
+    def display_total_payments(self, frame, is_detail=False):
         self.total_payments = 0
         # Total Payments.
         total_payments_label = tk.Label(
             frame,
-            text="Total Pagos:",
-            font=('calibri', 18, 'bold'))
-        total_payments_label.grid(row=1, column=0, pady=(25,0))
-        self.total_payments_number_label = tk.Label(
+            text="Pagos:",
+            font=('calibri', 17, 'bold'))
+        total_payments_label.grid(row=1, column=1, pady=20, sticky=tk.W)
+        self.total_payments_dollars_label = tk.Label(
             frame,
             text="{}$".format(self.total_payments),
-            font=('calibri', 18, 'bold'))
-        self.total_payments_number_label.grid(row=1, column=1, sticky=tk.E,pady=(25,0))
+            font=('calibri', 17, 'bold'))
+        self.total_payments_dollars_label.grid(row=1, column=2, pady=20, padx=10, sticky=tk.E)
+        self.total_payments_bs_label = tk.Label(
+            frame,
+            text="0bs",
+            font=('calibri', 17, 'bold'))
+        if not is_detail:
+            self.total_payments_bs_label.grid(row=1, column=3, pady=20, sticky=tk.E)
 
 
 
@@ -321,5 +333,8 @@ class PaymentHandler():
                     payment.rate,
                     payment.account))
 
+        total_payments = get_summary_payments(payments)[2]
+        self.total_payments_dollars_label['text'] = number_to_str(total_payments)
         for index in self.payments_tree.get_children():
-            self.calculate_total_sale(index)
+            self.calculate_total_sale(index, True)
+
