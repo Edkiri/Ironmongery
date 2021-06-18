@@ -394,7 +394,7 @@ class App():
         desc_label.grid(row=0, column=2, padx=(3,0))
         self.new_sale_desc_text = ttk.Entry(
             frame,
-            width=49,
+            width=52,
             font=('calibri', 15))
         self.new_sale_desc_text.grid(row=0, column=3)
 
@@ -783,7 +783,7 @@ class App():
         desc_label.grid(row=0, column=2, padx=(3,0))
         sale_desc_text = ttk.Entry(
             frame,
-            width=49,
+            width=52,
             font=('calibri', 15))
         sale_desc_text.insert(0, sale.description)
         sale_desc_text.grid(row=0, column=3)

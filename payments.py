@@ -91,12 +91,12 @@ class PaymentHandler():
         payments_tree.column('Tipo', width=65, minwidth=25)
         payments_tree.heading('Tipo', text='Tipo', anchor=tk.W)
         # Amount.
-        payments_tree.column('Cantidad', width=150, minwidth=25)
+        payments_tree.column('Cantidad', width=130, minwidth=25)
         payments_tree.heading('Cantidad', text='Cantidad', anchor=tk.W)
         # Currency.
         payments_tree.column('Moneda', width=0, stretch=tk.NO)
         # Method.
-        payments_tree.column('Metodo', width=150, minwidth=25)
+        payments_tree.column('Metodo', width=120, minwidth=25)
         payments_tree.heading('Metodo', text='Método', anchor=tk.W)
         # Tasa .
         payments_tree.column('Tasa', width=0, stretch=tk.NO)

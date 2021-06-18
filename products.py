@@ -157,7 +157,7 @@ class ProductHandler():
         product_tree.column("#0", width=0, stretch=tk.NO)
         for col in product_tree['columns']:
             if col == 'Nombre':
-                product_tree.column(col, width=280, minwidth=25)
+                product_tree.column(col, width=320, minwidth=25)
             elif col == 'Código':
                 product_tree.column(col, width=60, minwidth=25)
             elif col == 'Precio':
@@ -309,7 +309,7 @@ class ProductHandler():
         # Product Id
         self.orders_tree.column('pruduct_id', width=0, stretch=tk.NO)
         # Name
-        self.orders_tree.column('name', width=350, minwidth=25)
+        self.orders_tree.column('name', width=380, minwidth=25)
         self.orders_tree.heading('name', text='Nombre', anchor=tk.W)
         # Amount
         self.orders_tree.column('amount', width=80, minwidth=25)
