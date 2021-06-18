@@ -40,16 +40,19 @@ class PaymentHandler():
                 if currency == 'Dólares':
                     if pay_type == 'Pago':
                         self.total_payments -= string_to_float(amount)
+                        self.dollars_payments -= string_to_float(amount)
                     else:
                         self.total_payments += string_to_float(amount)
-                    self.total_payments_dollars_label['text'] = number_to_str(self.total_payments) + '$'
+                        self.dollars_payments += string_to_float(amount)
+                    self.total_payments_dollars_label['text'] = number_to_str(self.dollars_payments) + '$'
                 else:
-
                     if pay_type == 'Pago':
                         self.total_payments -= (string_to_float(amount) / rate)
+                        self.bs_payments -= string_to_float(amount)
                     else:
                         self.total_payments += (string_to_float(amount) / rate)
-                    self.total_payments_bs_label['text'] =  number_to_str(self.total_payments * rate) + 'bs'
+                        self.bs_payments += string_to_float(amount)
+                    self.total_payments_bs_label['text'] =  number_to_str(self.bs_payments) + 'bs'
                 if self.payments_tree.item(index)['values'][0] != 'None':
                     self.payments_to_delete.append(self.payments_tree.item(index)['values'][0])
                 self.payments_tree.delete(index)
@@ -119,7 +122,7 @@ class PaymentHandler():
 
 
 
-    def add_payment_window(self, date, rate, is_return=False):
+    def add_payment_window(self, date, rate, is_return=False, is_detail=False):
         
         # New Window.
         new_payment_window = tk.Toplevel(padx=30, pady=50)
@@ -249,7 +252,7 @@ class PaymentHandler():
                         method.get(),
                         rate_entry.get(),
                         account.get()))
-                self.calculate_total_sale(index, True)
+                self.calculate_total_sale(index, is_detail)
                 self.row_indexes.append(index)
                 new_payment_window.destroy()
             except Exception as err:
@@ -276,21 +279,27 @@ class PaymentHandler():
         if currency == 'Dólares':
             if sale_type == 'Pago':
                 self.total_payments += string_to_float(amount)
+                self.dollars_payments += string_to_float(amount)
             else:
                 self.total_payments -= string_to_float(amount)
-            self.total_payments_dollars_label['text'] = number_to_str(self.total_payments) + "$"
+                self.dollars_payments -= string_to_float(amount)
+            self.total_payments_dollars_label['text'] = number_to_str(self.dollars_payments) + "$"
         else:
             if sale_type == 'Pago':
                 self.total_payments += (string_to_float(amount) / rate)
+                self.bs_payments += string_to_float(amount)
             else: 
                 self.total_payments -= (string_to_float(amount) / rate)
+                self.bs_payments -= string_to_float(amount)
             if is_detail:
                 self.total_payments_dollars_label['text'] = number_to_str(self.total_payments) + "$"
-            self.total_payments_bs_label['text'] = number_to_str(self.total_payments * rate) + "bs"
+            self.total_payments_bs_label['text'] = number_to_str(self.bs_payments) + "bs"
 
 
     def display_total_payments(self, frame, is_detail=False):
         self.total_payments = 0
+        self.dollars_payments = 0
+        self.bs_payments = 0
         # Total Payments.
         total_payments_label = tk.Label(
             frame,

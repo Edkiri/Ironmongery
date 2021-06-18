@@ -475,19 +475,6 @@ class App():
     # Sum total sale and payments.
     def display_total_sale(self):
 
-        # Functions
-        def calculate_remaining():
-            dollars_order = float(self.product_handler.total_sale_number_label['text'].rstrip("$"))
-            # bs_order = string_to_float(self.product_handler.total_sale_label_bs['text'].rstrip("bs"))
-            # dollars_paid = float(self.payment_handler.total_payments_dollars_label['text'].rstrip("$"))
-            # bs_paid = string_to_float(self.payment_handler.total_payments_bs_label['text'].rstrip("bs"))
-            total_dollar_payments = self.payment_handler.total_payments
-            remaining_dollars = dollars_order - total_dollar_payments
-            rate =  string_to_float(self.rate.get())
-            remaining_bs = number_to_str(remaining_dollars * rate)
-            self.remaining_sale_dollars_label['text'] = number_to_str(remaining_dollars) + "$"
-            self.remaining_sale_bs_label['text'] = number_to_str(remaining_bs) + "bs"
-
         # Total Sale Frame.
         total_sale_frame = tk.Frame(self.create_sale_frame)
 
@@ -503,7 +490,7 @@ class App():
             bd=1,
             relief=tk.RIDGE,
             bg='#ffff00',
-            command=calculate_remaining)
+            command=self.calculate_remaining)
         calculate_remaining_payments_button.grid(row=2, column=0, pady=(10,0))
         remaining_sale_label = tk.Label(
             total_sale_frame,
@@ -520,6 +507,19 @@ class App():
             text="0bs",
             font=('calibri', 17, 'bold'))
         self.remaining_sale_bs_label.grid(row=2, column=3, sticky=tk.E, pady=(10,0))
+
+
+
+
+    # Functions
+    def calculate_remaining(self):
+        dollars_order = float(self.product_handler.total_sale_number_label['text'].rstrip("$"))
+        total_dollar_payments = self.payment_handler.total_payments
+        remaining_dollars = dollars_order - total_dollar_payments
+        rate =  string_to_float(self.rate.get())
+        remaining_bs = number_to_str(remaining_dollars * rate)
+        self.remaining_sale_dollars_label['text'] = number_to_str(remaining_dollars) + "$"
+        self.remaining_sale_bs_label['text'] = number_to_str(remaining_bs) + "bs"
 
 
 
@@ -627,7 +627,7 @@ class App():
                 raise Exception("No puedes crear una venta sin productos.")
 
             total_sale = float(self.product_handler.total_sale_number_label['text'].rstrip("$"))
-            total_payments = float(self.payment_handler.total_payments_dollars_label['text'].rstrip("$"))
+            total_payments = float(self.payment_handler.total_payments)
 
             if es_casi_igual(total_sale, total_payments):
                 client = self.client_handler.client
@@ -836,7 +836,7 @@ class App():
             bd=1,
             relief=tk.RIDGE,
             bg='#54bf54',
-            command=lambda: payments_handler.add_payment_window(self.query_date.get(), self.rate.get()))
+            command=lambda: payments_handler.add_payment_window(self.query_date.get(), self.rate.get(), False, True))
         add_payment_button.grid(row=3, column=0, sticky=tk.W)
 
         add_return_button = tk.Button(
@@ -846,7 +846,7 @@ class App():
             bd=1,
             relief=tk.RIDGE,
             bg='#54bf54',
-            command=lambda: payments_handler.add_payment_window(self.query_date.get(), self.rate.get(), True))
+            command=lambda: payments_handler.add_payment_window(self.query_date.get(), self.rate.get(), True, True))
         add_return_button.grid(row=3, column=0, sticky=tk.W, padx=(100,0))
 
         # Update Sale.
