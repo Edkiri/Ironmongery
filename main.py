@@ -573,6 +573,8 @@ class App():
             self.payment_handler.total_payments_dollars_label['text'] = "0$"
             self.payment_handler.total_payments_bs_label['text'] = "0bs"
             self.payment_handler.total_payments = 0
+            self.payment_handler.dollars_payments = 0
+            self.payment_handler.bs_payments = 0
             self.remaining_sale_bs_label['text'] = "0bs"
             self.remaining_sale_dollars_label['text'] = "0$"
 
