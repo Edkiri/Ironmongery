@@ -59,10 +59,11 @@ class App():
 
         # Binding
         def PressAnyKey(event):
+            # print(event.keycode)
             if event.keycode == 65:
                 self.product_handler.display_new_order_window(self.rate.get())
             elif event.keycode == 90:
-                self.payment_handler.add_payment_window(self.query_date.get(), self.rate.get())
+                self.payment_handler.add_payment_window(self.query_date.get(), self.rate.get(), False)
             elif event.keycode == 88:
                 self.payment_handler.add_payment_window(self.query_date.get(), self.rate.get(), True)
             elif event.keycode == 49:
@@ -71,6 +72,23 @@ class App():
                 self.display_credit_window()
             elif event.keycode == 51:
                 self.display_credit_window(True)
+            elif (event.keycode == 66) or (event.keycode == 68):
+                # Bolívares > 66 > "ctrl + b"
+                # Dólares68 > 68 > "ctrl + d"
+                self.calculate_remaining()
+                total_orders = float(self.product_handler.total_sale_number_label['text'].rstrip("$"))
+                total_payments = float(self.payment_handler.total_payments)
+                total_result = total_orders - total_payments
+                currencies = {66: "bs", 68: "usd"}
+                currency = currencies[event.keycode]
+                if total_result > 0:
+                    if currency == "bs":
+                        rate = string_to_float(self.rate.get())
+                        self.payment_handler.add_payment_window(self.query_date.get(), self.rate.get(), total=total_result*rate, currency_option=currency)
+                    else:
+                        self.payment_handler.add_payment_window(self.query_date.get(), self.rate.get(), total=total_result, currency_option=currency)
+                # print("Ordenes: ", total_orders)
+                # print("Pagos: ", total_payments)
         self.root.bind('<Control-KeyPress>', lambda i: PressAnyKey(i))
 
 
@@ -451,21 +469,21 @@ class App():
         # Display buttons
         add_payment_button = tk.Button(
             payments_frame,
-            text="Pago(Z)",
+            text="Pago",
             font=('calibri', 12),
             bd=1,
             relief=tk.RIDGE,
             bg='#54bf54',
-            padx=8,
+            padx=5,
             command=lambda: self.payment_handler.add_payment_window(self.query_date.get(), self.rate.get()))
         add_return_button = tk.Button(
             payments_frame,
-            text="Vuelto(X)",
+            text="Vuelto",
             font=('calibri', 12),
             bd=1,
             relief=tk.RIDGE,
             bg='#54bf54',
-            padx=8,
+            padx=5,
             command=lambda: self.payment_handler.add_payment_window(self.query_date.get(), self.rate.get(), True))
         add_payment_button.grid(row=3, column=0, sticky=tk.W)
         add_return_button.grid(row=3, column=0, sticky=tk.W, padx=(90,0))

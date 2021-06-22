@@ -122,8 +122,8 @@ class PaymentHandler():
 
 
 
-    def add_payment_window(self, date, rate, is_return=False, is_detail=False):
-        
+    def add_payment_window(self, date, rate, is_return=False, is_detail=False, total=0, currency_option=None):
+        print(currency_option)
         # New Window.
         new_payment_window = tk.Toplevel(padx=30, pady=50)
 
@@ -165,6 +165,8 @@ class PaymentHandler():
             currency,
             *currency_choices)
         curr_option.grid(row=2, pady=(0,20), sticky=tk.E)
+        if currency_option == "usd":
+            currency.set(currency_choices[2])
         
         # Method
         method_label = tk.Label(
@@ -183,6 +185,8 @@ class PaymentHandler():
             method,
             *method_choices)
         method_option.grid(row=3, sticky=tk.E, pady=(0,20))
+        if currency_option == "usd":
+            method.set(method_choices[4])
         
         # Account
         account_label = tk.Label(
@@ -224,6 +228,8 @@ class PaymentHandler():
             font=('calibri', 15))
         amount_entry.focus()
         amount_entry.grid(row=6, pady=(0,20), sticky=tk.E)
+        if total:
+            amount_entry.insert(0, number_to_str(total))
         
         # Saving
         def add_payment_to_tree():
