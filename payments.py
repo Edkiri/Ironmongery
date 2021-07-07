@@ -24,10 +24,10 @@ class PaymentHandler():
 
 
 
-    def display_payments_tree(self, frame, sale_id=None):
+    def display_payments_tree(self, frame, sale_id=None, callbacks=[]):
         
         # Functions
-        def delete_payment_row():
+        def delete_payment_row(callbacks):
         
             if self.payments_tree.focus():
                 index = self.payments_tree.focus()
@@ -58,7 +58,9 @@ class PaymentHandler():
                 self.payments_tree.delete(index)
                 if sale_id:
                     self.total_payments_dollars_label['text'] = number_to_str(self.total_payments) + '$'
-        
+                if callbacks:
+                    for callback in callbacks:
+                        callback()
         # Title
         payments_title_label = tk.Label(
             frame,
@@ -117,13 +119,17 @@ class PaymentHandler():
             bd=1,
             relief=tk.RIDGE,
             bg='#e85d5d',
-            command=delete_payment_row)
+            command=lambda: delete_payment_row(callbacks))
         delete_payment_button.grid(row=3, column=0, sticky=tk.E)
 
 
 
-    def add_payment_window(self, date, rate, is_return=False, is_detail=False, total=0, currency_option=None):
-        print(currency_option)
+    def add_payment_window(
+        self, date, rate, 
+        is_return=False, is_detail=False, total=0, 
+        currency_option=None, callbacks=[]
+        ):
+
         # New Window.
         new_payment_window = tk.Toplevel(padx=30, pady=50)
 
@@ -261,6 +267,9 @@ class PaymentHandler():
                 self.calculate_total_sale(index, is_detail)
                 self.row_indexes.append(index)
                 new_payment_window.destroy()
+                if callbacks:
+                    for callback in callbacks:
+                        callback()
             except Exception as err:
                 messagebox.showerror("Error", err, parent=new_payment_window)
         

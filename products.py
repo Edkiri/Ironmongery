@@ -24,7 +24,7 @@ class ProductHandler():
 
 
     # Dislplay Products Window
-    def display_new_order_window(self, rate):
+    def display_new_order_window(self, rate, callbacks=[]):
 
         self.product_window = tk.Toplevel(
             width=700, 
@@ -55,7 +55,7 @@ class ProductHandler():
         filters_title.grid(row=0, columnspan=2, pady=(10,20))
         
         self._display_filters_frame()
-        self._display_filters_tree()
+        self._display_filters_tree(callbacks)
 
 
     
@@ -139,7 +139,7 @@ class ProductHandler():
 
 
     # Filtered Produts Tree.
-    def _display_filters_tree(self):
+    def _display_filters_tree(self, callbacks):
         
         # Products Tree.
         style = ttk.Style()
@@ -170,7 +170,7 @@ class ProductHandler():
         product_tree.grid(row=1, column=1, padx=(30,0), sticky=tk.N)
 
         def ask_for_amount_and_discont(event):
-            self.ask_for_amount_and_discont()
+            self.ask_for_amount_and_discont(callbacks)
         product_tree.bind("<Return>", ask_for_amount_and_discont)
 
 
@@ -182,7 +182,7 @@ class ProductHandler():
             relief=tk.RIDGE,
             bg='#54bf54',
             padx=30,
-            command=lambda: self.ask_for_amount_and_discont())
+            command=lambda: self.ask_for_amount_and_discont(callbacks))
         search_button.grid(row=2, column=1, pady=(30,10))
 
         create_product_button = tk.Button(
@@ -281,7 +281,7 @@ class ProductHandler():
 
 
     # Display Orders Tree.
-    def display_orders_tree(self, frame):
+    def display_orders_tree(self, frame, callbacks=[]):
         
         # Title.
         products_label = tk.Label(
@@ -328,7 +328,7 @@ class ProductHandler():
         self.orders_tree.grid(row=1, column=0, pady=(10,0))
 
         # Delete Orders
-        def delete_row():
+        def delete_row(callbacks=callbacks):
             if self.orders_tree.focus():
                 index = self.orders_tree.focus()
 
@@ -362,6 +362,10 @@ class ProductHandler():
                 if self.orders_tree.item(index)['values'][0] != 'None':
                     self.orders_to_delete.append(self.orders_tree.item(index)['values'][0])
                 self.orders_tree.delete(index)
+                if callbacks:
+                    for callback in callbacks:
+                        callback()
+
 
         delete_order_button = tk.Button(
             frame, 
@@ -410,7 +414,7 @@ class ProductHandler():
 
 
     # Ask For amount.
-    def ask_for_amount_and_discont(self):
+    def ask_for_amount_and_discont(self, callbacks):
         if self.product_tree.focus():
             
             def save_amount_callback(event):
@@ -434,6 +438,9 @@ class ProductHandler():
                 self.calculate_total_sale()
                 ask_window.destroy()
                 self.product_window.destroy()
+                if callbacks:
+                    for callback in callbacks:
+                        callback()
 
             # Amount.
             amount_label = tk.Label(
