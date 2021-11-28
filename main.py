@@ -25,6 +25,9 @@ from utils import (
 # Backups
 from backUp import BackUp, Restore
 
+# Resume
+from CreateResume import CreateResume
+
 
 class App():
 
@@ -773,7 +776,7 @@ class App():
 
     # Detail Sale.
     def detail_sale_window(self, sale_id, callback_functions=[], params=None):
-
+        
         sale = Sale.get(Sale.id == sale_id)
         finished = ""
         if sale.is_finished:
@@ -786,6 +789,16 @@ class App():
             padx=30,
             pady=30)
         detail_sale_window.title(f"Venta {sale_id}")
+        
+        # MENU
+        menubar = tk.Menu(detail_sale_window)
+        resume_menu = tk.Menu(menubar, tearoff=0, font=('arial', 15))
+        
+        detail_sale_window.title(f"Venta {sale_id}")
+        resume_menu.add_command(label="Crear", command=lambda: CreateResume(detail_sale_window, sale_id))
+        resume_menu.add_command(label="Imprimir")
+        menubar.add_cascade(label="Notas de entrega", menu=resume_menu)
+        detail_sale_window.config(menu=menubar)
 
         # Title.
         filters_title = tk.Label(
@@ -1269,7 +1282,7 @@ class App():
 
     # Display Credits Window.
     def display_credit_window(self, vale=False):
-
+        
         # New Window.
         credits_window = tk.Toplevel(pady=20,padx=20)
         title = "Créditos"

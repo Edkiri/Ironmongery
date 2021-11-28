@@ -31,14 +31,12 @@ class ProductUpdater:
             if counter == 0:
                 counter += 1
                 continue
-
             code = value[2]
             if str(code) != 'nan':
                 brand = value[0]
                 refence = value[1]
                 price = format_float(value[5])
                 name = value[3].replace("Ð", "Ñ").replace("║", "|")
-
                 try:
                     product = Product.get(code=code)
                 except Exception:

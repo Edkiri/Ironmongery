@@ -10,3 +10,4 @@ venv/
 products.csv
 migrations/
 old_database.db
+resumes/
