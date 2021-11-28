@@ -6,7 +6,7 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 # Models
-from models import Client, Order, Payment, Sale
+from models import Order, Sale
 
 
 class CreateResume():
