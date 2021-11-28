@@ -338,13 +338,14 @@ class CreateResume():
       
       iva = 0.16
       total = reduce(
-          lambda acc, cur: acc + cur.product.price, 
+          lambda acc, cur: acc + (cur.product.price * cur.amount), 
           self.orders,
           0
         )
       sub_total, total_iva = total, None
       if (self.currency.get() == 'Bolívares'):
         total = total * string_to_float(self.rate_entry.get())
+        sub_total = total
         if (self.iva.get() == 'Sí'):
           sub_total = "%.2f" % (total * (1 - iva))
           total_iva = "%.2f" % (total * iva)
