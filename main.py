@@ -795,7 +795,7 @@ class App():
         resume_menu = tk.Menu(menubar, tearoff=0, font=('arial', 15))
         
         detail_sale_window.title(f"Venta {sale_id}")
-        resume_menu.add_command(label="Crear", command=lambda: CreateResume(detail_sale_window, sale_id))
+        resume_menu.add_command(label="Crear", command=lambda: CreateResume(detail_sale_window, sale_id, self.rate.get()))
         resume_menu.add_command(label="Imprimir")
         menubar.add_cascade(label="Notas de entrega", menu=resume_menu)
         detail_sale_window.config(menu=menubar)
