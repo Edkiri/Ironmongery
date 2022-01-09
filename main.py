@@ -260,7 +260,10 @@ class App():
                     self.delete_sale(get_focus_id())
 
         def display_detail_win():
-            detail_win = DetailWin(get_focus_id(), )
+            detail_win = DetailWin(
+                get_focus_id(), 
+                self.insert_into_daily_tree
+            )
             
 
         detail_sale_button = tk.Button(
