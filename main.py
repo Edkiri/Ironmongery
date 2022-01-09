@@ -1333,29 +1333,29 @@ class App():
             font=('calibri', 15))
         identity_entry.grid(row=4, column=1, padx=10, pady=(5,20))
 
-        # Functions.
-        def search_credits(event):
-            self.insert_into_credits_tree(vale, get_params())
+        # # Functions.
+        # def search_credits(event):
+        #     self.insert_into_credits_tree(vale, get_params())
 
-        def get_params():
-            return {
-                'name': name_entry.get(),
-                'pre_id': client_pre_id_var.get(),
-                'identity': identity_entry.get()}
+        # def get_params():
+        #     return {
+        #         'name': name_entry.get(),
+        #         'pre_id': client_pre_id_var.get(),
+        #         'identity': identity_entry.get()}
 
-        # Buttons.
-        search_button = tk.Button(
-            filters_frame,
-            text="Buscar",
-            font=('calibri', 18, 'bold'),
-            bd=1,
-            relief=tk.RIDGE,
-            bg='#54bf54',
-            command=lambda: self.insert_into_credits_tree(vale, get_params()))
-        search_button.grid(row=5, column=0, columnspan=2, padx=10, pady=(30,10), sticky=tk.W+tk.E)
+        # # Buttons.
+        # search_button = tk.Button(
+        #     filters_frame,
+        #     text="Buscar",
+        #     font=('calibri', 18, 'bold'),
+        #     bd=1,
+        #     relief=tk.RIDGE,
+        #     bg='#54bf54',
+        #     command=lambda: self.insert_into_credits_tree(vale, get_params()))
+        # search_button.grid(row=5, column=0, columnspan=2, padx=10, pady=(30,10), sticky=tk.W+tk.E)
 
-        name_entry.bind("<Return>", search_credits)
-        identity_entry.bind("<Return>", search_credits)
+        # name_entry.bind("<Return>", search_credits)
+        # identity_entry.bind("<Return>", search_credits)
 
         # Credits Tree.
         credits_frame = tk.LabelFrame(credits_window, padx=25, pady=10)
@@ -1522,6 +1522,8 @@ class App():
                         number_to_str(total)
                     )
                 )
+        
+        
 
 
 

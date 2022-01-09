@@ -129,15 +129,15 @@ class CreditWin:
     
   def delete_credit(self):
     
-    def get_params():
-            return {
-                'name': self.name_entry.get(),
-                'pre_id': self.client_pre_id_var.get(),
-                'identity': self.identity_entry.get()}
-            
     if self.credits_tree.focus():
         response = messagebox.askyesno("Atención, atención!", f"Quieres eliminar este {title.rstrip('s')}?", parent=credits_frame)
         if response:
             sale_id = self.credits_tree.item(self.credits_tree.focus())['values'][0]
             self.delete_sale(sale_id)
-            self.insert_into_credits_tree(self.vale, get_params())
+            self.insert_into_credits_tree(self.vale, self.get_filter_params())
+            
+  def get_filter_params(self):
+          return {
+              'name': self.name_entry.get(),
+              'pre_id': self.client_pre_id_var.get(),
+              'identity': self.identity_entry.get()}
