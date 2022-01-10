@@ -46,10 +46,10 @@ class CreditWin:
             font=('calibri', 15, 'bold'))
         name_label.grid(row=1, column=1, columnspan=2)
         self.name_entry = ttk.Entry(
-            filters_frame,
+            self.filters_frame,
             width=16,
             font=('calibri', 15))
-        self.name_entry.grid(row=2, column=1, padx=10, pady=(5,20))
+        self.grid(row=2, column=1, padx=10, pady=(5,0))
 
         self.client_pre_id_var = tk.StringVar()
         pre_id_choices = ['', 'V', 'J']
@@ -70,6 +70,19 @@ class CreditWin:
             width=16,
             font=('calibri', 15))
         self.identity_entry.grid(row=4, column=1, padx=10, pady=(5,20))
+        
+        search_button = tk.Button(
+            filters_frame,
+            text="Buscar",
+            font=('calibri', 18, 'bold'),
+            bd=1,
+            relief=tk.RIDGE,
+            bg='#54bf54',
+            command=lambda: self.insert_into_credits_tree(vale, self.get_filter_params()))
+        search_button.grid(row=5, column=0, columnspan=2, padx=10, pady=(30,10), sticky=tk.W+tk.E)
+
+        self.name_entry.bind("<Return>", search_credits)
+        self.identity_entry.bind("<Return>", search_credits)
         
         
         self.credits_frame = tk.LabelFrame(self.win, padx=25, pady=10)
@@ -160,7 +173,7 @@ class CreditWin:
             
     def get_filter_params(self):
           return {
-              'name': self.name_entry.get(),
+              'name': self.get(),
               'pre_id': self.client_pre_id_var.get(),
               'identity': self.identity_entry.get()}
           
