@@ -2,6 +2,7 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
+from CreditWin import CreditWin
 
 # Peewee
 from peewee import IntegrityError
@@ -111,10 +112,18 @@ class App():
             self.rate.get()))
         menubar.add_cascade(label="Resumen", menu=summary_menu)
         # Credit menu
-        # credit_menu = tk.Menu(menubar, tearoff=0, font=('arial', 15))
-        # credit_menu.add_command(label="Vales", command=lambda: self.display_credit_window(True))
-        # credit_menu.add_command(label="Créditos", command=self.display_credit_window)
-        # menubar.add_cascade(label="Créditos", menu=credit_menu)
+        credit_menu = tk.Menu(menubar, tearoff=0, font=('arial', 15))
+        credit_menu.add_command(label="Vales", command=lambda: CreditWin(
+            True,
+            self.query_date.get(),
+            self.rate.get(),
+        ))
+        credit_menu.add_command(label="Créditos", command=lambda: CreditWin(
+            False,
+            self.query_date.get(),
+            self.rate.get(),
+        ))
+        menubar.add_cascade(label="Créditos", menu=credit_menu)
         # Database menu
         def backup():
             response = messagebox.askyesno("Atención, atención!", "¿Quires hacer un respaldo de la base de datos?", parent=self.root)
@@ -781,252 +790,6 @@ class App():
         sale.delete_instance()
         self.insert_into_daily_tree()
         self.insert_into_summary_day()
-
-
-    # # Display Credits Window.
-    # def display_credit_window(self, vale=False):
-        
-    #     # New Window.
-    #     credits_window = tk.Toplevel(pady=20,padx=20)
-    #     title = "Créditos"
-    #     if vale:
-    #         title = "Vales"
-    #     credits_window.title(title)
-
-    #     # Filters Frame.
-    #     filters_frame = tk.LabelFrame(credits_window, padx=15)
-    #     filters_frame.grid(row=0, column=0)
-
-    #     # Title.
-    #     filters_title = tk.Label(
-    #         filters_frame,
-    #         text=f"Filtrar {title}",
-    #         font=('calibri', 18, 'bold'))
-    #     filters_title.grid(row=0, columnspan=2, pady=(10,20))
-
-    #     # Client.
-    #     name_label = tk.Label(
-    #         filters_frame,
-    #         text="Nombre",
-    #         font=('calibri', 15, 'bold'))
-    #     name_label.grid(row=1, column=1, columnspan=2)
-    #     name_entry = ttk.Entry(
-    #         filters_frame,
-    #         width=16,
-    #         font=('calibri', 15))
-    #     name_entry.grid(row=2, column=1, padx=10, pady=(5,20))
-
-    #     client_pre_id_var = tk.StringVar()
-    #     pre_id_choices = ['', 'V', 'J']
-    #     client_pre_id_var.set(pre_id_choices[1])
-    #     pre_id_option = ttk.OptionMenu(
-    #         filters_frame,
-    #         client_pre_id_var,
-    #         *pre_id_choices)
-    #     pre_id_option.grid(row=4, column=0, sticky=tk.W+tk.N, pady=(7,0))
-
-    #     identity_label = tk.Label(
-    #         filters_frame,
-    #         text="Cédula/RIF",
-    #         font=('calibri', 15, 'bold'))
-    #     identity_label.grid(row=3, column=1, columnspan=2)
-    #     identity_entry = ttk.Entry(
-    #         filters_frame,
-    #         width=16,
-    #         font=('calibri', 15))
-    #     identity_entry.grid(row=4, column=1, padx=10, pady=(5,20))
-
-    #     # # Functions.
-    #     # def search_credits(event):
-    #     #     self.insert_into_credits_tree(vale, get_params())
-
-    #     # def get_params():
-    #     #     return {
-    #     #         'name': name_entry.get(),
-    #     #         'pre_id': client_pre_id_var.get(),
-    #     #         'identity': identity_entry.get()}
-
-    #     # # Buttons.
-    #     # search_button = tk.Button(
-    #     #     filters_frame,
-    #     #     text="Buscar",
-    #     #     font=('calibri', 18, 'bold'),
-    #     #     bd=1,
-    #     #     relief=tk.RIDGE,
-    #     #     bg='#54bf54',
-    #     #     command=lambda: self.insert_into_credits_tree(vale, get_params()))
-    #     # search_button.grid(row=5, column=0, columnspan=2, padx=10, pady=(30,10), sticky=tk.W+tk.E)
-
-    #     # name_entry.bind("<Return>", search_credits)
-    #     # identity_entry.bind("<Return>", search_credits)
-
-    #     # Credits Tree.
-    #     credits_frame = tk.LabelFrame(credits_window, padx=25, pady=10)
-    #     credits_frame.grid(row=0, column=1, padx=(20,0), sticky=tk.N)
-
-    #     # Title.
-    #     tree_title = tk.Label(
-    #         credits_frame,
-    #         text=title,
-    #         font=('calibri', 18, 'bold'))
-    #     tree_title.grid(row=0, column=0, pady=(0,15), columnspan=4)
-
-    #     # Payment tree.
-    #     self.credits_tree = ttk.Treeview(
-    #         credits_frame,
-    #         height=18,
-    #         selectmode ='browse',
-    #         columns=(
-    #             'sale_id', 'sale_date',
-    #             'client_name', 'client_identity',
-    #             'sale_description', 'amount'),
-    #         style="mystyle.Treeview")
-    #     credits_tree = self.credits_tree
-
-    #     # HEADING.
-    #     credits_tree.column("#0", width=0, stretch=tk.NO)
-    #     # Sale.
-    #     credits_tree.column("sale_id", width=0, stretch=tk.NO)
-    #     # Date.
-    #     credits_tree.column('sale_date', width=70, minwidth=25)
-    #     credits_tree.heading('sale_date', text='Días', anchor=tk.W)
-    #     # Client Name.
-    #     credits_tree.column('client_name', width=150, minwidth=25)
-    #     credits_tree.heading('client_name', text='Nombre', anchor=tk.W)
-    #     # Clinet Identity.
-    #     credits_tree.column('client_identity', width=110, minwidth=25)
-    #     credits_tree.heading('client_identity', text='Cédula/RIF', anchor=tk.W)
-    #     # Sale Description.
-    #     credits_tree.column('sale_description', width=170, minwidth=25)
-    #     credits_tree.heading('sale_description', text='Descripción', anchor=tk.W)
-    #     # Amount.
-    #     credits_tree.column('amount', width=80, minwidth=25)
-    #     credits_tree.heading('amount', text='Cantidad', anchor=tk.W)
-
-    #     # Grid tree.
-    #     credits_tree.grid(row=1, column=0, columnspan=4)
-
-    #     # Functions.
-    #     def display_detail_window():
-    #         if credits_tree.focus():
-    #             sale_id = credits_tree.item(credits_tree.focus())['values'][0]
-    #             self.detail_sale_window(sale_id, callback_functions=[self.insert_into_credits_tree], params=[vale, get_params()])
-    #     def delete_credit():
-    #         if credits_tree.focus():
-    #             response = messagebox.askyesno("Atención, atención!", f"Quieres eliminar este {title.rstrip('s')}?", parent=credits_frame)
-    #             if response:
-    #                 sale_id = credits_tree.item(credits_tree.focus())['values'][0]
-    #                 self.delete_sale(sale_id)
-    #                 self.insert_into_credits_tree(vale, get_params())
-    #     # Buttons.
-    #     detail_button = tk.Button(
-    #         credits_frame,
-    #         text="Detalle",
-    #         font=('calibri', 18, 'bold'),
-    #         bd=1,
-    #         relief=tk.RIDGE,
-    #         bg='#54bf54',
-    #         command=display_detail_window)
-    #     detail_button.grid(row=2, column=0, sticky=tk.W)
-    #     delete_button = tk.Button(
-    #         credits_frame,
-    #         text="Eliminar",
-    #         font=('calibri', 18, 'bold'),
-    #         bd=1,
-    #         relief=tk.RIDGE,
-    #         bg='#e85d5d',
-    #         command=delete_credit)
-    #     delete_button.grid(row=2, column=3, sticky=tk.E)
-
-    #     self.insert_into_credits_tree(vale, get_params())
-
-
-
-    # # Insert Into Credits Tree.
-    # def insert_into_credits_tree(self, vale, params):
-
-    #     self.credits_tree.delete(*self.credits_tree.get_children())
-
-    #     credits = []
-    #     vales = []
-
-    #     unfinished_sales = (Sale.select().where(Sale.is_finished == False))
-
-    #     client_identity_card = params['pre_id'] + "-" + params['identity']
-    #     if params['identity']:
-    #         unfinished_sales = (unfinished_sales
-    #             .select()
-    #             .join(Client)
-    #             .where(Client.identity_card
-    #                 .contains(client_identity_card)))
-
-    #     elif params['name']:
-    #         unfinished_sales = (unfinished_sales
-    #             .select()
-    #             .join(Client)
-    #             .where(Client.name
-    #                 .contains(params['name'])))
-
-
-    #     for sale in unfinished_sales:
-    #         sale_total_orders = 0
-    #         sale_total_payments = 0
-
-    #         orders = (Order
-    #             .select()
-    #             .join(Sale)
-    #             .where(Sale.id == sale)
-    #         )
-    #         for order in orders:
-    #             sale_total_orders += order.price
-
-    #         payments = (Payment
-    #             .select()
-    #             .join(Sale)
-    #             .where(Sale.id == sale))
-    #         sale_total_payments = get_summary_payments(payments)[2]
-
-    #         total = abs(sale_total_orders - sale_total_payments)
-
-    #         if (sale_total_orders > sale_total_payments):
-    #             credits.append([sale,total])
-    #         else:
-    #             vales.append([sale,total])
-
-    #     if not vale:
-    #         for credit in credits:
-    #             sale = credit[0]
-    #             total = credit[1]
-    #             self.credits_tree.insert(
-    #                 "",
-    #                 index='end',
-    #                 value=(
-    #                     sale.id,
-    #                     (date.today() - sale.date).days,
-    #                     sale.client.name,
-    #                     sale.client.identity_card,
-    #                     sale.description,
-    #                     number_to_str(total)
-    #                 )
-    #             )
-    #     else:
-    #         for vale in vales:
-    #             sale = vale[0]
-    #             total = vale[1]
-    #             self.credits_tree.insert(
-    #                 "",
-    #                 index='end',
-    #                 value=(
-    #                     sale.id,
-    #                     (date.today() - sale.date).days,
-    #                     sale.client.name,
-    #                     sale.client.identity_card,
-    #                     sale.description,
-    #                     number_to_str(total)
-    #                 )
-    #             )
-        
-        
 
 
 
