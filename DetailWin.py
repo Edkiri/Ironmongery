@@ -150,7 +150,7 @@ class DetailWin:
             bd=1,
             relief=tk.RIDGE,
             bg='#54bf54',
-            command=lambda: self.payments_handler.add_payment_window(self.query_date.get(), self.rate.get(), True, True))
+            command=lambda: self.payments_handler.add_payment_window(self.query_date, self.rate, True, True))
         add_return_button.grid(row=3, column=0, sticky=tk.W, padx=(100,0))
         
         update_sale_button = tk.Button(

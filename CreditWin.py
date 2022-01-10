@@ -29,19 +29,19 @@ class CreditWin:
         
 
         # Filters Frame.
-        filters_frame = tk.LabelFrame(self.win, padx=15)
-        filters_frame.grid(row=0, column=0)
+        self.filters_frame = tk.LabelFrame(self.win, padx=15)
+        self.filters_frame.grid(row=0, column=0)
 
         # Title.
         filters_title = tk.Label(
-            filters_frame,
+            self.filters_frame,
             text=f"Filtrar {self.title}",
             font=('calibri', 18, 'bold'))
         filters_title.grid(row=0, columnspan=2, pady=(10,20))
 
         # Client.
         name_label = tk.Label(
-            filters_frame,
+            self.filters_frame,
             text="Nombre",
             font=('calibri', 15, 'bold'))
         name_label.grid(row=1, column=1, columnspan=2)
@@ -49,41 +49,45 @@ class CreditWin:
             self.filters_frame,
             width=16,
             font=('calibri', 15))
-        self.grid(row=2, column=1, padx=10, pady=(5,0))
+        self.name_entry.grid(row=2, column=1, padx=10, pady=(5,0))
 
         self.client_pre_id_var = tk.StringVar()
         pre_id_choices = ['', 'V', 'J']
         self.client_pre_id_var.set(pre_id_choices[1])
         pre_id_option = ttk.OptionMenu(
-            filters_frame,
+            self.filters_frame,
             self.client_pre_id_var,
             *pre_id_choices)
         pre_id_option.grid(row=4, column=0, sticky=tk.W+tk.N, pady=(7,0))
 
         identity_label = tk.Label(
-            filters_frame,
+            self.filters_frame,
             text="Cédula/RIF",
             font=('calibri', 15, 'bold'))
         identity_label.grid(row=3, column=1, columnspan=2)
         self.identity_entry = ttk.Entry(
-            filters_frame,
+            self.filters_frame,
             width=16,
             font=('calibri', 15))
         self.identity_entry.grid(row=4, column=1, padx=10, pady=(5,20))
         
         search_button = tk.Button(
-            filters_frame,
+            self.filters_frame,
             text="Buscar",
             font=('calibri', 18, 'bold'),
             bd=1,
             relief=tk.RIDGE,
             bg='#54bf54',
-            command=lambda: self.insert_into_credits_tree(vale, self.get_filter_params()))
+            command=lambda: self.insert_into_credits_tree(self.vale, self.get_filter_params()))
         search_button.grid(row=5, column=0, columnspan=2, padx=10, pady=(30,10), sticky=tk.W+tk.E)
 
+
+        # Functions.
+        def search_credits(event):
+            self.insert_into_credits_tree(self.vale, self.get_filter_params())
+            
         self.name_entry.bind("<Return>", search_credits)
         self.identity_entry.bind("<Return>", search_credits)
-        
         
         self.credits_frame = tk.LabelFrame(self.win, padx=25, pady=10)
         self.credits_frame.grid(row=0, column=1, padx=(20,0), sticky=tk.N)
@@ -130,6 +134,12 @@ class CreditWin:
         # Grid tree.
         credits_tree.grid(row=1, column=0, columnspan=4)
         
+        self.total_label = tk.Label(
+            self.credits_frame,
+            text='',
+            font=('calibri', 18, 'bold'))
+        self.total_label.grid(row=2, column=0, columnspan=4)
+        
         # Buttons.
         detail_button = tk.Button(
             self.credits_frame,
@@ -160,7 +170,8 @@ class CreditWin:
                 sale_id, 
                 self.query_date, 
                 self.rate, 
-                callback_functions=[]
+                callback_functions=[self.insert_into_credits_tree],
+                params=[self.vale, self.get_filter_params()]
             )
     
     def delete_credit(self):
@@ -173,7 +184,7 @@ class CreditWin:
             
     def get_filter_params(self):
           return {
-              'name': self.get(),
+              'name': self.name_entry.get(),
               'pre_id': self.client_pre_id_var.get(),
               'identity': self.identity_entry.get()}
           
@@ -227,10 +238,14 @@ class CreditWin:
             else:
                 vales.append([sale,total])
 
+        total_credits = 0
+        total_vales = 0
         if not vale:
             for credit in credits:
                 sale = credit[0]
                 total = credit[1]
+                total_credits += total
+                self.total_label['text'] = number_to_str(total_credits) + "$" 
                 self.credits_tree.insert(
                     "",
                     index='end',
@@ -247,6 +262,8 @@ class CreditWin:
             for vale in vales:
                 sale = vale[0]
                 total = vale[1]
+                total_vales += total
+                self.total_label['text'] = number_to_str(total_vales) + "$" 
                 self.credits_tree.insert(
                     "",
                     index='end',
