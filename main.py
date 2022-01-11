@@ -2,24 +2,20 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
-from CreditWin import CreditWin
-
-# Peewee
-from peewee import IntegrityError
 
 # App.
+from CreditWin import CreditWin
 from FilterPaymentsWin import FilterPaymentWin
 from products import ProductHandler
-from productUpdater import ProductUpdater
 from clients import ClientHandler
 from payments import PaymentHandler
 from DetailWin import DetailWin
 
 # Models.
-from models import Payment, Sale, Order, Client
+from models import Payment, Sale, Order
 
 # Utils.
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 
 from utils import (
     get_weekday, get_month_name, get_summary_payments,
@@ -608,7 +604,6 @@ class App():
         add_sale_button.grid(row=0)
 
 
-
     # Clear New Sale Frame.
     def clear_new_sale_frame(self, creating=False):
 
@@ -643,7 +638,6 @@ class App():
                 clear_sale_frame()
         else:
             clear_sale_frame()
-
 
 
     # Create Sale.
@@ -726,7 +720,6 @@ class App():
             messagebox.showerror("Error", err, parent=self.root)
 
 
-
     # Insert into Daily Tree
     def insert_into_daily_tree(self):
 
@@ -779,7 +772,6 @@ class App():
         self.insert_into_summary_day()
 
 
-
     # Delete sale.
     def delete_sale(self, sale_id):
         sale = Sale.get(sale_id)
@@ -790,7 +782,6 @@ class App():
         sale.delete_instance()
         self.insert_into_daily_tree()
         self.insert_into_summary_day()
-
 
 
 if __name__ == '__main__':

@@ -250,7 +250,7 @@ class CreateResume():
         if order:
           name = order.product.name
           quantity = order.amount
-          unit_price = order.product.price
+          unit_price = order.price
           if self.withoutIva.get() == 'Sí':
             unit_price *= (1 - IVA)
         
