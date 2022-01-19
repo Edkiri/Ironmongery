@@ -14,7 +14,7 @@ from utils import DATE_FORMAT, TODAY, string_to_float, es_casi_igual, get_dollar
 from datetime import date, datetime
 
 # App.
-from products import ProductHandler
+from OrderTree import OrderTree
 from clients import ClientHandler
 from payments import PaymentHandler
 
@@ -103,10 +103,13 @@ class DetailWin:
         # Orders
         orders_frame = tk.Frame(self.detail_sale_window)
         orders_frame.grid(row=3, column=0, columnspan=2, sticky=tk.W)
-        self.products_handler = ProductHandler()
-        self.products_handler.display_total_orders(total_frame, True)
-        self.products_handler.display_orders_tree(orders_frame)
-        self.products_handler.insert_into_order_sale_tree(sale_id)
+        self.products_handler = OrderTree(
+            self.detail_sale_window, 
+            self.sale
+        )
+        # self.products_handler.display_total_orders(total_frame, True)
+        # self.products_handler.display_orders_tree(orders_frame)
+        # self.products_handler.insert_into_order_sale_tree(sale_id)
 
         # Payments
         payments_frame = tk.Frame(self.detail_sale_window)

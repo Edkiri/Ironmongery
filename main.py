@@ -6,10 +6,11 @@ from tkinter import messagebox
 # App.
 from CreditWin import CreditWin
 from FilterPaymentsWin import FilterPaymentWin
-from products import ProductHandler
+from OrderTree import OrderTree
 from clients import ClientHandler
 from payments import PaymentHandler
 from DetailWin import DetailWin
+from ProductsWin import ProductsWin
 
 # Models.
 from models import Payment, Sale, Order
@@ -198,14 +199,14 @@ class App():
             text="Tasa",
             font=('calibri', 15))
         rate_label.grid(row=1, column=1, columnspan=3, sticky=tk.W)
-        self.rate = tk.Entry(
+        self.rate_entry = tk.Entry(
             date_frame,
             width=9,
             borderwidth=2,
             font=('calibri', 15))
-        self.rate.insert(0, 0)
-        self.rate.focus()
-        self.rate.grid(row=1, column=1, columnspan=3, sticky=tk.W, padx=(50,0))
+        self.rate_entry.insert(0, 0)
+        self.rate_entry.focus()
+        self.rate_entry.grid(row=1, column=1, columnspan=3, sticky=tk.W, padx=(50,0))
 
 
 
@@ -456,15 +457,14 @@ class App():
     # Product Frame.
     def display_products_for_sale(self):
 
-
         # Frame
         products_frame = tk.Frame(self.create_sale_frame)
         products_frame.grid(row=3, column=0, pady=(10,0), sticky=tk.W)
 
         # Product Window
 
-        self.product_handler = ProductHandler()
-        self.product_handler.display_orders_tree(products_frame, callbacks=[self.calculate_remaining])
+        self.order_tree = OrderTree(products_frame)
+        # self.product_handler.display_orders_tree(products_frame, callbacks=[self.calculate_remaining])
 
         # Buttons.
         add_product_button = tk.Button(
@@ -474,7 +474,15 @@ class App():
             bd=1,
             relief=tk.RIDGE,
             bg='#54bf54',
-            command=lambda: self.product_handler.display_new_order_window(self.rate.get(), callbacks=[self.calculate_remaining]))
+            command=lambda: ProductsWin(
+                    self.rate_entry.get(),
+                    on_create=self.order_tree.insert_into_orders_tree,
+                    callbacks=[
+                        self.order_tree.calculate_total,
+                        # self.calculate_remaining
+                    ]
+                )
+            )
         add_product_button.grid(row=2, column=0, sticky=tk.W)
 
 
@@ -532,7 +540,7 @@ class App():
 
         total_sale_frame.grid(row=4, column=0, sticky=tk.E, padx=(0,10), pady=(30,0))
 
-        self.product_handler.display_total_orders(total_sale_frame)
+        # self.order_tree.display_total_orders(total_sale_frame)
         self.payment_handler.display_total_payments(total_sale_frame)
 
         calculate_remaining_payments_button = tk.Button(
@@ -559,7 +567,6 @@ class App():
             text="0bs",
             font=('calibri', 17, 'bold'))
         self.remaining_sale_bs_label.grid(row=2, column=3, sticky=tk.E, pady=(10,0))
-
 
 
 

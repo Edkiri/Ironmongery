@@ -28,7 +28,7 @@ class BackUp:
             BackUp.__instance = self
 
 
-    def copy_db_to_backups_dir(self, parent):
+    def copy_db_to_backups_dir(self):
 
         original = BASE_DIR + DATABASE_NAME
 
@@ -54,7 +54,7 @@ class BackUp:
 
         shutil.copyfile(original, target)
 
-        messagebox.showinfo("Operación exitosa!", "Base de datos respaldada.", parent=parent)
+        messagebox.showinfo("Operación exitosa!", "Base de datos respaldada.")
 
 
 class Restore:
