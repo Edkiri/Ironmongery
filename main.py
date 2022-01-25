@@ -171,7 +171,7 @@ class App():
             width=9,
             borderwidth=2,
             font=('calibri', 15))
-        self.rate_entry.insert(0, 4.82)
+        self.rate_entry.insert(0, 0)
         self.rate_entry.focus()
         self.rate_entry.grid(row=1, column=1, columnspan=3, sticky=tk.W, padx=(50,0))
 
