@@ -2,6 +2,7 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
+from ProductsWin import ProductsWin
 
 # Models
 from models import Payment, Sale, Order
@@ -21,11 +22,11 @@ from payments import PaymentHandler
 
 class DetailWin:
   
-    def __init__(self, sale_id, query_date, rate,  callback_functions, params=None):
+    def __init__(self, sale_id, query_date, rate,  callbacks=[], params=None):
         self.params = params
         self.query_date = query_date
         self.rate = rate
-        self.callback_functions = callback_functions
+        self.callbacks = callbacks
         self.sale = Sale.get(Sale.id == sale_id)
         finished = ""
         if self.sale.is_finished:
@@ -103,13 +104,11 @@ class DetailWin:
         # Orders
         orders_frame = tk.Frame(self.detail_sale_window)
         orders_frame.grid(row=3, column=0, columnspan=2, sticky=tk.W)
-        self.products_handler = OrderTree(
-            self.detail_sale_window, 
-            self.sale
+        self.order_tree = OrderTree(
+            orders_frame,
+            total_frame=total_frame,
+            sale=self.sale
         )
-        # self.products_handler.display_total_orders(total_frame, True)
-        # self.products_handler.display_orders_tree(orders_frame)
-        # self.products_handler.insert_into_order_sale_tree(sale_id)
 
         # Payments
         payments_frame = tk.Frame(self.detail_sale_window)
@@ -131,7 +130,11 @@ class DetailWin:
             bd=1,
             relief=tk.RIDGE,
             bg='#54bf54',
-            command=lambda: self.products_handler.display_new_order_window(self.rate))
+            command=lambda: ProductsWin(
+                self.rate,
+                on_create=self.order_tree.insert_into_orders_tree,
+                callbacks=[self.order_tree.calculate_total]
+            ))
         add_product_button.grid(row=2, column=0, sticky=tk.W)
 
         add_payment_button = tk.Button(
@@ -183,12 +186,12 @@ class DetailWin:
             if sale_client != self.client_handler.client:
                 self.sale.client = self.client_handler.client
 
-            if not self.products_handler.orders_tree.get_children():
+            if not self.order_tree.orders_tree.get_children():
                 raise Exception("No puede existir una venta sin órdenes!")
 
-            for order_index in self.products_handler.orders_tree.get_children():
-                if self.products_handler.orders_tree.item(order_index)['values'][0] == 'None':
-                    new_order_values = self.products_handler.orders_tree.item(order_index)['values']
+            for order_index in self.order_tree.orders_tree.get_children():
+                if self.order_tree.orders_tree.item(order_index)['values'][0] == 'None':
+                    new_order_values = self.order_tree.orders_tree.item(order_index)['values']
                     Order.create(
                         product=new_order_values[1],
                         sale=self.sale.id,
@@ -211,15 +214,19 @@ class DetailWin:
                     rate= string_to_float(payment_values[7]),
                     account=Payment.ACCOUNTS[payment_values[8]])
 
-            for order_id in self.products_handler.orders_to_delete:
-                order = Order.get(Order.id == order_id)
-                order.delete_instance()
+            for order_id in self.order_tree.orders_to_delete:
+                try:
+                    order = Order.get(Order.id == order_id)
+                    order.delete_instance()
+                except Exception as err:
+                    pass
+                    
 
             for payment_id in self.payments_handler.payments_to_delete:
                 payment = Payment.get(Payment.id == payment_id)
                 payment.delete_instance()
 
-            total_sale = float(self.products_handler.total_sale_number_label["text"].rstrip("$"))
+            total_sale = float(self.order_tree.total_orders_usd)
             total_payments = float(self.payments_handler.total_payments_dollars_label["text"].rstrip("$"))
             if es_casi_igual(total_sale, total_payments):
                 self.sale.is_finished = True
@@ -230,14 +237,11 @@ class DetailWin:
             self.sale.save()
             self.detail_sale_window.destroy()
             
-            if self.callback_functions:
-                for func in self.callback_functions:
-                    if (self.params) and (type(self.params) == type(list())):
-                        func(*self.params)
-                    elif (self.params):
-                        func(self.params)
-                    else:
-                        func()
+            if self.callbacks and self.params:
+                self.callbacks[0](self.params)
+            elif self.callbacks:
+                for callback in self.callbacks:
+                    callback(self.query_date)
 
         except Exception as err:
             messagebox.showerror("Error!", err, parent=self.detail_sale_window)

@@ -78,13 +78,13 @@ class CreditWin:
             bd=1,
             relief=tk.RIDGE,
             bg='#54bf54',
-            command=lambda: self.insert_into_credits_tree(self.vale, self.get_filter_params()))
+            command=lambda: self.insert_into_credits_tree(self.get_filter_params()))
         search_button.grid(row=5, column=0, columnspan=2, padx=10, pady=(30,10), sticky=tk.W+tk.E)
 
 
         # Functions.
         def search_credits(event):
-            self.insert_into_credits_tree(self.vale, self.get_filter_params())
+            self.insert_into_credits_tree(self.get_filter_params())
             
         self.name_entry.bind("<Return>", search_credits)
         self.identity_entry.bind("<Return>", search_credits)
@@ -161,7 +161,7 @@ class CreditWin:
             command=self.delete_credit)
         delete_button.grid(row=2, column=3, sticky=tk.E)
         
-        self.insert_into_credits_tree(self.vale, self.get_filter_params())
+        self.insert_into_credits_tree(self.get_filter_params())
     
     def display_detail_sale_win(self):
         if self.credits_tree.focus():
@@ -170,8 +170,8 @@ class CreditWin:
                 sale_id, 
                 self.query_date, 
                 self.rate, 
-                callback_functions=[self.insert_into_credits_tree],
-                params=[self.vale, self.get_filter_params()]
+                callbacks=[self.insert_into_credits_tree],
+                params=self.get_filter_params()
             )
     
     def delete_credit(self):
@@ -180,7 +180,7 @@ class CreditWin:
             if response:
                 sale_id = self.credits_tree.item(self.credits_tree.focus())['values'][0]
                 self.delete_sale(sale_id)
-                self.insert_into_credits_tree(self.vale, self.get_filter_params())
+                self.insert_into_credits_tree(self.get_filter_params())
             
     def get_filter_params(self):
           return {
@@ -189,7 +189,7 @@ class CreditWin:
               'identity': self.identity_entry.get()}
           
           
-    def insert_into_credits_tree(self, vale, params):
+    def insert_into_credits_tree(self, params):
         self.credits_tree.delete(*self.credits_tree.get_children())
         
         credits = []
@@ -240,9 +240,11 @@ class CreditWin:
 
         total_credits = 0
         total_vales = 0
-        if not vale:
+        if not self.vale:
             for credit in credits:
                 sale = credit[0]
+                if not sale.client:
+                    print(sale.id)
                 total = credit[1]
                 total_credits += total
                 self.total_label['text'] = number_to_str(total_credits) + "$" 

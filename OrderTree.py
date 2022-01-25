@@ -1,4 +1,5 @@
 # Tkinter
+from subprocess import call
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
@@ -18,12 +19,17 @@ from backUp import BackUp
 
 class OrderTree():
 
-    def __init__(self, frame, sale=None):
+    def __init__(self, frame, total_frame=None, sale=None, callbacks=[]):
         self.orders_to_delete = []
+        self.callbacks = callbacks
         self.frame = frame
         self.sale = sale
-        self.total_orders = 0
+        self.total_orders_usd = 0
+        self.total_orders_bs = 0
         self._display_orders_tree()
+        if self.sale:
+            self.display_total_orders(total_frame)
+            self._insert_into_order_sale_tree(sale)
         
     # Display Orders Tree.
     def _display_orders_tree(self):
@@ -76,37 +82,12 @@ class OrderTree():
         def delete_row():
             if self.orders_tree.focus():
                 index = self.orders_tree.focus()
-
-                def clean_price(mess_price):
-                    cleaned_price = str()
-                    for char in mess_price:
-                        if (char == '$') or (char == 'b'):
-                            break
-                        cleaned_price += char
-                    if ',' in cleaned_price:
-                        return string_to_float(cleaned_price)
-                    return float(cleaned_price)
-                
-                clean_total_sale = float(self.total_sale_number_label['text'].rstrip("$"))
-                clean_total_sale_bs = clean_price(self.total_sale_label_bs['text'])
-                
-                amount = float(self.orders_tree.item(index)['values'][3])
-                if self.orders_tree.item(index)['values'][7] != 'None':
-                    discount =  string_to_float(self.orders_tree.item(index)['values'][7])
-                order_price = (clean_price(self.orders_tree.item(index)['values'][5]))
-                rate = self.orders_tree.item(index)['values'][6]
-                order_price_bs = 0
-                if rate != 'None':
-                    order_price_bs = order_price * string_to_float(rate)
-
-                total_sale = clean_total_sale - order_price
-                total_sale_bs = clean_total_sale_bs - order_price_bs
-
-                self.total_sale_number_label['text'] = number_to_str(total_sale) + "$"
-                self.total_sale_label_bs['text'] = number_to_str(total_sale_bs) + "bs"
-                if self.orders_tree.item(index)['values'][0] != 'None':
+                if self.sale:
                     self.orders_to_delete.append(self.orders_tree.item(index)['values'][0])
                 self.orders_tree.delete(index)
+                self.calculate_total()
+                for callback in self.callbacks:
+                    callback()
 
 
         delete_order_button = tk.Button(
@@ -126,9 +107,10 @@ class OrderTree():
             bd=1,
             relief=tk.RIDGE,
             bg='#54bf54',
-            # command=lambda: self.modify_order(callbacks)
+            command=self.modify_order
         )
-        modify_order_button.grid(row=2, column=0, sticky=tk.W, padx=(150,0))
+        if not self.sale:
+            modify_order_button.grid(row=2, column=0, sticky=tk.W, padx=(150,0))
 
 
 
@@ -162,66 +144,35 @@ class OrderTree():
                 discount
             )
         )
+        for callback in self.callbacks:
+            callback()
 
 
 
     # Display Total Orders
-    def display_total_orders(self, frame, is_detail=False):
+    def display_total_orders(self, frame):
         total_sale_label = tk.Label(
             frame,
             text="Órdenes:",
             font=('calibri', 17, 'bold'))
         total_sale_label.grid(row=0, column=1, sticky=tk.W)
-        self.total_sale_number_label = tk.Label(
+        self.total_orders_label_usd = tk.Label(
             frame,
             text="0$",
             font=('calibri', 17, 'bold'))
-        self.total_sale_number_label.grid(row=0, column=2, padx=10, sticky=tk.E)
-        self.total_sale_label_bs = tk.Label(
+        self.total_orders_label_usd.grid(row=0, column=2, padx=10, sticky=tk.E)
+        self.total_orders_label_bs = tk.Label(
             frame,
             text="0bs",
             font=('calibri', 17, 'bold'))
-        if not is_detail:
-            self.total_sale_label_bs.grid(row=0, column=3, sticky=tk.E)
-
-
-
-    # Calculate Total Sale.
-    def calculate_total_sale(self, price=None, amount=None, discount=None, rate=None):
-        
-        def clean_price(mess_price):
-            cleaned_price = str()
-            for char in mess_price:
-                if (char == '$') or (char == 'b'):
-                    break
-                cleaned_price += char
-            if ',' in cleaned_price:
-                return string_to_float(cleaned_price)
-            return float(cleaned_price)
-        
-        mess_product_price = price
-        clean_product_price = clean_price(mess_product_price)
-
-        mess_actual_value = self.total_sale_number_label['text']
-        mess_actual_value_bs = self.total_sale_label_bs['text']
-
-        clean_actual_value = clean_price(mess_actual_value)
-        clean_actual_value_bs = clean_price(mess_actual_value_bs)
-        
-        amount = float(amount)
-        discount =  string_to_float(discount)
-
-        new_total = clean_actual_value + (clean_product_price * amount) * ( 1 - (discount/100))
-        new_total_bs = new_total * string_to_float(rate)
-
-        self.total_sale_number_label['text'] = number_to_str(new_total) + "$"
-        self.total_sale_label_bs['text'] = number_to_str(new_total_bs) + "bs"
+        if not self.sale:
+            self.total_orders_label_bs.grid(row=0, column=3, sticky=tk.E)
 
 
 
     # Insert into Order Sale Tree.
-    def insert_into_order_sale_tree(self, sale_id):
-        orders = Order.select().join(Sale).where(Sale.id==sale_id)
+    def _insert_into_order_sale_tree(self, sale):
+        orders = Order.select().join(Sale).where(Sale.id==sale.id)
         for order in orders:
             # Getting price.
             unit_price = str(order.price / order.amount)+"$"
@@ -240,13 +191,12 @@ class OrderTree():
                     None
                 )
             )
-            total = float(self.total_sale_number_label['text'].rstrip("$")) + order.price
-            self.total_sale_number_label['text'] = number_to_str(total) + "$"
+            self.calculate_total()
 
             
 
     # Modify order
-    def modify_order(self, callbacks):
+    def modify_order(self):
         if self.orders_tree.focus():
             order_index = self.orders_tree.focus()
             product_name = self.orders_tree.item(order_index)['values'][2]
@@ -286,7 +236,7 @@ class OrderTree():
                 width=15,
                 font=('calibri', 14)
             )
-            amount_entry.insert(0, amount)
+            amount_entry.insert(0, string_to_float(amount))
             amount_entry.grid(row=3, padx=15)
 
             # Price.
@@ -331,15 +281,10 @@ class OrderTree():
                     self.orders_tree.item(order_index)['values'][6],
                     discount_entry.get(),
                 ))
-                self.calculate_total_sale(
-                    price_entry.get(),
-                    amount_entry.get(),
-                    discount_entry.get(),
-                    self.orders_tree.item(order_index)['values'][6],
-                )
+                self.calculate_total()
                 modify_order_window.destroy()
-                if callbacks:
-                    for callback in callbacks:
+                if self.callbacks:
+                    for callback in self.callbacks:
                         callback()
             
             # Save Button
@@ -355,10 +300,24 @@ class OrderTree():
             modify_button.grid(row=8, column=0, pady=(15,10))
     
     
+    
     def calculate_total(self):
+        total_orders_usd = 0
+        total_orders_bs = 0
         for order_index in self.orders_tree.get_children():
             order_values = self.orders_tree.item(order_index)['values']
-            total_order = order_values[5]
-            print(order_values)
-            print()
-            print(total_order)
+            total_order =  get_dollars(order_values[5])
+            total_orders_usd += total_order
+            if not self.sale:
+                rate_order =  string_to_float(order_values[6])
+                total_orders_bs += (total_order * rate_order)
+        self.total_orders_usd = total_orders_usd
+        self.total_orders_bs = total_orders_bs
+        self._update_total_labels()
+        
+        
+        
+    def _update_total_labels(self):
+        self.total_orders_label_usd['text'] = number_to_str(self.total_orders_usd) + "$"
+        if not self.sale:
+            self.total_orders_label_bs['text'] = number_to_str(self.total_orders_bs) + "bs"

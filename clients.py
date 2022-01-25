@@ -129,7 +129,7 @@ class ClientHandler():
             self.frame, 
             width=12, 
             font=('calibri', 14))
-
+        
         def client_callback(event):
             self.client_checker()
         self.id_entry.bind("<Return>", client_callback)

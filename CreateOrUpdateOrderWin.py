@@ -30,10 +30,10 @@ class CreateOrUpdateOrderWin:
             self._save()
         self.window.bind("<Return>", save_event)
         
-        self._display_content()
+        self._display_form()
         
     
-    def _display_content(self):
+    def _display_form(self):
         # Amount.
         amount_label = tk.Label(
             self.window,
@@ -99,20 +99,3 @@ class CreateOrUpdateOrderWin:
             self.rate
         )
         self.window.destroy()
-        # self.insert_into_orders_tree(
-        #     self.price_entry.get(),
-        #     self.amount_entry.get(),
-        #     self.discount_entry.get(),
-        # )
-
-        # self.calculate_total_sale(
-        #     self.price_entry.get(),
-        #     self.amount_entry.get(),
-        #     self.discount_entry.get(),
-        #     self.rate_entry.get()
-        # )
-        # self.window.destroy()
-        # self.product_window.destroy()
-        # if self.callbacks:
-        #     for callback in self.callbacks:
-        #         callback()

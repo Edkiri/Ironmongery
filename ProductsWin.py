@@ -186,7 +186,12 @@ class ProductsWin:
             relief=tk.RIDGE,
             bg='#54bf54',
             padx=30,
-            command=lambda: self.ask_for_amount_and_discount(self.callbacks))
+            command=lambda: CreateOrUpdateOrderWin(
+                self.rate_entry.get(),
+                self.product_tree.item(self.product_tree.focus())['values'][5],
+                on_save=self.add_order
+            )
+        )
         search_button.grid(row=2, column=1, pady=(30,10))
 
         create_product_button = tk.Button(

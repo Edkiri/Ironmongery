@@ -211,7 +211,7 @@ class FilterPaymentWin:
                 sale_id,
                 self.query_date,
                 rate=self.rate,
-                callback_functions=[self.insert_into_payment_tree], 
+                callbacks=[self.insert_into_payment_tree], 
                 params=self.get_query_params()
             )
             
@@ -304,4 +304,5 @@ class FilterPaymentWin:
         'method': self.method_var.get(),
         'account': self.account_var.get(),
         'pre_id': self.client_pre_id_var.get(),
-        'client_id': self.client_ident_entry.get()}
+        'client_id': self.client_ident_entry.get()
+    }

@@ -19,7 +19,6 @@ class PaymentHandler():
 
 
     def __init__(self):
-
         self.payments_to_delete = []
 
 

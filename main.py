@@ -62,7 +62,14 @@ class App():
         def PressAnyKey(event):
             # print(event.keycode)
             if event.keycode == 65:
-                self.product_handler.display_new_order_window(self.rate.get(), callbacks=[self.calculate_remaining])
+                ProductsWin(
+                    self.rate_entry.get(), 
+                    self.order_tree.insert_into_orders_tree,
+                    callbacks=[
+                        self.order_tree.calculate_total,
+                        self.calculate_remaining
+                    ],
+                )
             elif event.keycode == 90:
                 self.payment_handler.add_payment_window(self.query_date.get(), self.rate.get(), False, callbacks=[self.calculate_remaining])
             elif event.keycode == 88:
@@ -77,11 +84,11 @@ class App():
                 # Bolívares > 66 > "ctrl + b"
                 # Dólares68 > 68 > "ctrl + d"
             
-                total_orders = float(self.product_handler.total_sale_number_label['text'].rstrip("$"))
+                total_orders = float(self.order_tree.total_orders_usd)
                 total_payments = float(self.payment_handler.total_payments)
                 total_result = total_orders - total_payments
                 currencies = {66: "bs", 68: "usd"}
-                rate = string_to_float(self.rate.get())
+                rate = string_to_float(self.rate_entry.get())
                 currency = currencies[event.keycode]
                 is_return = total_result < 0
                 if currency == "bs":
@@ -106,19 +113,19 @@ class App():
         summary_menu = tk.Menu(menubar, tearoff=0, font=('arial', 15))
         summary_menu.add_command(label="Pagos", command=lambda: FilterPaymentWin(
             self.query_date.get(),
-            self.rate.get()))
+            self.rate_entry.get()))
         menubar.add_cascade(label="Resumen", menu=summary_menu)
         # Credit menu
         credit_menu = tk.Menu(menubar, tearoff=0, font=('arial', 15))
         credit_menu.add_command(label="Vales", command=lambda: CreditWin(
             True,
             self.query_date.get(),
-            self.rate.get(),
+            self.rate_entry.get(),
         ))
         credit_menu.add_command(label="Créditos", command=lambda: CreditWin(
             False,
             self.query_date.get(),
-            self.rate.get(),
+            self.rate_entry.get(),
         ))
         menubar.add_cascade(label="Créditos", menu=credit_menu)
         # Database menu
@@ -153,16 +160,21 @@ class App():
             borderwidth=0,
             font=('calibri', 15))
         self.query_date.insert(0, TODAY)
+        # Rate
+        rate_label = tk.Label(
+            date_frame,
+            text="Tasa",
+            font=('calibri', 15))
+        rate_label.grid(row=1, column=1, columnspan=3, sticky=tk.W)
+        self.rate_entry = tk.Entry(
+            date_frame,
+            width=9,
+            borderwidth=2,
+            font=('calibri', 15))
+        self.rate_entry.insert(0, 4.82)
+        self.rate_entry.focus()
+        self.rate_entry.grid(row=1, column=1, columnspan=3, sticky=tk.W, padx=(50,0))
 
-        # Buttons
-        def change_day(sign):
-            current_date = datetime.strptime(self.query_date.get(), DATE_FORMAT)
-            if sign == ">":
-                new_date = current_date + timedelta(days=1)
-            else:
-                new_date = current_date + timedelta(days=-1)
-            self.query_date.delete(0, tk.END)
-            self.query_date.insert(0, new_date.strftime(DATE_FORMAT))
         day_down_button = tk.Button(
             date_frame,
             text="<",
@@ -193,20 +205,16 @@ class App():
         day_up_button.grid(row=0, column=3, padx=(5,0), pady=(0,2))
         day_down_button.grid(row=0, column=0, padx=(10,5), pady=(0,2))
         show_button.grid(row=0, column=4, pady=(0,5), padx=(20,0))
-        # Rate
-        rate_label = tk.Label(
-            date_frame,
-            text="Tasa",
-            font=('calibri', 15))
-        rate_label.grid(row=1, column=1, columnspan=3, sticky=tk.W)
-        self.rate_entry = tk.Entry(
-            date_frame,
-            width=9,
-            borderwidth=2,
-            font=('calibri', 15))
-        self.rate_entry.insert(0, 0)
-        self.rate_entry.focus()
-        self.rate_entry.grid(row=1, column=1, columnspan=3, sticky=tk.W, padx=(50,0))
+        
+        # Buttons
+        def change_day(sign):
+            current_date = datetime.strptime(self.query_date.get(), DATE_FORMAT)
+            if sign == ">":
+                new_date = current_date + timedelta(days=1)
+            else:
+                new_date = current_date + timedelta(days=-1)
+            self.query_date.delete(0, tk.END)
+            self.query_date.insert(0, new_date.strftime(DATE_FORMAT))
 
 
 
@@ -269,11 +277,13 @@ class App():
                     self.delete_sale(get_focus_id())
 
         def display_detail_win():
-            detail_win = DetailWin(
+            DetailWin(
                 get_focus_id(),
                 self.query_date.get(),
-                self.rate.get(),
-                callback_functions=[self.insert_into_daily_tree]
+                self.rate_entry.get(),
+                callbacks=[
+                    self.insert_into_daily_tree,
+                    self.insert_into_summary_day]
             )
             
         detail_sale_button = tk.Button(
@@ -334,23 +344,24 @@ class App():
 
 
     # Insert summary.
-    def insert_into_summary_day(self):
-
+    def insert_into_summary_day(self, query_date=None):
+        if not query_date:
+            query_date = self.query_date.get()
         # Getting sales and payments
         def get_month_payments():
-                year = int(self.query_date.get().split("-")[0])
-                month = int(self.query_date.get().split("-")[1])
-                day = int(self.query_date.get().split("-")[2])
-                day_date = datetime.strptime(self.query_date.get(), DATE_FORMAT)
-                if day == 1:
-                    return (Payment
-                            .select()
-                            .where(Payment.date==day_date))
-                else:
-                    first_day_of_month = datetime(year, month, 1)
-                    return (Payment
-                            .select()
-                            .where(Payment.date.between(first_day_of_month, day_date)))
+            year = int(query_date.split("-")[0])
+            month = int(query_date.split("-")[1])
+            day = int(query_date.split("-")[2])
+            day_date = datetime.strptime(query_date, DATE_FORMAT)
+            if day == 1:
+                return (Payment
+                    .select()
+                    .where(Payment.date==day_date))
+            else:
+                first_day_of_month = datetime(year, month, 1)
+                return (Payment
+                    .select()
+                    .where(Payment.date.between(first_day_of_month, day_date)))
 
         def get_week_payments():
             day_date = datetime.strptime(self.query_date.get(), DATE_FORMAT)
@@ -451,7 +462,7 @@ class App():
         self.client_handler = ClientHandler(client_frame)
         # Client.
         self.client_handler.display_client_checker()
-
+    
 
 
     # Product Frame.
@@ -463,8 +474,10 @@ class App():
 
         # Product Window
 
-        self.order_tree = OrderTree(products_frame)
-        # self.product_handler.display_orders_tree(products_frame, callbacks=[self.calculate_remaining])
+        self.order_tree = OrderTree(
+            products_frame, 
+            callbacks=[self.calculate_remaining]
+        )
 
         # Buttons.
         add_product_button = tk.Button(
@@ -479,7 +492,7 @@ class App():
                     on_create=self.order_tree.insert_into_orders_tree,
                     callbacks=[
                         self.order_tree.calculate_total,
-                        # self.calculate_remaining
+                        self.calculate_remaining
                     ]
                 )
             )
@@ -508,7 +521,7 @@ class App():
             padx=5,
                 command=lambda: self.payment_handler.add_payment_window(
                     self.query_date.get(), 
-                    self.rate.get(),
+                    self.rate_entry.get(),
                     callbacks=[self.calculate_remaining]
                 )
             )
@@ -522,7 +535,7 @@ class App():
             padx=5,
             command=lambda: self.payment_handler.add_payment_window(
                     self.query_date.get(), 
-                    self.rate.get(), 
+                    self.rate_entry.get(), 
                     True,
                     callbacks=[self.calculate_remaining]
                 )
@@ -540,18 +553,9 @@ class App():
 
         total_sale_frame.grid(row=4, column=0, sticky=tk.E, padx=(0,10), pady=(30,0))
 
-        # self.order_tree.display_total_orders(total_sale_frame)
+        self.order_tree.display_total_orders(total_sale_frame)
         self.payment_handler.display_total_payments(total_sale_frame)
 
-        calculate_remaining_payments_button = tk.Button(
-            total_sale_frame,
-            text="Calc",
-            font=('calibri', 8),
-            bd=1,
-            relief=tk.RIDGE,
-            bg='#ffff00',
-            command=self.calculate_remaining)
-        calculate_remaining_payments_button.grid(row=2, column=0, pady=(10,0))
         remaining_sale_label = tk.Label(
             total_sale_frame,
             text="Pendiente:",
@@ -572,10 +576,10 @@ class App():
 
     # Functions
     def calculate_remaining(self):
-        dollars_order = float(self.product_handler.total_sale_number_label['text'].rstrip("$"))
+        dollars_order = float(self.order_tree.total_orders_usd)
         total_dollar_payments = self.payment_handler.total_payments
         remaining_dollars = dollars_order - total_dollar_payments
-        rate =  string_to_float(self.rate.get())
+        rate =  string_to_float(self.rate_entry.get())
         remaining_bs = number_to_str(remaining_dollars * rate)
         self.remaining_sale_dollars_label['text'] = number_to_str(remaining_dollars) + "$"
         self.remaining_sale_bs_label['text'] = number_to_str(remaining_bs) + "bs"
@@ -624,10 +628,9 @@ class App():
             else:
                 self.client_handler.pre_id.set(self.client_handler.pre_id_choices[1])
                 self.client_handler.id_entry.delete(0, 'end')
-            self.product_handler.orders_tree.delete(*self.product_handler.orders_tree.get_children())
+            self.order_tree.orders_tree.delete(*self.order_tree.orders_tree.get_children())
             self.payment_handler.payments_tree.delete(*self.payment_handler.payments_tree.get_children())
-            self.product_handler.total_sale_number_label['text'] = "0$"
-            self.product_handler.total_sale_label_bs['text'] = "0bs"
+            self.order_tree.calculate_total()
             self.payment_handler.total_payments_dollars_label['text'] = "0$"
             self.payment_handler.total_payments_bs_label['text'] = "0bs"
             self.payment_handler.total_payments = 0
@@ -635,11 +638,12 @@ class App():
             self.payment_handler.bs_payments = 0
             self.remaining_sale_bs_label['text'] = "0bs"
             self.remaining_sale_dollars_label['text'] = "0$"
+            self.calculate_remaining()
 
         if creating:
             clear_sale_frame()
 
-        elif (self.product_handler.orders_tree.get_children()) or (self.payment_handler.payments_tree.get_children()):
+        elif (self.order_tree.orders_tree.get_children()) or (self.payment_handler.payments_tree.get_children()):
             response = messagebox.askyesno("Atención, atención!", "¿Quieres limpiar la venta?", parent=self.root)
             if response:
                 clear_sale_frame()
@@ -653,8 +657,8 @@ class App():
         try:
 
             def create_orders(sale):
-                for order_index in self.product_handler.orders_tree.get_children():
-                    order_values = self.product_handler.orders_tree.item(order_index)['values']
+                for order_index in self.order_tree.orders_tree.get_children():
+                    order_values = self.order_tree.orders_tree.item(order_index)['values']
                     product_id = order_values[1]
                     amount = order_values[3]
                     price = get_dollars(order_values[5])
@@ -682,10 +686,10 @@ class App():
                         account=Payment.ACCOUNTS[payment_values[8]]
                     )
 
-            if not self.product_handler.orders_tree.get_children():
+            if not self.order_tree.orders_tree.get_children():
                 raise Exception("No puedes crear una venta sin productos.")
 
-            total_sale = float(self.product_handler.total_sale_number_label['text'].rstrip("$"))
+            total_sale = float(self.order_tree.total_orders_usd)
             total_payments = float(self.payment_handler.total_payments)
 
             if es_casi_igual(total_sale, total_payments):
@@ -728,10 +732,13 @@ class App():
 
 
     # Insert into Daily Tree
-    def insert_into_daily_tree(self):
+    def insert_into_daily_tree(self, query_date=None):
 
         # Update title
-        day = self.query_date.get()
+        if not query_date:
+            day = self.query_date.get()
+        else:
+            day = query_date
         self.day_tree_label['text'] = "Ventas del {} {} {} - {}".format(
                 get_weekday(datetime.strptime(day, DATE_FORMAT)),
                 day.split('-')[2],
@@ -788,7 +795,6 @@ class App():
             order.delete_instance()
         sale.delete_instance()
         self.insert_into_daily_tree()
-        self.insert_into_summary_day()
 
 
 if __name__ == '__main__':
