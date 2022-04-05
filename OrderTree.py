@@ -1,4 +1,5 @@
 # Tkinter
+import dis
 from subprocess import call
 import tkinter as tk
 from tkinter import ttk
@@ -21,6 +22,7 @@ class OrderTree():
 
     def __init__(self, frame, total_frame=None, sale=None, callbacks=[]):
         self.orders_to_delete = []
+        self.orders_to_update = []
         self.callbacks = callbacks
         self.frame = frame
         self.sale = sale
@@ -109,8 +111,7 @@ class OrderTree():
             bg='#54bf54',
             command=self.modify_order
         )
-        if not self.sale:
-            modify_order_button.grid(row=2, column=0, sticky=tk.W, padx=(150,0))
+        modify_order_button.grid(row=2, column=0, sticky=tk.W, padx=(150,0))
 
 
 
@@ -199,10 +200,13 @@ class OrderTree():
     def modify_order(self):
         if self.orders_tree.focus():
             order_index = self.orders_tree.focus()
+            order_id = self.orders_tree.item(order_index)['values'][0]
             product_name = self.orders_tree.item(order_index)['values'][2]
             amount = self.orders_tree.item(order_index)['values'][3]
             price = self.orders_tree.item(order_index)['values'][4]
             discount = self.orders_tree.item(order_index)['values'][7]
+            if discount == 'None':
+                discount = 0
             # New window
             modify_order_window = tk.Toplevel(
                 width=700,
@@ -259,18 +263,23 @@ class OrderTree():
                 modify_order_window,
                 text="Descuento",
                 font=('calibri', 16, 'bold'))
-            discount_label.grid(row=6, column=0, pady=(20,3))
+            if not self.sale:
+                discount_label.grid(row=6, column=0, pady=(20,3))
             discount_entry = ttk.Entry(
                 modify_order_window,
                 width=15,
                 font=('calibri', 14)
             )
             discount_entry.insert(0, discount)
-            discount_entry.grid(row=7, padx=15)
+            if not self.sale:
+                discount_entry.grid(row=7, padx=15)
 
             # Functions
             def modify_order_row():
-                total = (float(price_entry.get()) * float(amount_entry.get())) * (1 - (float(discount_entry.get()) / 100))
+                discount = discount_entry.get()
+                total = (float(price_entry.get()) * float(amount_entry.get())) * (1 - (float(discount) / 100))
+                if discount == 'None':
+                    discount = 0
                 self.orders_tree.item(order_index, values=(
                     self.orders_tree.item(order_index)['values'][0],
                     self.orders_tree.item(order_index)['values'][1],
@@ -279,8 +288,10 @@ class OrderTree():
                     str(price_entry.get()) + "$",
                     str(total) + "$",
                     self.orders_tree.item(order_index)['values'][6],
-                    discount_entry.get(),
+                    discount,
                 ))
+                if order_id != 'None':
+                    self.orders_to_update.append(order_index)
                 self.calculate_total()
                 modify_order_window.destroy()
                 if self.callbacks:

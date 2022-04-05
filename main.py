@@ -71,9 +71,9 @@ class App():
                     ],
                 )
             elif event.keycode == 90:
-                self.payment_handler.add_payment_window(self.query_date.get(), self.rate.get(), False, callbacks=[self.calculate_remaining])
+                self.payment_handler.add_payment_window(self.query_date.get(), self.rate_entry.get(), False, callbacks=[self.calculate_remaining])
             elif event.keycode == 88:
-                self.payment_handler.add_payment_window(self.query_date.get(), self.rate.get(), True, callbacks=[self.calculate_remaining])
+                self.payment_handler.add_payment_window(self.query_date.get(), self.rate_entry.get(), True, callbacks=[self.calculate_remaining])
             elif event.keycode == 49:
                 FilterPaymentWin(self.query_date)
             elif event.keycode == 50:
@@ -83,7 +83,6 @@ class App():
             elif (event.keycode == 66) or (event.keycode == 68):
                 # Bolívares > 66 > "ctrl + b"
                 # Dólares68 > 68 > "ctrl + d"
-            
                 total_orders = float(self.order_tree.total_orders_usd)
                 total_payments = float(self.payment_handler.total_payments)
                 total_result = total_orders - total_payments
@@ -96,7 +95,7 @@ class App():
                 if int(total_result) != 0:
                     self.payment_handler.add_payment_window(
                         self.query_date.get(), 
-                        self.rate.get(), 
+                        self.rate_entry.get(), 
                         total=abs(total_result), 
                         currency_option=currency,
                         is_return=is_return,
@@ -519,10 +518,10 @@ class App():
             relief=tk.RIDGE,
             bg='#54bf54',
             padx=5,
-                command=lambda: self.payment_handler.add_payment_window(
-                    self.query_date.get(), 
-                    self.rate_entry.get(),
-                    callbacks=[self.calculate_remaining]
+            command=lambda: self.payment_handler.add_payment_window(
+                self.query_date.get(), 
+                self.rate_entry.get(),
+                callbacks=[self.calculate_remaining]
                 )
             )
         add_return_button = tk.Button(

@@ -214,6 +214,18 @@ class DetailWin:
                     rate= string_to_float(payment_values[7]),
                     account=Payment.ACCOUNTS[payment_values[8]])
 
+            for order_index in self.order_tree.orders_to_update:
+                updated_order_values = self.order_tree.orders_tree.item(order_index)['values']
+                order_id = updated_order_values[0]
+                amount = updated_order_values[3]
+                # discount = int(updated_order_values[7])
+                price = get_dollars(updated_order_values[5])
+                order = Order.get(order_id)
+                order.amount = amount
+                order.price = price
+                # order.discount = discount
+                order.save()
+            
             for order_id in self.order_tree.orders_to_delete:
                 try:
                     order = Order.get(Order.id == order_id)
@@ -245,3 +257,4 @@ class DetailWin:
 
         except Exception as err:
             messagebox.showerror("Error!", err, parent=self.detail_sale_window)
+            
