@@ -179,7 +179,8 @@ class CreditWin:
             response = messagebox.askyesno("Atención, atención!", f"Quieres eliminar este {self.title.rstrip('s')}?", parent=self.credits_frame)
             if response:
                 sale_id = self.credits_tree.item(self.credits_tree.focus())['values'][0]
-                self.delete_sale(sale_id)
+                sale = Sale.get(sale_id)
+                sale.delete_instance()
                 self.insert_into_credits_tree(self.get_filter_params())
             
     def get_filter_params(self):

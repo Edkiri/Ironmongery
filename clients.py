@@ -4,7 +4,7 @@ from tkinter import ttk
 from tkinter import messagebox
 
 # Models.
-from models import Client
+from models import Client, Sale
 
 # Peewee.
 from peewee import IntegrityError
@@ -171,7 +171,8 @@ class ClientHandler():
             client = Client.get(identity_card=pre_id + "-" + id_card)
             self.update_client_frame(client)
         except Exception as err:
-            self.create_or_update_client()
+            print(err)
+            # self.create_or_update_client()
     
     
     
@@ -245,6 +246,8 @@ class ClientHandler():
         self.curr_option.grid_forget()
         self.search_button.grid_forget()
         self.display_client_detail(client)
+        client_color = self.get_debt_color(client)
+        self.client_name_label.config(fg=client_color)
 
 
     def create_or_update_client(self, client_id=None):
@@ -390,3 +393,10 @@ class ClientHandler():
                 command=update_client)
             update_client_button.grid(row=3, column=0,  columnspan=2, sticky=tk.W, pady=(15,0))
 
+
+    def get_debt_color(self, client):
+        client_sales = (Sale.select().join(Client).where(Client.id == client))
+        debt_sales = (client_sales.select().where(Sale.is_finished == False))
+        if debt_sales.count() > 0:
+            return 'red'
+        return 'black'
