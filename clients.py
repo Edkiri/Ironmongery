@@ -170,9 +170,8 @@ class ClientHandler():
             id_card = self.id_entry.get()
             client = Client.get(identity_card=pre_id + "-" + id_card)
             self.update_client_frame(client)
-        except Exception as err:
-            print(err)
-            # self.create_or_update_client()
+        except Exception:
+            self.create_or_update_client()
     
     
     
