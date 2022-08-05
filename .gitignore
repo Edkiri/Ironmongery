@@ -11,3 +11,6 @@ products.csv
 migrations/
 old_database.db
 resumes/
+backups/
+newrelic_agent.log
+TODO*
