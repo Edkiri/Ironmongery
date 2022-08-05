@@ -1,8 +1,8 @@
 """Sales models."""
 from peewee import *
-from config import DATABASE_NAME
+from config import DATABASE_PATH
 
-db = SqliteDatabase(DATABASE_NAME)
+db = SqliteDatabase(DATABASE_PATH)
 
 class BaseModel(Model):
     class Meta:
@@ -63,8 +63,7 @@ class Order(BaseModel):
     amount = FloatField()
     date = DateField()
     price = FloatField()
-    # discount = IntegerField(default=0) # All discont are allready included in the order price.
-
+    
 db.connect()
 db.create_tables([Sale, Payment, Client, Order, Product])
 db.close()

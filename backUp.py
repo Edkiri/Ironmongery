@@ -3,7 +3,7 @@ from datetime import date
 import os
 from tkinter import messagebox
 from tkinter.filedialog import askopenfile
-from config import BASE_DIR, BACKUP_DIR, DATABASE_NAME
+from config import BASE_DIR, BACKUP_DIR, DATABASE_NAME, DATABASE_PATH
 
 class BackUp:
     """ Singleton Pattern implemented to handle the backup
@@ -30,8 +30,6 @@ class BackUp:
 
     def copy_db_to_backups_dir(self):
 
-        original = BASE_DIR + DATABASE_NAME
-
         today = date.today().strftime("%d-%m-%Y")
         db_name = DATABASE_NAME.rstrip(".db")
         target = BACKUP_DIR + f"{db_name}_{today}.db"
@@ -52,7 +50,7 @@ class BackUp:
             else:
                 break
 
-        shutil.copyfile(original, target)
+        shutil.copyfile(DATABASE_PATH, target)
 
         messagebox.showinfo("Operación exitosa!", "Base de datos respaldada.")
 
@@ -90,8 +88,6 @@ class Restore:
 
             old_db = self.db.name
 
-            target = BASE_DIR + DATABASE_NAME
-
-            shutil.copyfile(old_db, target)
+            shutil.copyfile(old_db, DATABASE_PATH)
 
             messagebox.showinfo("Operación exitosa!", "Base de datos actualizada.", parent=parent)

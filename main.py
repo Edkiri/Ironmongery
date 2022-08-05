@@ -132,7 +132,7 @@ class App():
             response = messagebox.askyesno("Atención, atención!", "¿Quires hacer un respaldo de la base de datos?", parent=self.root)
             if response:
                 try:
-                    BackUp.get_instance().copy_db_to_backups_dir(self.root)
+                    BackUp.get_instance().copy_db_to_backups_dir()
                 except Exception as err:
                     messagebox.showerror("Error", err, parent=self.root)
         def restore():
