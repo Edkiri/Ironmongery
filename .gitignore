@@ -16,3 +16,5 @@ newrelic_agent.log
 TODO*
 databases/
 *.csv
+moi.csv
+products-to-db-moi*

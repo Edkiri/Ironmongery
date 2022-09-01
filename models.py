@@ -41,10 +41,8 @@ class Payment(BaseModel):
     method = IntegerField(choices=METHODS)
     rate = FloatField()
     ACCOUNTS = {
-        'Comercial Guerra': 0,
-        'Ivan Guerra': 1,
-        'Jesús Daniel': 2,
-        'Jesús Guerra': 3}
+        'Moises': 0
+    }
     account = IntegerField(choices=ACCOUNTS)
     TYPES = {'Pago': 0, 'Vuelto': 1}
     type = IntegerField(choices=TYPES)  

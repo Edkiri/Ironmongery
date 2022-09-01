@@ -155,16 +155,18 @@ class ProductsWin:
         product_tree = self.product_tree
         product_tree.column("#0", width=0, stretch=tk.NO)
         for col in product_tree['columns']:
-            if col == 'Nombre':
-                product_tree.column(col, width=320, minwidth=25)
+            if col == 'Marca':
+                product_tree.column(col, width=0, stretch=tk.NO)
+            elif col == 'Nombre':
+                product_tree.column(col, width=250, minwidth=25)
             elif col == 'Código':
-                product_tree.column(col, width=60, minwidth=25)
+                product_tree.column(col, width=80, minwidth=25)
             elif col == 'Precio':
-                product_tree.column(col, width=190, minwidth=25)
+                product_tree.column(col, width=150, minwidth=25)
             elif col == 'Id':
                 product_tree.column(col, width=0, stretch=tk.NO)
             else:
-                product_tree.column(col, width=100, minwidth=25)
+                product_tree.column(col, width=150, minwidth=25)
             product_tree.heading(col, text=col, anchor=tk.W)
         product_tree.grid(row=1, column=1, padx=(30,0), sticky=tk.N)
 
@@ -429,9 +431,10 @@ class ProductsWin:
                 bg='#54bf54',
                 command=update_product)
             update_product_button.grid(row=13, column=0, sticky=tk.W+tk.E, padx=15, pady=15)
+            print("Código", product.code)
             name_entry.insert(0, product.name)
             reference_entry.insert(0, product.reference)
-            brand_entry.insert(0, product.brand)
+            # brand_entry.insert(0, product.brand)
             code_entry.insert(0, product.code)
             price_entry.insert(0, product.price)
             stock_entry.insert(0, product.stock)
