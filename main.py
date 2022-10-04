@@ -11,6 +11,7 @@ from clients import ClientHandler
 from payments import PaymentHandler
 from DetailWin import DetailWin
 from ProductsWin import ProductsWin
+from OrderDetailWin import OrderDetailWin
 
 # Models.
 from models import Payment, Sale, Order
@@ -496,6 +497,17 @@ class App():
                 )
             )
         add_product_button.grid(row=2, column=0, sticky=tk.W)
+        
+        order_details_button = tk.Button(
+            products_frame,
+            text="Detalle",
+            font=('calibri', 12),
+            bd=1,
+            relief=tk.RIDGE,
+            bg='#54bf54',
+            command=lambda: OrderDetailWin(self.rate_entry.get(), self.order_tree),
+            )
+        order_details_button.grid(row=2, column=0)
 
 
 
