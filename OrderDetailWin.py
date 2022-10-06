@@ -1,12 +1,10 @@
 # Tkinter
-from re import T
 import tkinter as tk
 from tkinter import ttk
-from turtle import width
 
 from utils import number_to_str, string_to_float
 
-IVA = 0.16
+IVA = 1.16
 
 class OrderDetailWin:
 
@@ -81,13 +79,13 @@ class OrderDetailWin:
         self.total_orders = 0
         for order in self.orders:
             unit_price = self.rate * order.get('price')
-            self.total_orders += (unit_price  * order.get('quantity'))
-            unit_price = unit_price - (unit_price * IVA)
+            self.total_orders += ((unit_price  * order.get('quantity')) / IVA)
+            unit_price = unit_price / IVA
             self.orders_tree.insert(
                 "",
                 index=tk.END,
                 values=(
-                    order.get('quantity'),
+                    number_to_str(order.get('quantity')),
                     order.get('name'),
                     number_to_str(unit_price),
                     number_to_str(unit_price * order.get('quantity'))
@@ -97,7 +95,7 @@ class OrderDetailWin:
     
     def _display_total_text(self):
         frame = tk.Frame(self.order_details_win)
-        sub_total = number_to_str(self.total_orders - (self.total_orders * IVA))
+        total_iva = self.total_orders * (IVA - 1)
         
         sub_total_label = tk.Label(
             frame,
@@ -120,19 +118,19 @@ class OrderDetailWin:
         
         _sub_total_label = tk.Label(
             frame,
-            text=f"{sub_total}",
+            text=f"{number_to_str(self.total_orders)}",
             font=('calibri', 16, 'bold'))
         _sub_total_label.grid(row=3, column=0, pady=(4,10), padx=40)
         
         _iva_label = tk.Label(
             frame,
-            text=f"{number_to_str(self.total_orders * IVA)}",
+            text=f"{number_to_str(total_iva)}",
             font=('calibri', 16, 'bold'))
         _iva_label.grid(row=3, column=1, pady=(4,10), padx=40)
         
         _total_label = tk.Label(
             frame,
-            text=f"{number_to_str(self.total_orders)}",
+            text=f"{number_to_str(self.total_orders + total_iva)}",
             font=('calibri', 16, 'bold'))
         _total_label.grid(row=3, column=2, pady=(4,10), padx=40)
         
