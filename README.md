@@ -1,6 +1,11 @@
 # Ironmongery
-Desktop app to take control of a ironmongery store's sales.
 
-Built with Python Tkinter Module, and Peewee to interact with the database (Sqlite3).
+Aplicación de escritorio ue lleva el control de las ventas y el inventario de una ferretería. 
 
-This app has been sold and i'm constantly maintaining it.
+## Tecnologías
+* Numpy
+* Openpyxl
+* Pandas
+* Peewee
+* XlsxWriter
+* Sqlite
