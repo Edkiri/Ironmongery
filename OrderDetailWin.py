@@ -67,7 +67,7 @@ class OrderDetailWin:
         self.orders_tree.heading('name', text='Producto', anchor=tk.W)
 
         self.orders_tree.column('unit_price', width=150, minwidth=25)
-        self.orders_tree.heading('unit_price', text='Precio/Unidad', anchor=tk.W)
+        self.orders_tree.heading('unit_price', text='$/Unidad', anchor=tk.W)
         
         self.orders_tree.column('total', width=100, minwidth=25)
         self.orders_tree.heading('total', text='Total', anchor=tk.W)

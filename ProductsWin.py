@@ -170,6 +170,7 @@ class ProductsWin:
 
         def new_order_event(event):
             product_price = self.product_tree.item(self.product_tree.focus())['values'][5]
+            print(product_price)
             CreateOrUpdateOrderWin(
                 self.rate_entry.get(),
                 product_price,
@@ -440,8 +441,10 @@ class ProductsWin:
     def add_order(self, price, amount, discount, rate):
         product_id = self.product_tree.item(self.product_tree.focus())['values'][0]
         product_name = self.product_tree.item(self.product_tree.focus())['values'][2]
+        product_code = self.product_tree.item(self.product_tree.focus())['values'][4]
         self.on_create(
             product_id,
+            product_code,
             product_name,
             price, 
             amount, 

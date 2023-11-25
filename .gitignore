@@ -17,3 +17,4 @@ TODO*
 databases/
 *.csv
 products-to-db-moi.py
+.env

@@ -671,9 +671,9 @@ class App():
                 for order_index in self.order_tree.orders_tree.get_children():
                     order_values = self.order_tree.orders_tree.item(order_index)['values']
                     product_id = order_values[1]
-                    amount = order_values[3]
-                    price = get_dollars(order_values[5])
-                    discount = int(order_values[7])
+                    amount = order_values[4]
+                    price = get_dollars(order_values[6])
+                    discount = int(order_values[8])
                     Order.create(
                         product=product_id,
                         sale=sale,
