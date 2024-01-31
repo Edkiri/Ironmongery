@@ -7,7 +7,7 @@ from tkinter import messagebox
 from models import Payment, Sale
 
 # Utils
-from utils import (
+from src.utils.utils import (
     number_to_str, 
     string_to_float, 
     get_summary_payments,

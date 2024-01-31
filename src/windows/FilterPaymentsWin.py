@@ -1,19 +1,18 @@
 # Tkinter.
 import tkinter as tk
 from tkinter import ttk
-from tkinter import messagebox
 
 # Models
 from models import Payment, Client, Sale
 
 # Utils
-from utils import DATE_FORMAT, number_to_str, get_summary_payments
+from src.utils.utils import DATE_FORMAT, number_to_str, get_summary_payments
 from datetime import datetime
 
 # App.
-from DetailWin import DetailWin
+from src.windows import DetailWin
 
-class FilterPaymentWin:
+class FilterPaymentsWin:
   def __init__(self, query_date, rate):
     self.rate = rate
     self.query_date = query_date

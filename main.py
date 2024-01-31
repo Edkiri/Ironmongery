@@ -3,15 +3,12 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 
-# App.
-from CreditWin import CreditWin
-from FilterPaymentsWin import FilterPaymentWin
+# Windows
+from src.windows import CreditWin, FilterPaymentsWin, OrderDetailWin, DetailWin, ProductsWin
+
 from OrderTree import OrderTree
 from clients import ClientHandler
 from payments import PaymentHandler
-from DetailWin import DetailWin
-from ProductsWin import ProductsWin
-from OrderDetailWin import OrderDetailWin
 
 # Models.
 from models import Payment, Sale, Order
@@ -19,14 +16,13 @@ from models import Payment, Sale, Order
 # Utils.
 from datetime import datetime, timedelta
 
-from utils import (
+from src.utils.utils import (
     get_weekday, get_month_name, get_summary_payments,
     string_to_float, number_to_str, es_casi_igual, get_dollars,
     DATE_FORMAT, TODAY)
 
 # Backups
 from backUp import BackUp, Restore
-
 
 class App():
 
@@ -76,7 +72,7 @@ class App():
             elif event.keycode == 88:
                 self.payment_handler.add_payment_window(self.query_date.get(), self.rate_entry.get(), True, callbacks=[self.calculate_remaining])
             elif event.keycode == 49:
-                FilterPaymentWin(self.query_date)
+                FilterPaymentsWin(self.query_date)
             elif event.keycode == 50:
                 self.display_credit_window()
             elif event.keycode == 51:
@@ -111,7 +107,7 @@ class App():
         menubar = tk.Menu(root)
         # Sumary menu
         summary_menu = tk.Menu(menubar, tearoff=0, font=('arial', 15))
-        summary_menu.add_command(label="Pagos", command=lambda: FilterPaymentWin(
+        summary_menu.add_command(label="Pagos", command=lambda: FilterPaymentsWin(
             self.query_date.get(),
             self.rate_entry.get()))
         menubar.add_cascade(label="Resumen", menu=summary_menu)

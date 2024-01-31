@@ -1,5 +1,5 @@
 import pandas as pd
-from utils import es_casi_igual, format_float
+from src.utils.utils import es_casi_igual, format_float
 from models import Product
 import tkinter as tk
 from tkinter import messagebox

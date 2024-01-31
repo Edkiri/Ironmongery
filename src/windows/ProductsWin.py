@@ -4,19 +4,19 @@ from tkinter import ttk
 from tkinter import messagebox
 
 # Models
-from models import Product, Order, Sale
+from models import Product
 
 # products
 from productUpdater import ProductUpdater
 
 # Utils
-from utils import number_to_str, string_to_float, get_dollars
+from src.utils.utils import number_to_str, string_to_float
 
 # Backup
 from backUp import BackUp
 
 # App
-from CreateOrUpdateOrderWin import CreateOrUpdateOrderWin
+from src.windows import CreateOrUpdateOrderWin
 
 
 class ProductsWin:

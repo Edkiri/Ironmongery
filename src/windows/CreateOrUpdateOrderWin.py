@@ -1,19 +1,8 @@
 import tkinter as tk
 from tkinter import ttk
-from tkinter import messagebox
-
-# Models
-from models import Product, Order, Sale
-
-# products
-from productUpdater import ProductUpdater
 
 # Utils
-from utils import number_to_str, string_to_float, get_dollars
-
-# Backup
-from backUp import BackUp
-
+from src.utils.utils import get_dollars
 
 class CreateOrUpdateOrderWin:
     

@@ -1,22 +1,12 @@
 # Tkinter
-import dis
-from subprocess import call
 import tkinter as tk
 from tkinter import ttk
-from tkinter import messagebox
 
 # Models
-from models import Product, Order, Sale
-
-# products
-from productUpdater import ProductUpdater
+from models import Order, Sale
 
 # Utils
-from utils import number_to_str, string_to_float, get_dollars
-
-# Backup
-from backUp import BackUp
-
+from src.utils.utils import number_to_str, string_to_float, get_dollars
 
 class OrderTree:
     def __init__(self, frame, total_frame=None, sale=None, callbacks=[]):

@@ -1,8 +1,9 @@
 # Tkinter.
 import tkinter as tk
 from tkinter import ttk
-from tkinter import messagebox
-from ProductsWin import ProductsWin
+
+# Windows
+from src.windows import ProductsWin
 
 # Models
 from models import Payment, Sale, Order
@@ -11,7 +12,7 @@ from models import Payment, Sale, Order
 from CreateResume import CreateResume
 
 # Utils
-from utils import DATE_FORMAT, TODAY, string_to_float, es_casi_igual, get_dollars, number_to_str
+from src.utils.utils import DATE_FORMAT, TODAY, string_to_float, es_casi_igual, get_dollars
 from datetime import date, datetime
 
 # App.

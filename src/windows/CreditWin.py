@@ -4,14 +4,14 @@ from tkinter import ttk
 from tkinter import messagebox
 
 # App.
-from DetailWin import DetailWin
+from src.windows import DetailWin
 
 # Models.
 from models import Payment, Sale, Order, Client
 
 # Utils.
 from datetime import date
-from utils import get_summary_payments, number_to_str
+from src.utils.utils import get_summary_payments, number_to_str
 
 
 class CreditWin:

@@ -2,7 +2,7 @@
 import tkinter as tk
 from tkinter import ttk
 
-from utils import number_to_str, string_to_float
+from src.utils.utils import number_to_str, string_to_float
 
 IVA = 1.16
 
