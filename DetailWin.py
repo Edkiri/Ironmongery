@@ -176,84 +176,85 @@ class DetailWin:
         sale_desc = self.sale.description
         sale_client = self.sale.client
 
-        try:
-            if sale_date != self.sale_date_entry.get():
-                self.sale.date = datetime.strptime(self.sale_date_entry.get(), DATE_FORMAT)
+        # try:
+        if sale_date != self.sale_date_entry.get():
+            self.sale.date = datetime.strptime(self.sale_date_entry.get(), DATE_FORMAT)
 
-            if sale_desc != self.sale_desc_text.get():
-                self.sale.description = self.sale_desc_text.get()
+        if sale_desc != self.sale_desc_text.get():
+            self.sale.description = self.sale_desc_text.get()
 
-            if sale_client != self.client_handler.client:
-                self.sale.client = self.client_handler.client
+        if sale_client != self.client_handler.client:
+            self.sale.client = self.client_handler.client
 
-            if not self.order_tree.orders_tree.get_children():
-                raise Exception("No puede existir una venta sin órdenes!")
+        if not self.order_tree.orders_tree.get_children():
+            raise Exception("No puede existir una venta sin órdenes!")
 
-            for order_index in self.order_tree.orders_tree.get_children():
-                if self.order_tree.orders_tree.item(order_index)['values'][0] == 'None':
-                    new_order_values = self.order_tree.orders_tree.item(order_index)['values']
-                    print(new_order_values)
-                    Order.create(
-                        product=new_order_values[1],
-                        sale=self.sale.id,
-                        date=datetime.strptime(TODAY, DATE_FORMAT),
-                        amount=new_order_values[4],
-                        price=get_dollars(new_order_values[5]),
-                        discount=int(new_order_values[7])
-                    )
+        for order_index in self.order_tree.orders_tree.get_children():
+            if self.order_tree.orders_tree.item(order_index)['values'][0] == 'None':
+                new_order_values = self.order_tree.orders_tree.item(order_index)['values']
+                print(new_order_values)
+                Order.create(
+                    product=new_order_values[1],
+                    sale=self.sale.id,
+                    date=datetime.strptime(TODAY, DATE_FORMAT),
+                    amount=new_order_values[4],
+                    price=get_dollars(new_order_values[5]),
+                    discount=int(new_order_values[7]),
+                    stock=Order.stock + new_order_values[4]
+                )
 
-            for payment_index in self.payments_handler.payments_tree.get_children():
-                if self.payments_handler.payments_tree.item(payment_index)['values'][0] == 'None':
-                    payment_values = self.payments_handler.payments_tree.item(payment_index)['values']
-                    Payment.create(
-                    sale=self.sale,
-                    date=datetime.strptime(payment_values[2], DATE_FORMAT),
-                    type=Payment.TYPES[payment_values[3]],
-                    amount=string_to_float(payment_values[4]),
-                    currency=Payment.CURRENCIES[payment_values[5]],
-                    method=Payment.METHODS[payment_values[6]],
-                    rate= string_to_float(payment_values[7]),
-                    account=Payment.ACCOUNTS[payment_values[8]])
+        for payment_index in self.payments_handler.payments_tree.get_children():
+            if self.payments_handler.payments_tree.item(payment_index)['values'][0] == 'None':
+                payment_values = self.payments_handler.payments_tree.item(payment_index)['values']
+                Payment.create(
+                sale=self.sale,
+                date=datetime.strptime(payment_values[2], DATE_FORMAT),
+                type=Payment.TYPES[payment_values[3]],
+                amount=string_to_float(payment_values[4]),
+                currency=Payment.CURRENCIES[payment_values[5]],
+                method=Payment.METHODS[payment_values[6]],
+                rate= string_to_float(payment_values[7]),
+                account=Payment.ACCOUNTS[payment_values[8]])
 
-            for order_index in self.order_tree.orders_to_update:
-                updated_order_values = self.order_tree.orders_tree.item(order_index)['values']
-                order_id = updated_order_values[0]
-                amount = updated_order_values[4]
-                price = get_dollars(updated_order_values[6])
-                order = Order.get(order_id)
-                order.amount = amount
-                order.price = price
-                order.save()
-            
-            for order_id in self.order_tree.orders_to_delete:
-                try:
-                    order = Order.get(Order.id == order_id)
-                    order.delete_instance()
-                except Exception as err:
-                    pass
-                    
-
-            for payment_id in self.payments_handler.payments_to_delete:
-                payment = Payment.get(Payment.id == payment_id)
-                payment.delete_instance()
-
-            total_sale = float(self.order_tree.total_orders_usd)
-            total_payments = float(self.payments_handler.total_payments_dollars_label["text"].rstrip("$"))
-            if es_casi_igual(total_sale, total_payments):
-                self.sale.is_finished = True
-                self.sale.finished_date = date.today()
-            else:
-                self.sale.is_finished = False
+        for order_index in self.order_tree.orders_to_update:
+            updated_order_values = self.order_tree.orders_tree.item(order_index)['values']
+            order_id = updated_order_values[0]
+            amount = updated_order_values[4]
+            price = get_dollars(updated_order_values[6])
+            order = Order.get(order_id)
+            order.amount = amount
+            order.price = price
+            order.save()
+        
+        for order_id in self.order_tree.orders_to_delete:
+            try:
+                order = Order.get(Order.id == order_id)
+                order.delete_instance()
+            except Exception as err:
+                pass
                 
-            self.sale.save()
-            self.detail_sale_window.destroy()
-            
-            if self.callbacks and self.params:
-                self.callbacks[0](self.params)
-            elif self.callbacks:
-                for callback in self.callbacks:
-                    callback(self.query_date)
 
-        except Exception as err:
-            messagebox.showerror("Error!", err, parent=self.detail_sale_window)
+        for payment_id in self.payments_handler.payments_to_delete:
+            payment = Payment.get(Payment.id == payment_id)
+            payment.delete_instance()
+
+        total_sale = float(self.order_tree.total_orders_usd)
+        total_payments = string_to_float(self.payments_handler.total_payments_dollars_label["text"].rstrip("$"))
+        if es_casi_igual(total_sale, total_payments):
+            self.sale.is_finished = True
+            self.sale.finished_date = date.today()
+        else:
+            self.sale.is_finished = False
+            
+        self.sale.save()
+        self.detail_sale_window.destroy()
+        
+        if self.callbacks and self.params:
+            self.callbacks[0](self.params)
+        elif self.callbacks:
+            for callback in self.callbacks:
+                callback(self.query_date)
+
+        # except Exception as err:
+        #     messagebox.showerror("Error!", err, parent=self.detail_sale_window)
             

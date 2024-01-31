@@ -442,6 +442,7 @@ class ProductsWin:
         product_id = self.product_tree.item(self.product_tree.focus())['values'][0]
         product_name = self.product_tree.item(self.product_tree.focus())['values'][2]
         product_code = self.product_tree.item(self.product_tree.focus())['values'][4]
+        print(price)
         self.on_create(
             product_id,
             product_code,

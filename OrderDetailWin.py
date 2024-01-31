@@ -21,9 +21,9 @@ class OrderDetailWin:
         def get_order(index):
             order = order_tree.orders_tree.item(index)['values']
             return {
-                'quantity': float(order[3]),
-                'name': order[2],
-                'price': string_to_float(order[4])
+                'quantity': float(order[4]),
+                'name': order[3],
+                'price': string_to_float(order[5])
             }
         return list(map(get_order, order_tree.orders_tree.get_children()))
 

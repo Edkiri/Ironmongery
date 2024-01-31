@@ -34,7 +34,7 @@ class PaymentHandler():
                 pay_type = payment['values'][3]
                 amount = payment['values'][4]
                 currency = payment['values'][5]
-                rate = string_to_float(str(payment['values'][7]))
+                rate = string_to_float(str(1 if payment['values'][7] == '' else payment['values'][7]))
 
                 if currency == 'Dólares':
                     if pay_type == 'Pago':
