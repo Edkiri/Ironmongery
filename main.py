@@ -22,7 +22,7 @@ from src.utils.utils import (
     DATE_FORMAT, TODAY)
 
 # Backups
-from backUp import BackUp, Restore
+from src.functions.backUp import BackUp, Restore
 
 class App():
 

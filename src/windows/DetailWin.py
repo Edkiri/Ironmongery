@@ -9,7 +9,7 @@ from src.windows import ProductsWin
 from models import Payment, Sale, Order
 
 # Resume
-from CreateResume import CreateResume
+from src.functions.CreateResume import CreateResume
 
 # Utils
 from src.utils.utils import DATE_FORMAT, TODAY, string_to_float, es_casi_igual, get_dollars

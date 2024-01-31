@@ -7,17 +7,16 @@ from tkinter import messagebox
 from models import Product
 
 # products
-from productUpdater import ProductUpdater
+from src.functions.ProductUpdater import ProductUpdater
 
 # Utils
 from src.utils.utils import number_to_str, string_to_float
 
 # Backup
-from backUp import BackUp
+from src.functions.backUp import BackUp
 
 # App
-from src.windows import CreateOrUpdateOrderWin
-
+from .CreateOrUpdateOrderWin import CreateOrUpdateOrderWin
 
 class ProductsWin:
     
