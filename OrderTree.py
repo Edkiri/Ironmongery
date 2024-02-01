@@ -4,6 +4,7 @@ from tkinter import ttk
 
 # Models
 from models import Order, Sale
+from src.orders.OrderProduct import OrderProduct
 
 # Utils
 from src.utils.utils import number_to_str, string_to_float, get_dollars
@@ -122,18 +123,17 @@ class OrderTree:
 
     # Insert into Orders Tree.
     def insert_into_orders_tree(
-        self, product_id, product_code, product_name, price, amount, discount, rate
+        self, order_product: OrderProduct
     ):
-        amount = float(amount)
-        discount = int(discount)
-        product_id = product_id
-        product_name = product_name
+        quantity = order_product.quantity
+        discount = order_product.discount
+        product_id = order_product.product.product_id
 
         # Getting price.
-        product_price = string_to_float(price)
+        product_price = string_to_float(order_product.price)
         product_price *= 1 - (discount / 100)
         price_to_print = f"{product_price}$"
-        total_price = f"{ product_price * amount }$"
+        total_price = f"{ product_price * quantity }$"
         if discount != 0:
             price_to_print += f" - {discount}% (Ya incluído)"
 
@@ -144,12 +144,12 @@ class OrderTree:
             values=(
                 None,
                 product_id,
-                product_code,
-                product_name,
-                amount,
+                order_product.product.code,
+                order_product.product.name,
+                order_product.quantity,
                 price_to_print,
                 total_price,
-                rate,
+                order_product.rate,
                 discount,
             ),
         )
@@ -234,7 +234,7 @@ class OrderTree:
             amount_entry = ttk.Entry(
                 modify_order_window, width=15, font=("calibri", 14)
             )
-            amount_entry.insert(0, string_to_float(amount))
+            amount_entry.insert(0, str(string_to_float(amount)))
             amount_entry.grid(row=3, padx=15)
 
             # Price.
@@ -244,7 +244,7 @@ class OrderTree:
             price_label.grid(row=4, column=0, pady=(20, 3))
             price_entry = ttk.Entry(modify_order_window, width=15, font=("calibri", 14))
             price = get_dollars(price)
-            price_entry.insert(0, price)
+            price_entry.insert(0, str(price))
             price_entry.grid(row=5, padx=15)
 
             # Discount
@@ -256,7 +256,7 @@ class OrderTree:
             discount_entry = ttk.Entry(
                 modify_order_window, width=15, font=("calibri", 14)
             )
-            discount_entry.insert(0, discount)
+            discount_entry.insert(0, str(discount))
             if not self.sale:
                 discount_entry.grid(row=7, padx=15)
 
