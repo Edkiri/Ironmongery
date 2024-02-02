@@ -2,13 +2,14 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
+from src.payments.components import PaymentTotal
 
 # Windows
 from src.windows import CreditWin, FilterPaymentsWin, OrderDetailWin, DetailWin
 
-from OrderTree import OrderTree
+from src.orders.components import OrderTree
 from src.clients import ClientSelector
-from payments import PaymentHandler
+from src.payments.components import PaymentHandler
 
 # Models.
 from models import Payment, Sale, Order
@@ -60,8 +61,8 @@ class App:
         self.display_new_sale_title_and_meta_data()
         self.display_client_checker()
         self.display_products_for_sale()
-        self.display_new_sale_payments_tree()
         self.display_total_sale()
+        self.display_new_sale_payments_tree()
         self.display_create_sale_buttons()
 
         # Binding
@@ -521,47 +522,13 @@ class App:
 
     # Payments Tree.
     def display_new_sale_payments_tree(self):
-        # Payments Frame
-        payments_frame = tk.Frame(self.create_sale_frame)
-        payments_frame.grid(row=4, column=0, sticky=tk.W)
-
-        self.payment_handler = PaymentHandler()
-        self.payment_handler.display_payments_tree(
-            payments_frame, callbacks=[self.calculate_remaining]
+        self.payment_handler = PaymentHandler(
+            date_entry=self.query_date,
+            rate_entry=self.rate_entry,
+            parent_frame=self.create_sale_frame,
+            on_change=lambda: self.total_payments.update(self.payment_handler)
         )
-
-        # Display buttons
-        add_payment_button = tk.Button(
-            payments_frame,
-            text="Pago",
-            font=("calibri", 12),
-            bd=1,
-            relief=tk.RIDGE,
-            bg="#54bf54",
-            padx=5,
-            command=lambda: self.payment_handler.add_payment_window(
-                self.query_date.get(),
-                self.rate_entry.get(),
-                callbacks=[self.calculate_remaining],
-            ),
-        )
-        add_return_button = tk.Button(
-            payments_frame,
-            text="Vuelto",
-            font=("calibri", 12),
-            bd=1,
-            relief=tk.RIDGE,
-            bg="#54bf54",
-            padx=5,
-            command=lambda: self.payment_handler.add_payment_window(
-                self.query_date.get(),
-                self.rate_entry.get(),
-                True,
-                callbacks=[self.calculate_remaining],
-            ),
-        )
-        add_payment_button.grid(row=3, column=0, sticky=tk.W)
-        add_return_button.grid(row=3, column=0, sticky=tk.W, padx=(90, 0))
+        self.payment_handler.frame.grid(row=4, column=0, sticky=tk.W)
 
     # Sum total sale and payments.
     def display_total_sale(self):
@@ -571,7 +538,7 @@ class App:
         total_sale_frame.grid(row=4, column=0, sticky=tk.E, padx=(0, 10), pady=(30, 0))
 
         self.order_tree.display_total_orders(total_sale_frame)
-        self.payment_handler.display_total_payments(total_sale_frame)
+        self.total_payments = PaymentTotal(total_sale_frame)
 
         remaining_sale_label = tk.Label(
             total_sale_frame, text="Pendiente:", font=("calibri", 17, "bold")
@@ -591,7 +558,9 @@ class App:
     # Functions
     def calculate_remaining(self):
         dollars_order = float(self.order_tree.total_orders_usd)
-        total_dollar_payments = self.payment_handler.total_payments
+        # TODO: Change this
+        # total_dollar_payments = self.payment_handler.total_payments
+        total_dollar_payments = 1
         remaining_dollars = dollars_order - total_dollar_payments
         rate = string_to_float(self.rate_entry.get())
         remaining_bs = number_to_str(remaining_dollars * rate)

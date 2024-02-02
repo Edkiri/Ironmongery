@@ -12,7 +12,7 @@ from src.utils.utils import number_to_str
 from src.functions.backUp import BackUp
 
 from src.orders.windows import CreateOrUpdateProductOrderWin
-from src.orders.OrderProduct import OrderProduct
+from src.orders.models import OrderProduct
 
 
 class ProductDashboardWin:

@@ -3,7 +3,7 @@ from tkinter import ttk
 from typing import Callable
 
 from src.products.models import Product
-from src.orders.OrderProduct import OrderProduct
+from src.orders.models import OrderProduct
 from src.utils.utils import get_dollars
 
 

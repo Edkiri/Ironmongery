@@ -13,7 +13,7 @@ from src.utils.utils import (
     get_dollars,
 )
 from src.clients import ClientSearchWin
-from OrderTree import OrderTree
+from src.orders.components import OrderTree
 from payments import PaymentHandler
 
 

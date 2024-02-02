@@ -4,10 +4,11 @@ from tkinter import ttk
 
 # Models
 from models import Order, Sale
-from src.orders.OrderProduct import OrderProduct
+from src.orders.models import OrderProduct
 
 # Utils
 from src.utils.utils import number_to_str, string_to_float, get_dollars
+
 
 class OrderTree:
     def __init__(self, frame, total_frame=None, sale=None, callbacks=[]):
@@ -122,9 +123,7 @@ class OrderTree:
         modify_order_button.grid(row=2, column=0, sticky=tk.W, padx=(150, 0))
 
     # Insert into Orders Tree.
-    def insert_into_orders_tree(
-        self, order_product: OrderProduct
-    ):
+    def insert_into_orders_tree(self, order_product: OrderProduct):
         quantity = order_product.quantity
         discount = order_product.discount
         product_id = order_product.product.product_id
