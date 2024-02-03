@@ -35,10 +35,10 @@ class OrderTree:
         # Products Tree.
         style = ttk.Style()
         style.configure(
-            "mystyle.Treeview", highlightthickness=0, bd=0, font=("Calibri", 13)
+            "mystyle.Treeview", font=("Calibri", 13), padding=5
         )  # Modify the font of the body
         style.configure(
-            "mystyle.Treeview.Heading", font=("Calibri", 14, "bold")
+            "mystyle.Treeview.Heading", font=("Calibri", 14, "bold"), padding=5
         )  # Modify the font of the headings
         # Tree.
         self.orders_tree = ttk.Treeview(

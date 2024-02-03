@@ -2,13 +2,14 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
+from src.clients.components import ClientHandler
 from src.payments.components import PaymentTotal
 
 # Windows
 from src.windows import CreditWin, FilterPaymentsWin, OrderDetailWin, DetailWin
 
 from src.orders.components import OrderTree
-from src.clients import ClientSelector
+# from src.clients import ClientSelector
 from src.payments.components import PaymentHandler
 
 # Models.
@@ -475,9 +476,10 @@ class App:
         client_frame = tk.Frame(self.create_sale_frame)
         client_frame.grid(row=2, column=0, columnspan=2, sticky=tk.W, pady=(20, 0))
 
-        self.client_handler = ClientSelector(client_frame)
+        self.client_handler = ClientHandler(client_frame)
+        self.client_handler.frame.grid(row=0, column=0)
         # Client.
-        self.client_handler.display_client_checker()
+        # self.client_handler.display_client_checker()
 
     # Product Frame.
     def display_products_for_sale(self):

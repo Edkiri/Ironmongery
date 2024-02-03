@@ -1,32 +1,44 @@
 import tkinter as tk
 from tkinter import ttk
+from typing import Callable
 
-from models import Client
+from src.clients.models import Client
+from models import Client as ClientModel
+
 
 class ClientSearchWin:
-    def __init__(self, callback):
-        self.callback = callback
+    def __init__(self, on_insert: Callable[[Client], None]):
+        self.on_insert = on_insert
 
-        # Window.
-        self.search_window = tk.Toplevel(width=350, height=350, padx=30, pady=30)
-        # Title
-        search_label = tk.Label(
-            self.search_window, text="Buscar cliente", font=("calibri", 18, "bold")
-        )
-        search_label.grid(row=0, column=0, columnspan=2, pady=(0, 15))
-        # Name Entry
-        self.name_entry = ttk.Entry(self.search_window, width=18, font=("calibri", 15))
+        self.window = tk.Toplevel(width=350, height=350, padx=30, pady=30)
+
+        text = "Buscar cliente"
+        title = tk.Label(self.window, text=text, font=("calibri", 18, "bold"))
+        title.grid(row=0, column=0, columnspan=3, pady=(0, 15))
+
+        self.form_frame = tk.Frame(self.window)
+
+        self.name_entry = ttk.Entry(self.form_frame, width=18, font=("calibri", 15))
         self.name_entry.focus()
-        self.name_entry.grid(row=1, column=0, sticky=tk.W, pady=(0, 20))
+        self.name_entry.grid(row=0, column=0, sticky=tk.W, pady=(0, 20))
+        
+        self.pre_id = tk.StringVar()
+        self.pre_id_choices = ("", "V", "J")
+        self.pre_id.set(self.pre_id_choices[1])
+        self.curr_option = ttk.OptionMenu(self.form_frame, self.pre_id, *self.pre_id_choices)
+        self.curr_option.grid(row=0, column=1, sticky=tk.E, pady=(0, 20))
 
-        def search(event):
-            self._search_in_database()
-
-        self.name_entry.bind("<Return>", search)
+        self.identity_entry = ttk.Entry(self.form_frame, width=12, font=("calibri", 14))
+        self.identity_entry.grid(row=0, column=2, sticky=tk.E, pady=(0, 20))
+        
+        self.form_frame.grid(row=2, column=0, columnspan=3)
+        
+        self.name_entry.bind("<Return>", lambda event: self._search_client())
+        
         # Tree
         columns = ("id", "name", "id_card")
         self.clients_tree = ttk.Treeview(
-            self.search_window,
+            self.window,
             height=5,
             selectmode="browse",
             columns=columns,
@@ -43,11 +55,11 @@ class ClientSearchWin:
         self.clients_tree.column("id_card", width=150, minwidth=25)
         self.clients_tree.heading("id_card", text="Cédula", anchor=tk.W)
         # Grid tree.
-        self.clients_tree.grid(row=1, column=1)
+        self.clients_tree.grid(row=3, column=0, columnspan=3)
 
         # Select button.
         select_client_button = tk.Button(
-            self.search_window,
+            self.window,
             text="Verificar",
             font=("calibri", 12),
             bd=1,
@@ -55,11 +67,11 @@ class ClientSearchWin:
             bg="#54bf54",
             command=self._get_client,
         )
-        select_client_button.grid(row=2, column=0, columnspan=2, pady=(15, 0))
+        select_client_button.grid(row=4, column=0, columnspan=3, pady=(15, 0))
 
-    def _search_in_database(self):
+    def _search_client(self):
         name = self.name_entry.get()
-        clients = Client.select().where(Client.name.contains(name))
+        clients = ClientModel.select().where(ClientModel.name.contains(name))
 
         for client in clients:
             self.clients_tree.insert(
@@ -71,6 +83,6 @@ class ClientSearchWin:
             index = self.clients_tree.focus()
             client_id = self.clients_tree.item(index)["values"][0]
             if client_id:
-                client = Client.get(id=client_id)
-                self.callback(client)
-                self.search_window.destroy()
+                client = ClientModel.get(id=client_id)
+                self.on_insert(client)
+                self.window.destroy()

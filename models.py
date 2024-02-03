@@ -11,6 +11,7 @@ class BaseModel(Model):
 
 
 class Client(BaseModel):
+    id = AutoField(primary_key=True)
     name = CharField(max_length=255)
     identity_card = CharField(unique=True)
     phone_number = CharField(max_length=60)
@@ -30,7 +31,7 @@ class Sale(BaseModel):
 
 class Payment(BaseModel):
     """Payment Model."""
-
+    id = AutoField(primary_key=True)
     sale = ForeignKeyField(Sale, backref="payments")
     date = DateField()
     amount = FloatField()
@@ -69,6 +70,7 @@ class Product(BaseModel):
 
 
 class Order(BaseModel):
+    id = AutoField(primary_key=True)
     product = ForeignKeyField(Product, backref="orders")
     sale = ForeignKeyField(Sale, backref="orders")
     amount = FloatField()

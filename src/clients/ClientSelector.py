@@ -1,13 +1,14 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
+from typing import Optional
 from peewee import IntegrityError
 
-from models import Client, Sale
+from models import Client as ClientModel, Sale
 from .ClientSearchWin import ClientSearchWin
-
+from src.clients.models import Client
 
 class ClientSelector:
-    def __init__(self, frame, client=None):
+    def __init__(self, frame, client: Optional[Client] = None):
         self.frame = frame
         self.client = client
 
@@ -67,12 +68,12 @@ class ClientSelector:
         try:
             pre_id = self.pre_id.get()
             id_card = self.id_entry.get()
-            client = Client.get(identity_card=pre_id + "-" + id_card)
+            client = ClientModel.get(identity_card=pre_id + "-" + id_card)
             self.update_client_frame(client)
         except Exception:
             self.create_or_update_client()
 
-    def display_client_detail(self, client):
+    def display_client_detail(self, client: Client):
         self.client = client
 
         # Client Label.
@@ -96,7 +97,7 @@ class ClientSelector:
             bd=1,
             relief=tk.RIDGE,
             bg="#54bf54",
-            command=lambda: self.create_or_update_client(self.client.id),
+            command=lambda: self.create_or_update_client(client.id),
         )
 
         # Calcel button.
@@ -142,7 +143,7 @@ class ClientSelector:
         # Functions.
         def create_client():
             try:
-                client = Client.create(
+                client = ClientModel.create(
                     name=name_entry.get(),
                     identity_card=pre_id.get() + "-" + identity_entry.get(),
                     phone_number=phone_entry.get(),
@@ -155,7 +156,7 @@ class ClientSelector:
                 messagebox.showerror("Error", error_message, parent=new_client_window)
 
         def update_client():
-            client = Client.get(Client.id == client_id)
+            client = ClientModel.get(ClientModel.id == client_id)
 
             ident = pre_id.get() + "-" + identity_entry.get()
             if client.identity_card != ident:
@@ -242,7 +243,7 @@ class ClientSelector:
             pre_id.set(self.pre_id.get())
             identity_entry.insert(0, self.id_entry.get())
         else:
-            client = Client.get(Client.id == client_id)
+            client = ClientModel.get(ClientModel.id == client_id)
             name_entry.insert(0, client.name)
             pre_id.set(client.identity_card.split("-")[0])
             identity_entry.delete(0, "end")
@@ -263,7 +264,7 @@ class ClientSelector:
             )
 
     def get_debt_color(self, client):
-        client_sales = Sale.select().join(Client).where(Client.id == client)
+        client_sales = Sale.select().join(ClientModel).where(ClientModel.id == client)
         debt_sales = client_sales.select().where(Sale.is_finished == False)
         if debt_sales.count() > 0:
             return "red"
