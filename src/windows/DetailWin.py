@@ -1,6 +1,7 @@
 from datetime import date, datetime
 import tkinter as tk
 from tkinter import ttk
+from src.clients.components import ClientHandler
 
 from models import Payment, Sale, Order
 from src.products.windows import ProductDashboardWin
@@ -12,7 +13,6 @@ from src.utils.utils import (
     es_casi_igual,
     get_dollars,
 )
-from src.clients import ClientSearchWin
 from src.orders.components import OrderTree
 from payments import PaymentHandler
 
@@ -74,12 +74,12 @@ class DetailWin:
         # Client
         client_frame = tk.Frame(self.detail_sale_window)
         client_frame.grid(row=2, column=0, columnspan=2, pady=(20, 0), sticky=tk.W)
-        self.client_handler = ClientSearchWin(client_frame, self.sale.client)
+        self.client_handler = ClientHandler(client_frame, self.sale.client)
 
-        if not self.client_handler.client:
-            self.client_handler.display_client_checker()
-        else:
-            self.client_handler.display_client_detail(self.sale.client)
+        # if not self.client_handler.client:
+        #     self.client_handler.display_client_checker()
+        # else:
+        #     self.client_handler.display_client_detail(self.sale.client)
 
         # Total
         total_frame = tk.Frame(self.detail_sale_window)

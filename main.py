@@ -2,6 +2,7 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
+from src.payments.components import PaymentsResumeFrame
 from src.clients.components import ClientHandler
 from src.payments.components import PaymentTotal
 
@@ -9,6 +10,7 @@ from src.payments.components import PaymentTotal
 from src.windows import CreditWin, FilterPaymentsWin, OrderDetailWin, DetailWin
 
 from src.orders.components import OrderTree
+
 # from src.clients import ClientSelector
 from src.payments.components import PaymentHandler
 
@@ -43,8 +45,15 @@ class App:
         self.root.state("zoomed")
         self.root.title("Comercial Guerra")
 
+        # Config Frame
+        self.config_frame = tk.Frame()
+
+        self.current_rate = self._create_rate_entry()
+
+        self.current_date = self._create_date_entry()
+
         # Menu bar.
-        self.display_menu_bar()
+        self._create_menu_bar()
 
         # Main Frames.
         self.sales_frame = tk.Frame(root)
@@ -55,7 +64,8 @@ class App:
         # Display Daily Sales Frame.
         self.display_daily_data()
         self.display_daily_sales_tree()
-        self.display_summary_sales_tree()
+        self.payment_resume_frame = PaymentsResumeFrame(self.sales_frame, self.current_date)
+        self.payment_resume_frame.frame.grid(row=3, column=0)
         self.insert_into_daily_tree()
 
         # Display New Sale Frame.
@@ -122,11 +132,10 @@ class App:
 
         self.root.bind("<Control-KeyPress>", lambda i: PressAnyKey(i))
 
-    # Menu.
-    def display_menu_bar(self):
-        root = self.root
-        menubar = tk.Menu(root)
-        # Sumary menu
+    def _create_menu_bar(self):
+        menubar = tk.Menu(self.root)
+
+        # Pagos
         summary_menu = tk.Menu(menubar, tearoff=0, font=("arial", 15))
         summary_menu.add_command(
             label="Pagos",
@@ -135,7 +144,8 @@ class App:
             ),
         )
         menubar.add_cascade(label="Resumen", menu=summary_menu)
-        # Credit menu
+
+        # Créditos
         credit_menu = tk.Menu(menubar, tearoff=0, font=("arial", 15))
         credit_menu.add_command(
             label="Vales",
@@ -180,6 +190,27 @@ class App:
         menubar.add_cascade(label="Base de datos", menu=credit_menu)
         # Menu config
         root.config(menu=menubar)
+
+    def _create_rate_entry(self):
+        # Title
+        rate_label = tk.Label(self.config_frame, text="Tasa", font=("calibri", 15))
+
+        rate_entry = tk.Entry(
+            self.config_frame, width=12, borderwidth=0, font=("calibri", 15)
+        )
+        rate_entry.insert(0, "0")
+        rate_entry.focus()
+
+        rate_label.grid(row=1, column=1, columnspan=3, sticky=tk.W)
+        rate_entry.grid(row=0, column=0, columnspan=3, sticky=tk.W, padx=(50, 0))
+
+        return rate_entry
+
+    def _create_date_entry(self):
+        date_entry = tk.Entry(
+            self.config_frame, width=12, borderwidth=0, font=("calibri", 15)
+        )
+        date_entry.insert(0, TODAY)
 
     # Daily Data.
     def display_daily_data(self):
@@ -315,7 +346,9 @@ class App:
                 get_focus_id(),
                 self.query_date.get(),
                 self.rate_entry.get(),
-                callbacks=[self.insert_into_daily_tree, self.insert_into_summary_day],
+                #TODO:
+                #callbacks=[self.insert_into_daily_tree, self.insert_into_summary_day],
+                callbacks=[self.insert_into_daily_tree],
             )
 
         detail_sale_button = tk.Button(
@@ -339,111 +372,111 @@ class App:
         detail_sale_button.grid(row=1, column=0, sticky=tk.W, padx=(28, 0))
         delete_sale_button.grid(row=1, column=0, sticky=tk.E, padx=(0, 28))
 
-    # Summary Sales Tree.
-    def display_summary_sales_tree(self):
-        # Summary Frame
-        summary_frame = tk.LabelFrame(self.sales_frame, bd=0)
-        summary_frame.grid(row=3, column=0, pady=(10, 0))
+    # # Summary Sales Tree.
+    # def display_summary_sales_tree(self):
+    #     # Summary Frame
+    #     summary_frame = tk.LabelFrame(self.sales_frame, bd=0)
+    #     summary_frame.grid(row=3, column=0, pady=(10, 0))
 
-        # Title.
-        summary_title = tk.Label(
-            summary_frame, text="Resumen", font=("calibri", 18, "bold")
-        )
-        summary_title.grid(row=0, column=0, pady=(0, 20))
+    #     # Title.
+    #     summary_title = tk.Label(
+    #         summary_frame, text="Resumen", font=("calibri", 18, "bold")
+    #     )
+    #     summary_title.grid(row=0, column=0, pady=(0, 20))
 
-        # Summary Tree
-        self.summary_sales_tree = ttk.Treeview(
-            summary_frame,
-            height=3,
-            selectmode="browse",
-            columns=("Fecha", "Bolívares", "Dólares", "Total"),
-            style="mystyle.Treeview",
-            padding=4,
-        )
-        summary_sales_tree = self.summary_sales_tree
-        summary_sales_tree.column("#0", width=0, stretch=tk.NO)
-        summary_sales_tree.heading("#1", text="Fecha", anchor=tk.W)
-        summary_sales_tree.heading("#2", text="Bolívares", anchor=tk.W)
-        summary_sales_tree.heading("#3", text="Dólares", anchor=tk.W)
-        summary_sales_tree.heading("#4", text="Total $", anchor=tk.W)
-        summary_sales_tree.column("#1", stretch=tk.YES, width=65)
-        summary_sales_tree.column("#2", stretch=tk.YES, width=125)
-        summary_sales_tree.column("#3", stretch=tk.YES, width=90)
-        summary_sales_tree.column("#4", stretch=tk.YES, width=90)
-        summary_sales_tree.grid(row=1, column=0)
+    #     # Summary Tree
+    #     self.summary_sales_tree = ttk.Treeview(
+    #         summary_frame,
+    #         height=3,
+    #         selectmode="browse",
+    #         columns=("Fecha", "Bolívares", "Dólares", "Total"),
+    #         style="mystyle.Treeview",
+    #         padding=4,
+    #     )
+    #     summary_sales_tree = self.summary_sales_tree
+    #     summary_sales_tree.column("#0", width=0, stretch=tk.NO)
+    #     summary_sales_tree.heading("#1", text="Fecha", anchor=tk.W)
+    #     summary_sales_tree.heading("#2", text="Bolívares", anchor=tk.W)
+    #     summary_sales_tree.heading("#3", text="Dólares", anchor=tk.W)
+    #     summary_sales_tree.heading("#4", text="Total $", anchor=tk.W)
+    #     summary_sales_tree.column("#1", stretch=tk.YES, width=65)
+    #     summary_sales_tree.column("#2", stretch=tk.YES, width=125)
+    #     summary_sales_tree.column("#3", stretch=tk.YES, width=90)
+    #     summary_sales_tree.column("#4", stretch=tk.YES, width=90)
+    #     summary_sales_tree.grid(row=1, column=0)
 
-    # Insert summary.
-    def insert_into_summary_day(self, query_date=None):
-        if not query_date:
-            query_date = self.query_date.get()
+    # # Insert summary.
+    # def insert_into_summary_day(self, query_date=None):
+    #     if not query_date:
+    #         query_date = self.query_date.get()
 
-        # Getting sales and payments
-        def get_month_payments():
-            year = int(query_date.split("-")[0])
-            month = int(query_date.split("-")[1])
-            day = int(query_date.split("-")[2])
-            day_date = datetime.strptime(query_date, DATE_FORMAT)
-            if day == 1:
-                return Payment.select().where(Payment.date == day_date)
-            else:
-                first_day_of_month = datetime(year, month, 1)
-                return Payment.select().where(
-                    Payment.date.between(first_day_of_month, day_date)
-                )
+    #     # Getting sales and payments
+    #     def get_month_payments():
+    #         year = int(query_date.split("-")[0])
+    #         month = int(query_date.split("-")[1])
+    #         day = int(query_date.split("-")[2])
+    #         day_date = datetime.strptime(query_date, DATE_FORMAT)
+    #         if day == 1:
+    #             return Payment.select().where(Payment.date == day_date)
+    #         else:
+    #             first_day_of_month = datetime(year, month, 1)
+    #             return Payment.select().where(
+    #                 Payment.date.between(first_day_of_month, day_date)
+    #             )
 
-        def get_week_payments():
-            day_date = datetime.strptime(self.query_date.get(), DATE_FORMAT)
-            for i in range(7):
-                new_date = day_date + timedelta(days=-i)
-                if (get_weekday(new_date) == "Lunes") and (i == 0):
-                    return Payment.select().where(Payment.date == new_date)
-                elif get_weekday(new_date) == "Lunes":
-                    return Payment.select().where(
-                        Payment.date.between(new_date, day_date)
-                    )
+    #     def get_week_payments():
+    #         day_date = datetime.strptime(self.query_date.get(), DATE_FORMAT)
+    #         for i in range(7):
+    #             new_date = day_date + timedelta(days=-i)
+    #             if (get_weekday(new_date) == "Lunes") and (i == 0):
+    #                 return Payment.select().where(Payment.date == new_date)
+    #             elif get_weekday(new_date) == "Lunes":
+    #                 return Payment.select().where(
+    #                     Payment.date.between(new_date, day_date)
+    #                 )
 
-        month_payments = get_month_payments()
-        week_payments = get_week_payments()
-        day_payments = Payment.select().where(
-            Payment.date == datetime.strptime(self.query_date.get(), DATE_FORMAT)
-        )
-        self.summary_sales_tree.delete(*self.summary_sales_tree.get_children())
-        # Summary day
-        bs_day, usd_day, total_day = get_summary_payments(day_payments)
-        self.summary_sales_tree.insert(
-            "",
-            index="end",
-            values=(
-                "Día",
-                number_to_str(bs_day),
-                number_to_str(usd_day),
-                number_to_str(total_day),
-            ),
-        )
-        # Sumary week
-        bs_week, usd_week, total_week = get_summary_payments(week_payments)
-        self.summary_sales_tree.insert(
-            "",
-            index="end",
-            values=(
-                "Semana",
-                number_to_str(bs_week),
-                number_to_str(usd_week),
-                number_to_str(total_week),
-            ),
-        )
-        # Sumary month
-        bs_month, usd_month, total_month = get_summary_payments(month_payments)
-        self.summary_sales_tree.insert(
-            "",
-            index="end",
-            values=(
-                "Mes",
-                number_to_str(bs_month),
-                number_to_str(usd_month),
-                number_to_str(total_month),
-            ),
-        )
+    #     month_payments = get_month_payments()
+    #     week_payments = get_week_payments()
+    #     day_payments = Payment.select().where(
+    #         Payment.date == datetime.strptime(self.query_date.get(), DATE_FORMAT)
+    #     )
+    #     self.summary_sales_tree.delete(*self.summary_sales_tree.get_children())
+    #     # Summary day
+    #     bs_day, usd_day, total_day = get_summary_payments(day_payments)
+    #     self.summary_sales_tree.insert(
+    #         "",
+    #         index="end",
+    #         values=(
+    #             "Día",
+    #             number_to_str(bs_day),
+    #             number_to_str(usd_day),
+    #             number_to_str(total_day),
+    #         ),
+    #     )
+    #     # Sumary week
+    #     bs_week, usd_week, total_week = get_summary_payments(week_payments)
+    #     self.summary_sales_tree.insert(
+    #         "",
+    #         index="end",
+    #         values=(
+    #             "Semana",
+    #             number_to_str(bs_week),
+    #             number_to_str(usd_week),
+    #             number_to_str(total_week),
+    #         ),
+    #     )
+    #     # Sumary month
+    #     bs_month, usd_month, total_month = get_summary_payments(month_payments)
+    #     self.summary_sales_tree.insert(
+    #         "",
+    #         index="end",
+    #         values=(
+    #             "Mes",
+    #             number_to_str(bs_month),
+    #             number_to_str(usd_month),
+    #             number_to_str(total_month),
+    #         ),
+    #     )
 
     # New Sale Title And Meta Data.
     def display_new_sale_title_and_meta_data(self):
@@ -528,7 +561,7 @@ class App:
             date_entry=self.query_date,
             rate_entry=self.rate_entry,
             parent_frame=self.create_sale_frame,
-            on_change=lambda: self.total_payments.update(self.payment_handler)
+            on_change=lambda: self.total_payments.update(self.payment_handler),
         )
         self.payment_handler.frame.grid(row=4, column=0, sticky=tk.W)
 
@@ -702,7 +735,8 @@ class App:
                 create_payments(sale)
                 self.clear_new_sale_frame(creating=True)
                 self.insert_into_daily_tree()
-                self.insert_into_summary_day()
+                # TODO:
+                # self.insert_into_summary_day()
             else:
                 title = "Pagos insuficientes!"
                 message = "¿Desea crear esta venta como CRÉDITO?"
@@ -726,7 +760,8 @@ class App:
                     create_payments(sale)
                     self.clear_new_sale_frame(creating=True)
                     self.insert_into_daily_tree()
-                    self.insert_into_summary_day()
+                    #TODO:
+                    # self.insert_into_summary_day()
 
         except Exception as err:
             messagebox.showerror("Error", err, parent=self.root)
@@ -776,7 +811,8 @@ class App:
                 value=(sale.id, state, sale.description, number_to_str(total)),
             )
 
-        self.insert_into_summary_day()
+        # TODO:
+        # self.insert_into_summary_day()
 
     # Delete sale.
     def delete_sale(self, sale_id):

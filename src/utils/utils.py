@@ -1,5 +1,5 @@
 # Utils
-from datetime import date, datetime, timedelta
+from datetime import date
 
 # Handle dates.
 DATE_FORMAT = "%Y-%m-%d"

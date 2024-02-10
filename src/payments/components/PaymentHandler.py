@@ -116,3 +116,6 @@ class PaymentHandler:
         self.total = total
         self.total_bs = total_bs
         self.total_us = total_us
+        
+    def _bind_keyboard(self):
+        self.frame.bind("")
