@@ -80,6 +80,7 @@ class CreateOrUpdateOrderWin:
                 price=float(self.price_entry.get()),
                 quantity=float(self.amount_entry.get()),
                 discount=float(self.discount_entry.get()),
+                sale_id=self.order.sale_id if self.order else None,
             )
         )
         self.window.destroy()

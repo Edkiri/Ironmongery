@@ -34,7 +34,7 @@ class PaymentCreateWin:
                 initial_date=initial_date,
                 initial_rate=initial_rate,
                 on_insert=lambda payment: self._on_save(payment),
-                currency=currency,
+                currency=self.initial_currency,
                 initial_amount=initial_amount,
                 payment_type=self.payment_type
             )

@@ -62,9 +62,26 @@ class SaleHandler:
         self.sale_total_frame = SaleTotalFrame(self.frame, self.rate_entry, self.orders_handler, self.payments_handler)
         
         self.sale_total_frame.frame.grid(row=4, column=0, sticky=tk.E)
-
-        # TODO: Display buttona
-
+        
+        save_title = "Create Venta" if not self.sale else "Venta" + str(self.sale.id)
+        save_button = tk.Button(
+            self.frame,
+            text=save_title,
+            font=("calibri", 18, "bold"),
+            bd=1,
+            relief=tk.RIDGE,
+            bg="#54bf54",
+            command=self._save,
+        )
+        save_button.grid(row=5, sticky=tk.W, pady=(30, 0))
+        
+        # TODO: Display clear button
+        
+    def _save(self) -> None:
+        [print(i) for i in self.orders_handler.orders]
+        [print(x) for x in self.payments_handler.payments]
+        
+    
     def _handle_on_change_payments(self) -> None:
         self.sale_total_frame.update()
         
