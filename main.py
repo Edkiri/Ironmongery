@@ -53,6 +53,13 @@ class App:
             rate_entry=self.current_rate,
         )
         self.sale_handler_frame.grid(row=0, column=1, rowspan=5)
+        
+        self.root.bind(
+            "<Control-KeyPress>",
+            lambda event: self.sale_handler.payments_handler.handle_binded_keyboard(
+                event.keycode
+            ),
+        )
 
         # self.sales_frame.grid(row=0, column=0, padx=(25, 0))
 
@@ -340,10 +347,7 @@ class App:
     #     )
     #     self.payment_handler.frame.grid(row=4, column=0, sticky=tk.W)
 
-    #     def PressAnyKey(event):
-    #         self.payment_handler.handle_binded_keyboard(event.keycode)
-
-    #     self.root.bind("<Control-KeyPress>", lambda i: PressAnyKey(i))
+    #
 
     # # Sum total sale and payments.
     # def display_total_sale(self):

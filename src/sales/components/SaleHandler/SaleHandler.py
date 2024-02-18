@@ -2,12 +2,11 @@ import tkinter as tk
 from tkinter import ttk
 from typing import Optional
 
-from src.payments.components import PaymentTotalFrame
-from src.orders.components import OrderHandler, OrderTotalFrame
+from .SaleTotalFrame import SaleTotalFrame
+from src.orders.components import OrderHandler
 from src.clients.components import ClientHandler
 from src.sales.models import Sale
 from src.payments.components import PaymentHandler
-from .RemainingHandler import RemainingHandler
 
 
 class SaleHandler:
@@ -55,33 +54,23 @@ class SaleHandler:
             parent=self.payments_frame,
             date_entry=self.date_entry,
             rate_entry=self.rate_entry,
+            order_handler=self.orders_handler,
             on_change=self._handle_on_change_payments,
         )
         self.payments_frame.grid(row=4, column=0, sticky=tk.W)
         
-        self.total_frame = tk.Frame(self.frame)
+        self.sale_total_frame = SaleTotalFrame(self.frame, self.rate_entry, self.orders_handler, self.payments_handler)
         
-        self.orders_total_frame = OrderTotalFrame(self.total_frame, self.orders_handler)
-        self.orders_total_frame.frame.grid(row=0, column=0, sticky=tk.E)
-        
-        self.payments_total_frame = PaymentTotalFrame(self.total_frame, self.payments_handler)
-        self.payments_total_frame.frame.grid(row=1, column=0, sticky=tk.E)
-        
-        remaining_frame = tk.Frame(self.total_frame)
-        self.remaining_handler = RemainingHandler(remaining_frame, self.rate_entry, self.payments_handler, self.orders_handler)
-        remaining_frame.grid(row=2, column=0, sticky=tk.E)
-        
-        self.total_frame.grid(row=4, column=0, sticky=tk.E)
+        self.sale_total_frame.frame.grid(row=4, column=0, sticky=tk.E)
 
         # TODO: Display buttona
 
     def _handle_on_change_payments(self) -> None:
-        self.payments_total_frame.update()
-        self.remaining_handler.calculate_remaining()
+        self.sale_total_frame.update()
+        
 
     def _handle_on_change_orders(self) -> None:
-        self.orders_total_frame.update()
-        self.remaining_handler.calculate_remaining()
+        self.sale_total_frame.update()
 
     def _create_metadata_frame(self, initial_date: str):
         frame = self.metadata_frame

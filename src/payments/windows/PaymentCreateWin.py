@@ -14,15 +14,17 @@ class PaymentCreateWin:
         on_insert: Callable[[Payment], None],
         payment_type: Optional[PaymentType] = None,
         currency: Optional[Currency] = Currency.Bolivares,
-        initial_amount: Union[int, float] = 0,
+        initial_amount: Optional[float] = None,
     ) -> None:
         try:
             self.initial_rate = self._validate_rate(initial_rate)
             self.initial_date = initial_date
             self.initial_rate = initial_rate
-            self.type = payment_type if payment_type != None else PaymentType.Pago
+            self.payment_type = payment_type if payment_type else PaymentType.Pago
+            self.initial_currency = currency if currency else Currency.Bolivares
+            
             self.on_insert = on_insert
-            self.title = "Agregar " + PaymentType.get_name(self.type)
+            self.title = "Agregar " + PaymentType.get_name(self.payment_type)
 
             self.window = self._create_window()
 
@@ -34,6 +36,7 @@ class PaymentCreateWin:
                 on_insert=lambda payment: self._on_save(payment),
                 currency=currency,
                 initial_amount=initial_amount,
+                payment_type=self.payment_type
             )
             self.form.frame.grid(row=0, column=0)
         except Exception as err:

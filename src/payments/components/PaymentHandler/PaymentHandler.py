@@ -4,6 +4,7 @@ from typing import Callable, Optional
 
 from src.payments.models import Payment, PaymentType, Currency
 from src.payments.windows import PaymentCreateWin
+from src.orders.components import OrderHandler
 from .PaymentTree import PaymentTree
 
 
@@ -13,6 +14,7 @@ class PaymentHandler:
         parent: tk.Frame,
         rate_entry: ttk.Entry,
         date_entry: ttk.Entry,
+        order_handler: OrderHandler,
         on_change: Callable,
         payments: "list[Payment]" = [],
     ) -> None:
@@ -21,6 +23,7 @@ class PaymentHandler:
         
         self.rate_entry = rate_entry
         self.date_entry = date_entry
+        self.order_handler = order_handler
         self.on_change = on_change
 
         self.payments = payments
@@ -77,12 +80,14 @@ class PaymentHandler:
 
     def open_create_payment_window(
         self,
-        currency: Optional[Currency] = None,
         payment_type: Optional[PaymentType] = None,
+        currency: Optional[Currency] = None,
+        initial_amount: Optional[float] = None,
     ):
         PaymentCreateWin(
             initial_date=self.date_entry.get(),
             initial_rate=self.rate_entry.get(),
+            initial_amount=initial_amount,
             on_insert=lambda payment: self.add_payment(payment),
             currency=currency,
             payment_type=payment_type,
@@ -133,4 +138,11 @@ class PaymentHandler:
     def handle_binded_keyboard(self, keycode: int) -> None:
         if (keycode == 66) or (keycode == 68):
             currency = Currency.Bolivares if keycode == 66 else Currency.Dolares
-            self.open_create_payment_window(currency)
+        
+            remaining = self.order_handler.total_us - self.total
+            
+            if currency == Currency.Bolivares:
+                remaining *= float(self.rate_entry.get())
+                
+            payment_type = PaymentType.Pago if remaining > 0 else PaymentType.Vuelto
+            self.open_create_payment_window(payment_type, currency, abs(remaining))
