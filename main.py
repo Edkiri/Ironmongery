@@ -80,7 +80,6 @@ class App:
         rate_label = ttk.Label(self.config_frame, text="Tasa", font=("calibri", 15))
 
         rate_entry = ttk.Entry(self.config_frame, width=12, font=("calibri", 15))
-        rate_entry.insert(0, "0")
         rate_entry.focus()
 
         rate_label.grid(row=0, column=0, sticky=tk.W)

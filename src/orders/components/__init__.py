@@ -1,1 +1,2 @@
 from .OrderHandler.OrderHandler import OrderHandler
+from .OrderHandler.OrderTotalFrame import OrderTotalFrame

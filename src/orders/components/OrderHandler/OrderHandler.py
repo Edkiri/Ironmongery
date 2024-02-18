@@ -50,7 +50,7 @@ class OrderHandler:
             relief=tk.RIDGE,
             bg="#54bf54",
             command=lambda: ProductDashboardWin(
-                float(self.rate_entry.get()),
+                self.rate_entry.get(),
                 on_insert=lambda order: self._insert(order),
             ),
         )

@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import messagebox
 from typing import Callable, Optional, Union
 
 from src.payments.components import CreatePaymentForm
@@ -13,26 +14,36 @@ class PaymentCreateWin:
         on_insert: Callable[[Payment], None],
         payment_type: Optional[PaymentType] = None,
         currency: Optional[Currency] = Currency.Bolivares,
-        initial_amount: Union[int, float] = 0 
+        initial_amount: Union[int, float] = 0,
     ) -> None:
-        self.initial_date = initial_date
-        self.initial_rate = initial_rate
-        self.type = payment_type if payment_type != None else PaymentType.Pago
-        self.on_insert = on_insert
-        self.title = "Agregar " + PaymentType.get_name(self.type)
+        try:
+            self.initial_rate = self._validate_rate(initial_rate)
+            self.initial_date = initial_date
+            self.initial_rate = initial_rate
+            self.type = payment_type if payment_type != None else PaymentType.Pago
+            self.on_insert = on_insert
+            self.title = "Agregar " + PaymentType.get_name(self.type)
 
-        self.window = self._create_window()
+            self.window = self._create_window()
 
-        self.form = CreatePaymentForm(
-            parent_frame=self.window,
-            title=self.title,
-            initial_date=initial_date,
-            initial_rate=initial_rate,
-            on_insert=lambda payment: self._on_save(payment),
-            currency=currency,
-            initial_amount=initial_amount
-        )
-        self.form.frame.grid(row=0, column=0)
+            self.form = CreatePaymentForm(
+                parent_frame=self.window,
+                title=self.title,
+                initial_date=initial_date,
+                initial_rate=initial_rate,
+                on_insert=lambda payment: self._on_save(payment),
+                currency=currency,
+                initial_amount=initial_amount,
+            )
+            self.form.frame.grid(row=0, column=0)
+        except Exception as err:
+            messagebox.showerror("Tasa inválida", "Tasa inválida")
+
+    def _validate_rate(self, rate: str) -> float:
+        valid_number = float(rate)
+        if valid_number == 0:
+            raise ValueError()
+        return valid_number
 
     def _create_window(self):
         window = tk.Toplevel(padx=30, pady=50)
