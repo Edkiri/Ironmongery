@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from typing import Union
 
-from src.payments.models import Payment
+from src.payments.models import Payment, PaymentType
 
 
 class PaymentTree:
@@ -37,7 +37,7 @@ class PaymentTree:
                 index="end",
                 values=(
                     payment.id,
-                    payment.type.get_name(),
+                    PaymentType.get_name(payment.type),
                     payment.get_string_price(),
                     payment.method.get_name(),
                 ),

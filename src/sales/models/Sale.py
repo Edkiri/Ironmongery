@@ -12,11 +12,11 @@ class Sale:
         finished_date: Optional[datetime] = None,
         description: Optional[str] = None,
         client: Optional[Client] = None,
-        sale_id: Optional[Union[str, int]] = None,
+        id: Optional[Union[str, int]] = None,
     ) -> None:
         self.date = date
         self.is_finished = is_finished
         self.finished_date = finished_date
         self.description = description
         self.client = client
-        self.id = sale_id
+        self.id = id

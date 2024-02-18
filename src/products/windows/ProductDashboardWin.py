@@ -11,19 +11,17 @@ from src.functions.ProductUpdater import ProductUpdater
 from src.utils.utils import number_to_str
 from src.functions.backUp import BackUp
 
-from src.orders.windows import CreateOrUpdateProductOrderWin
-from src.orders.models import OrderProduct
+from src.orders.windows import CreateOrUpdateOrderWin
+from src.orders.models import Order
 
 
 class ProductDashboardWin:
     def __init__(
         self,
         initial_rate: float,
-        on_insert: Callable[[OrderProduct], None],
-        callbacks: "list[Callable]",
+        on_insert: Callable[[Order], None],
     ):
         self.window = self._create_window(initial_rate)
-        self.callbacks = callbacks
         self.product_tree = ProductTree(self.window)
         self._display_product_tree()
 
@@ -117,10 +115,9 @@ class ProductDashboardWin:
             product_selected = self.product_tree.get_selected()
             if not product_selected:
                 return
-            CreateOrUpdateProductOrderWin(
+            CreateOrUpdateOrderWin(
                 product_selected,
                 float(self.rate_entry.get()),
-                product_selected.price,
                 on_save=lambda product_order: self.add_order(product_order),
             )
 
@@ -218,8 +215,6 @@ class ProductDashboardWin:
 
         self.product_tree.insert(products, float(self.rate_entry.get()))
 
-    def add_order(self, order_product: OrderProduct):
+    def add_order(self, order_product: Order):
         self.on_insert(order_product)
         self.window.destroy()
-        for callback in self.callbacks:
-            callback()

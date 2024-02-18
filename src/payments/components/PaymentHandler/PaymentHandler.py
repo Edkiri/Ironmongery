@@ -1,6 +1,7 @@
 import tkinter as tk
+from tkinter import ttk
+from typing import Callable, Optional
 
-from src.payments.components import PaymentTotal
 from src.payments.models import Payment, PaymentType, Currency
 from src.payments.windows import PaymentCreateWin
 from .PaymentTree import PaymentTree
@@ -9,17 +10,20 @@ from .PaymentTree import PaymentTree
 class PaymentHandler:
     def __init__(
         self,
-        parent_frame,
-        rate_entry,
-        date_entry,
-        on_change,
+        parent: tk.Frame,
+        rate_entry: ttk.Entry,
+        date_entry: ttk.Entry,
+        on_change: Callable,
+        payments: "list[Payment]" = [],
     ) -> None:
-        self.frame = tk.Frame(parent_frame)
+        self.frame = tk.Frame(parent)
+        self.frame.grid()
+        
         self.rate_entry = rate_entry
         self.date_entry = date_entry
         self.on_change = on_change
 
-        self.payments: list[Payment] = []
+        self.payments = payments
         self.total = 0
         self.total_bs = 0
         self.total_us = 0
@@ -38,7 +42,9 @@ class PaymentHandler:
             relief=tk.RIDGE,
             bg="#54bf54",
             padx=5,
-            command=lambda: self.open_create_payment_window(PaymentType.Pago),
+            command=lambda: self.open_create_payment_window(
+                payment_type=PaymentType.Pago
+            ),
         )
         add_return_button = tk.Button(
             self.frame,
@@ -48,7 +54,9 @@ class PaymentHandler:
             relief=tk.RIDGE,
             bg="#54bf54",
             padx=5,
-            command=lambda: self.open_create_payment_window(PaymentType.Vuelto),
+            command=lambda: self.open_create_payment_window(
+                payment_type=PaymentType.Vuelto
+            ),
         )
 
         delete_payment_button = tk.Button(
@@ -67,12 +75,17 @@ class PaymentHandler:
         add_return_button.grid(row=3, column=0, sticky=tk.W, padx=(90, 0))
         delete_payment_button.grid(row=3, column=0, sticky=tk.E)
 
-    def open_create_payment_window(self, payment_type: PaymentType):
+    def open_create_payment_window(
+        self,
+        currency: Optional[Currency] = None,
+        payment_type: Optional[PaymentType] = None,
+    ):
         PaymentCreateWin(
             initial_date=self.date_entry.get(),
             initial_rate=self.rate_entry.get(),
-            payment_type=payment_type,
             on_insert=lambda payment: self.add_payment(payment),
+            currency=currency,
+            payment_type=payment_type,
         )
 
     def add_payment(self, payment: Payment):
@@ -116,6 +129,8 @@ class PaymentHandler:
         self.total = total
         self.total_bs = total_bs
         self.total_us = total_us
-        
-    def _bind_keyboard(self):
-        self.frame.bind("")
+
+    def handle_binded_keyboard(self, keycode: int) -> None:
+        if (keycode == 66) or (keycode == 68):
+            currency = Currency.Bolivares if keycode == 66 else Currency.Dolares
+            self.open_create_payment_window(currency)

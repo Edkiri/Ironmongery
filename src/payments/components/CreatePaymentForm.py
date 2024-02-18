@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-from typing import Callable, Optional
+from typing import Callable, Optional, Union
 import uuid
 
 from src.payments.models import (
@@ -17,13 +17,15 @@ class CreatePaymentForm:
         self,
         parent_frame,
         title: str,
-        payment_type: PaymentType,
         initial_date: str,
         initial_rate: str,
         on_insert: Callable[[Payment], None],
         sale_id: Optional[int] = None,
+        payment_type: Optional[PaymentType] = None,
+        currency: Optional[Currency] = Currency.Bolivares,
+        initial_amount: Union[int, float] = 0,
     ) -> None:
-        self.type = payment_type
+        self.type = payment_type if payment_type != None else PaymentType.Pago
         self.sale_id = sale_id
         self.frame = tk.Frame(parent_frame)
         self.on_insert = on_insert
@@ -49,7 +51,8 @@ class CreatePaymentForm:
         self.currency = tk.StringVar()
         currencies = [member.name for member in Currency]
         currency_choices = ("", *currencies)
-        self.currency.set(currency_choices[1])
+        
+        self.currency.set(str(Currency.get_name(currency)))
         curr_option = ttk.OptionMenu(self.frame, self.currency, *currency_choices)
         curr_option.grid(row=2, pady=(0, 20), sticky=tk.E)
 
@@ -86,6 +89,7 @@ class CreatePaymentForm:
         amount_label = tk.Label(self.frame, text="Monto", font=("calibri", 15))
         amount_label.grid(row=6, pady=(0, 20), sticky=tk.W)
         self.amount = ttk.Entry(self.frame, width=13, font=("calibri", 15))
+        self.amount.insert(0, str(initial_amount))
         self.amount.focus()
         self.amount.grid(row=6, pady=(0, 20), sticky=tk.E)
 

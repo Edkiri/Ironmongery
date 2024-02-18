@@ -1,22 +1,22 @@
 import tkinter as tk
 from tkinter import ttk
-from typing import Callable
+from typing import Callable, Optional
+import uuid
 
 from src.products.models import Product
-from src.orders.models import OrderProduct
-from src.utils.utils import get_dollars
+from src.orders.models import Order
 
 
-class CreateOrUpdateProductOrderWin:
+class CreateOrUpdateOrderWin:
     def __init__(
         self,
         product: Product,
         rate: float,
-        price: float,
-        on_save: Callable[[OrderProduct], None],
+        on_save: Callable[[Order], None],
+        order: Optional[Order] = None,
     ):
+        self.order = order
         self.product = product
-        self.price = price
         self.rate = rate
         self.on_save = on_save
 
@@ -44,7 +44,8 @@ class CreateOrUpdateProductOrderWin:
         price_label = tk.Label(self.window, text="Precio", font=("calibri", 16, "bold"))
         price_label.grid(row=2, column=0, pady=(20, 3))
         self.price_entry = ttk.Entry(self.window, width=15, font=("calibri", 14))
-        self.price_entry.insert(0, str(self.price))
+        price = str(self.product.price) if not self.order else str(self.order.price)
+        self.price_entry.insert(0, price)
         self.price_entry.grid(row=3, padx=15)
 
         # Discount
@@ -70,8 +71,10 @@ class CreateOrUpdateProductOrderWin:
         search_button.grid(row=6, column=0, pady=(30, 10))
 
     def _save(self):
+        order_id = str(uuid.uuid4()) if not self.order else self.order.order_id
         self.on_save(
-            OrderProduct(
+            Order(
+                order_id=order_id,
                 product=self.product,
                 rate=self.rate,
                 price=float(self.price_entry.get()),

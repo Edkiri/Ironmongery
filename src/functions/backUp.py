@@ -29,6 +29,18 @@ class BackUp:
         else:
             BackUp.__instance = self
 
+    def backup(self, root):
+        response = messagebox.askyesno(
+            "Atención, atención!",
+            "¿Quires hacer un respaldo de la base de datos?",
+            parent=root,
+        )
+        if response:
+            try:
+                self.copy_db_to_backups_dir()
+            except Exception as err:
+                messagebox.showerror("Error", str(err), parent=root)
+
     def copy_db_to_backups_dir(self):
         today = date.today().strftime("%d-%m-%Y")
         db_name = DATABASE_NAME.rstrip(".db")
@@ -63,10 +75,9 @@ class Restore:
     __instance = None
 
     @staticmethod
-    def get_instance():
-        """static access method."""
-        if Restore.__instance == None:
-            Restore()
+    def get_instance() -> "Restore":
+        if Restore.__instance is None:
+            Restore.__instance = Restore()
         return Restore.__instance
 
     def __init__(self):
@@ -77,19 +88,22 @@ class Restore:
             Restore.__instance = self
 
     def restore_old_database(self, parent):
-        self.db = askopenfile(
-            parent=parent,
-            mode="r",
-            title="Escoge un archivo excel para actualizar los precios de los productos.",
-            initialdir=BACKUP_DIR,
-            filetypes=[("Bases de datos", "*.db")],
-        )
-
-        if self.db:
-            old_db = self.db.name
-
-            shutil.copyfile(old_db, DATABASE_PATH)
-
-            messagebox.showinfo(
-                "Operación exitosa!", "Base de datos actualizada.", parent=parent
+        try:
+            self.db = askopenfile(
+                parent=parent,
+                mode="r",
+                title="Escoge un archivo excel para actualizar los precios de los productos.",
+                initialdir=BACKUP_DIR,
+                filetypes=[("Bases de datos", "*.db")],
             )
+
+            if self.db:
+                old_db = self.db.name
+
+                shutil.copyfile(old_db, DATABASE_PATH)
+
+                messagebox.showinfo(
+                    "Operación exitosa!", "Base de datos actualizada.", parent=parent
+                )
+        except Exception as err:
+            messagebox.showerror("Error", str(err), parent=parent)

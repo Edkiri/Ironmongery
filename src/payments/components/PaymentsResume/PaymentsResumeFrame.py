@@ -1,10 +1,13 @@
 import tkinter as tk
+from tkinter import ttk
 
-from .PaymentsResumeTree import PaymentsResumeTree 
+from .PaymentsResumeTree import PaymentsResumeTree
+
 
 class PaymentsResumeFrame:
-    def __init__(self, parent, date_entry) -> None:
+    def __init__(self, parent: tk.Frame, date_entry: ttk.Entry) -> None:
         self.frame = tk.Frame(parent)
+        self.frame.grid()
         self.date_entry = date_entry
 
         title = tk.Label(self.frame, text="Resumen", font=("calibri", 18, "bold"))

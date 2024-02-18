@@ -1,17 +1,17 @@
-from typing import Optional
+from typing import Union
 
 from src.products.models import Product
 
 
-class OrderProduct:
+class Order:
     def __init__(
         self,
+        order_id: Union[int, str],
         product: Product,
         quantity: float,
         price: float,
         rate: float,
         discount: float = 0,
-        order_id: Optional[int] = None,
     ) -> None:
         self.product = product
         self.quantity = quantity

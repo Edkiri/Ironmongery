@@ -1,8 +1,8 @@
 import tkinter as tk
-from typing import Callable
+from typing import Callable, Optional, Union
 
 from src.payments.components import CreatePaymentForm
-from src.payments.models import Payment, PaymentType
+from src.payments.models import Payment, PaymentType, Currency
 
 
 class PaymentCreateWin:
@@ -10,26 +10,27 @@ class PaymentCreateWin:
         self,
         initial_date: str,
         initial_rate: str,
-        payment_type: PaymentType,
         on_insert: Callable[[Payment], None],
+        payment_type: Optional[PaymentType] = None,
+        currency: Optional[Currency] = Currency.Bolivares,
+        initial_amount: Union[int, float] = 0 
     ) -> None:
         self.initial_date = initial_date
         self.initial_rate = initial_rate
-        self.type = payment_type
+        self.type = payment_type if payment_type != None else PaymentType.Pago
         self.on_insert = on_insert
-        self.title = (
-            "Agregar Pago" if self.type == PaymentType.Pago else "Agregar Vuelto"
-        )
+        self.title = "Agregar " + PaymentType.get_name(self.type)
 
         self.window = self._create_window()
 
         self.form = CreatePaymentForm(
             parent_frame=self.window,
             title=self.title,
-            payment_type=self.type,
             initial_date=initial_date,
             initial_rate=initial_rate,
             on_insert=lambda payment: self._on_save(payment),
+            currency=currency,
+            initial_amount=initial_amount
         )
         self.form.frame.grid(row=0, column=0)
 
