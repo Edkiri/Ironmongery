@@ -2,8 +2,8 @@ from enum import Enum
 
 
 class PaymentType(Enum):
-    Pago = 0
-    Vuelto = 1
+    Pago = 1
+    Vuelto = 2
 
     @classmethod
     def get_name(cls, type) -> str:

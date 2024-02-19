@@ -51,6 +51,7 @@ class App:
             parent=self.sale_handler_frame,
             date_entry=self.date_frame.date_entry,
             rate_entry=self.current_rate,
+            on_save=print,
         )
         self.sale_handler_frame.grid(row=0, column=1, rowspan=5)
         

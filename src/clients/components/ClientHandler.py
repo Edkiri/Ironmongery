@@ -123,3 +123,6 @@ class ClientHandler:
             self._display_detail_frame(client)
         else:
             self._display_search_frame()
+            
+    def clear_state(self):
+        self._change_client(None)

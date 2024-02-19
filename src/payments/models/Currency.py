@@ -2,8 +2,8 @@ from enum import Enum
 
 
 class Currency(Enum):
-    Bolivares = 0
-    Dolares = 1
+    Bolivares = 1
+    Dolares = 2
 
     @classmethod
     def get_name(cls, currency) -> str:

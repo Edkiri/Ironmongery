@@ -2,10 +2,10 @@ from enum import Enum
 
 
 class PaymentAccount(Enum):
-    ComercialGuerra = 0
-    IvanGuerra = 1
-    JesusDaniel = 2
-    JesusGuerra = 3
+    ComercialGuerra = 1
+    IvanGuerra = 2
+    JesusDaniel = 3
+    JesusGuerra = 4
 
     def get_name(self) -> str:
         return {

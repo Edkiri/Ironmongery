@@ -2,13 +2,13 @@ from enum import Enum
 
 
 class PaymentMethod(Enum):
-    Punto = 0
-    PagoMovil = 1
-    Transferencia = 2
-    Efectivo = 3
-    Zelle = 4
-    Paypal = 5
-    Binance = 6
+    Punto = 1
+    PagoMovil = 2
+    Transferencia = 3
+    Efectivo = 4
+    Zelle = 5
+    Paypal = 6
+    Binance = 7
 
     def get_name(self) -> str:
         return {

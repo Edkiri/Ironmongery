@@ -130,10 +130,17 @@ class PaymentHandler:
             else:
                 total -= payment.amount
                 total_us -= payment.amount
+                
 
         self.total = total
         self.total_bs = total_bs
         self.total_us = total_us
+        
+    def clear_state(self):
+        self.payments = []
+        self.payment_tree.insert(self.payments)
+        self._calculate_total()
+        self.on_change()
 
     def handle_binded_keyboard(self, keycode: int) -> None:
         if (keycode == 66) or (keycode == 68):

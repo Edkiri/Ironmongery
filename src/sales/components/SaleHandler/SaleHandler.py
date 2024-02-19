@@ -2,14 +2,16 @@ from datetime import datetime
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
-from typing import Optional
+from typing import Callable, Optional
 
+from src.orders.services import OrderService
 from src.sales.services import SaleService
 from .SaleTotalFrame import SaleTotalFrame
 from src.orders.components import OrderHandler
 from src.clients.components import ClientHandler
 from src.sales.models import Sale
 from src.payments.components import PaymentHandler
+from src.payments.services import PaymentService
 
 
 class SaleHandler:
@@ -18,13 +20,17 @@ class SaleHandler:
         parent,
         date_entry: ttk.Entry,
         rate_entry: ttk.Entry,
+        on_save: Callable,
         sale: Optional[Sale] = None,
     ) -> None:
         self.sale = sale
         self.date_entry = date_entry
         self.rate_entry = rate_entry
+        self.on_save = on_save
 
         self.sale_service = SaleService()
+        self.orders_service = OrderService()
+        self.payments_service = PaymentService()
 
         self.frame = tk.Frame(parent)
         self.frame.grid(row=0, column=0)
@@ -89,6 +95,7 @@ class SaleHandler:
         if not orders:
             messagebox.showerror("Error", "No hay productos")
             return
+        
         new_sale = Sale(
             date=datetime.now(),
             client=self.client_handler.client,
@@ -99,6 +106,13 @@ class SaleHandler:
             orders=self.orders_handler.orders,
             payments=self.payments_handler.payments,
         )
+        
+        self.orders_service.create_many(sale, self.orders_handler.orders)
+        self.payments_service.create_many(sale, self.payments_handler.payments)
+        
+        self._clear_state()
+        
+        self.on_save()
 
     def _handle_on_change_payments(self) -> None:
         self.sale_total_frame.update()
@@ -125,3 +139,8 @@ class SaleHandler:
         description.grid(row=0, column=3)
 
         return date, description
+    
+    def _clear_state(self):
+        self.client_handler.clear_state()
+        self.orders_handler.clear_state()
+        self.payments_handler.clear_state()

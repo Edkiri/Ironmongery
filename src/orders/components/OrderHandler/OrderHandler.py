@@ -122,3 +122,9 @@ class OrderHandler:
 
         self.total_us = total_us
         self.total_bs = total_bs
+        
+    def clear_state(self):
+        self.orders = []
+        self.orders_tree.insert(self.orders)
+        self._calculate_total()
+        self.on_change()

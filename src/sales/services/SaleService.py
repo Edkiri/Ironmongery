@@ -15,10 +15,30 @@ class SaleService:
 
         self.client_service = ClientService()
 
+    def find(self, sale_id: int) -> Sale:
+        sale = self.sale_model.get(SaleModel.id == sale_id)
+
+        client = None
+        if sale.client != None:
+            client = self.client_service.find(sale.client.id)
+
+        return Sale(
+            id=sale.id,
+            date=sale.date,
+            is_finished=sale.is_finished,
+            finished_date=sale.finished_date,
+            client=client,
+            description=sale.description,
+        )
+
     def create(
         self, sale: Sale, orders: "list[Order]", payments: "list[Payment]"
     ) -> Sale:
-        client = self.client_service.find(sale.client.id) if sale.client else None
+        client = None
+        if sale.client:
+            if sale.client.id != None:
+                client = self.client_service.find(sale.client.id)
+
         is_finished = self._check_status(orders, payments)
 
         new_sale = self.sale_model.create(
@@ -29,6 +49,7 @@ class SaleService:
             is_finished=is_finished,
         )
         return Sale(
+            id=new_sale.id,
             client=new_sale.client,
             date=new_sale.date,
             description=new_sale.description,
