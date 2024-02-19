@@ -5,6 +5,7 @@ from src.clients.functions import search_clients
 from src.clients.components.ClientFilterForm import ClientFilterForm
 from src.clients.components.ClientTree import ClientTree
 from src.clients.models import Client
+from .ClientUpdateOrCreateWin import ClientUpdateOrCreateWin
 
 
 class ClientDashboardWin:
@@ -37,13 +38,25 @@ class ClientDashboardWin:
             padx=30,
             command=self._insert,
         )
+        
+        create_button = tk.Button(
+            self.window,
+            text="Crear Cliente",
+            font=("calibri", 15, "bold"),
+            bd=1,
+            relief=tk.RIDGE,
+            bg="#54bf54",
+            padx=30,
+            command=self._create,
+        ) 
+        create_button.grid(row=2, column=1, columnspan=2, pady=(15, 15), sticky=tk.E)
 
         title.grid(row=0, column=0, columnspan=2, pady=(0, 15))
         self.filters_frame.grid(row=1, column=0)
         self.tree_frame.grid(row=1, column=1)
 
         if self.on_insert:
-            insert_button.grid(row=2, column=0, columnspan=2, pady=(15, 15))
+            insert_button.grid(row=2, column=0, columnspan=2, pady=(15, 15), sticky=tk.N)
 
         if initial_client_name:
             self._on_search()
@@ -52,9 +65,23 @@ class ClientDashboardWin:
         selected = self.tree.get_selected()
         if not selected or not self.on_insert:
             return
-        self.on_insert(selected)
+        self._on_insert(selected)
+        
+        
+    def _on_insert(self, client: Client):
+        if not self.on_insert:
+            return
+        self.on_insert(client)
         self.window.destroy()
+        
+    def _create(self):
+        ClientUpdateOrCreateWin(
+            client=None,
+            on_save=lambda client: self._on_insert(client)
+        )
 
     def _on_search(self):
+        if not self.filter_form.get_data().name:
+            return
         clients = search_clients(self.filter_form.get_data())
         self.tree.insert(clients)

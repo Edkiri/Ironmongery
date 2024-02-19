@@ -13,9 +13,6 @@ class ClientPreviousSearch:
         self.frame.grid(row=0, column=0)
 
         self.identity_entry = ttk.Entry(self.frame, width=12, font=("calibri", 14))
-        self.identity_entry.bind(
-            "<Return>", lambda e: on_search(self.identity_entry.get())
-        )
 
         search_button = tk.Button(
             self.frame,
@@ -82,6 +79,7 @@ class ClientHandler:
         self.client = client
 
         self.frame = tk.Frame(parent_frame)
+        self.frame.grid(pady=24, sticky=tk.W)
         title = tk.Label(self.frame, text="Cliente: ", font=("calibri", 15))
         title.grid(row=0, column=0)
 
@@ -103,6 +101,7 @@ class ClientHandler:
         )
 
     def _display_detail_frame(self, client: Client):
+        self.client = client
         self.previus_search_frame.grid_forget()
         self.detail_frame.grid(row=0, column=1)
         client_detail = ClientDetail(

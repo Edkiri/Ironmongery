@@ -73,9 +73,10 @@ class Order(BaseModel):
     id = AutoField(primary_key=True)
     product = ForeignKeyField(Product, backref="orders")
     sale = ForeignKeyField(Sale, backref="orders")
-    amount = FloatField()
+    quantity = FloatField()
     date = DateField()
     price = FloatField()
+    discount = FloatField(null=True)
 
 
 db.connect()

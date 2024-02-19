@@ -2,6 +2,7 @@ from typing import Callable, Optional
 import tkinter as tk
 from tkinter import ttk
 
+from src.clients.services import ClientService
 from src.clients.functions import update_client
 from src.clients.components.ClientCreateOrUpdateForm import ClientCreateOrUpdateForm
 from src.clients.models import Client
@@ -15,6 +16,8 @@ class ClientUpdateOrCreateWin:
     ) -> None:
         self.client = client
         self.on_save = on_save
+        
+        self.client_service = ClientService()
 
         self.window = tk.Toplevel(width=350, height=350, padx=30, pady=30)
 
@@ -47,4 +50,16 @@ class ClientUpdateOrCreateWin:
             )
             update_client(self.client)
             self.on_save(self.client)
+            self.window.destroy()
+            
+        else:
+            new_client = Client(
+                id=None,
+                name=client_data.name,
+                phone_number=client_data.phone_number,
+                identity_card=client_data.identity,
+                email=None
+            )
+            client = self.client_service.create(new_client)
+            self.on_save(client)
             self.window.destroy()

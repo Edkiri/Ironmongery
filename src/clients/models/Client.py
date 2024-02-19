@@ -1,4 +1,3 @@
-from distutils.sysconfig import project_base
 from typing import Optional
 
 
@@ -9,7 +8,7 @@ class Client:
         identity_card: str,
         phone_number: Optional[str],
         email: Optional[str],
-        id: int,
+        id: Optional[int],
     ) -> None:
         self.name = name
         self.identity_card = identity_card

@@ -18,13 +18,11 @@ class SaleService:
     def create(
         self, sale: Sale, orders: "list[Order]", payments: "list[Payment]"
     ) -> Sale:
-
         client = self.client_service.find(sale.client.id) if sale.client else None
-
         is_finished = self._check_status(orders, payments)
 
         new_sale = self.sale_model.create(
-            client=client,
+            client=client.id if client else None,
             date=sale.date,
             description=sale.description,
             finished_date=datetime.now() if is_finished else None,

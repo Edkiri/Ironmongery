@@ -1,7 +1,10 @@
+from datetime import datetime
 import tkinter as tk
 from tkinter import ttk
+from tkinter import messagebox
 from typing import Optional
 
+from src.sales.services import SaleService
 from .SaleTotalFrame import SaleTotalFrame
 from src.orders.components import OrderHandler
 from src.clients.components import ClientHandler
@@ -21,6 +24,8 @@ class SaleHandler:
         self.date_entry = date_entry
         self.rate_entry = rate_entry
 
+        self.sale_service = SaleService()
+
         self.frame = tk.Frame(parent)
         self.frame.grid(row=0, column=0)
 
@@ -37,7 +42,7 @@ class SaleHandler:
         # Client
         self.client_frame = tk.Frame(self.frame)
         self.client_handler = ClientHandler(self.client_frame)
-        self.client_frame.grid(row=2, column=0)
+        self.client_frame.grid(row=2, column=0, sticky=tk.W)
 
         # Orders
         self.orders_frame = tk.Frame(self.frame)
@@ -58,11 +63,13 @@ class SaleHandler:
             on_change=self._handle_on_change_payments,
         )
         self.payments_frame.grid(row=4, column=0, sticky=tk.W)
-        
-        self.sale_total_frame = SaleTotalFrame(self.frame, self.rate_entry, self.orders_handler, self.payments_handler)
-        
+
+        self.sale_total_frame = SaleTotalFrame(
+            self.frame, self.rate_entry, self.orders_handler, self.payments_handler
+        )
+
         self.sale_total_frame.frame.grid(row=4, column=0, sticky=tk.E)
-        
+
         save_title = "Create Venta" if not self.sale else "Venta" + str(self.sale.id)
         save_button = tk.Button(
             self.frame,
@@ -74,17 +81,27 @@ class SaleHandler:
             command=self._save,
         )
         save_button.grid(row=5, sticky=tk.W, pady=(30, 0))
-        
+
         # TODO: Display clear button
-        
+
     def _save(self) -> None:
-        [print(i) for i in self.orders_handler.orders]
-        [print(x) for x in self.payments_handler.payments]
-        
-    
+        orders = self.orders_handler.orders
+        if not orders:
+            messagebox.showerror("Error", "No hay productos")
+            return
+        new_sale = Sale(
+            date=datetime.now(),
+            client=self.client_handler.client,
+            description=self.description.get(),
+        )
+        sale = self.sale_service.create(
+            sale=new_sale,
+            orders=self.orders_handler.orders,
+            payments=self.payments_handler.payments,
+        )
+
     def _handle_on_change_payments(self) -> None:
         self.sale_total_frame.update()
-        
 
     def _handle_on_change_orders(self) -> None:
         self.sale_total_frame.update()

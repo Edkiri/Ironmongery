@@ -21,7 +21,8 @@ class ClientFilterForm:
         name_label = tk.Label(self.frame, text="Nombre", font=("calibri", 16, "bold"))
         self.name_entry = ttk.Entry(self.frame, width=15, font=("calibri", 14))
         self.name_entry.focus()
-        self.name_entry.bind("<Return>", self.on_search)
+        self.name_entry.bind("<Return>", lambda _event: self._on_search())
+        self.name_entry.bind("<FocusOut>", self._unbind_return_event)
         if initial_client_name:
             self.name_entry.insert(0, initial_client_name)
 
@@ -57,7 +58,11 @@ class ClientFilterForm:
         )
         
     def _on_search(self):
+        self.frame.focus()
         self.on_search()
+        
+    def _unbind_return_event(self, _event):
+        self.name_entry.unbind("<Return>")
 
     def get_data(self) -> ClientQuery:
         return ClientQuery(
