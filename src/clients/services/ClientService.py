@@ -5,10 +5,10 @@ from .ClientFactory import ClientFactory
 
 class ClientService:
     def __init__(self) -> None:
-        self.client_model = ClientModel
-
+        pass
+    
     def find(self, id: int) -> Client:
-        client = ClientModel.get_by_id(id)
+        client = ClientModel.get(ClientModel.id == id)
         return Client(
             id=client.id,
             email=client.email,

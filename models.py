@@ -76,6 +76,7 @@ class Order(BaseModel):
     quantity = FloatField()
     date = DateField()
     price = FloatField()
+    rate = FloatField()
     discount = FloatField(null=True)
 
 

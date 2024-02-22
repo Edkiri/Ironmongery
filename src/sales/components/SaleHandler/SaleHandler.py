@@ -101,6 +101,7 @@ class SaleHandler:
             client=self.client_handler.client,
             description=self.description.get(),
         )
+        
         sale = self.sale_service.create(
             sale=new_sale,
             orders=self.orders_handler.orders,
@@ -141,6 +142,7 @@ class SaleHandler:
         return date, description
     
     def _clear_state(self):
+        self.description.insert(0, "")
         self.client_handler.clear_state()
         self.orders_handler.clear_state()
         self.payments_handler.clear_state()

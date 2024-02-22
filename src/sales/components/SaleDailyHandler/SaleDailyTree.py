@@ -1,7 +1,8 @@
 import tkinter as tk
 from tkinter import ttk
 
-from src.sales.models import Sale
+from src.sales.models import Sale, SaleState
+from src.utils.utils import number_to_str
 
 
 class SaleDailyTree:
@@ -47,5 +48,16 @@ class SaleDailyTree:
         return tree
 
     def insert(self, sales: "list[Sale]") -> None:
-        # TODO:
-        pass
+        self.tree.delete(*self.tree.get_children())
+        for sale in sales:
+            print(sale)
+            self.tree.insert(
+                "",
+                index="end",
+                values=(
+                    sale.id,
+                    SaleState.get_name(sale.get_state()),
+                    sale.description,
+                    number_to_str(sale.get_total()) + " $"
+                ),
+            )

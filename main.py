@@ -1,3 +1,4 @@
+from datetime import datetime
 import tkinter as tk
 from tkinter import ttk
 
@@ -51,7 +52,7 @@ class App:
             parent=self.sale_handler_frame,
             date_entry=self.date_frame.date_entry,
             rate_entry=self.current_rate,
-            on_save=print,
+            on_save=lambda: self.sale_daily_handler.insert(datetime.today()),
         )
         self.sale_handler_frame.grid(row=0, column=1, rowspan=5)
         
@@ -61,6 +62,8 @@ class App:
                 event.keycode
             ),
         )
+        
+        self.sale_daily_handler.insert(datetime.today())
 
         # self.sales_frame.grid(row=0, column=0, padx=(25, 0))
 

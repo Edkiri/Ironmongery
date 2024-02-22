@@ -1,7 +1,9 @@
+from datetime import datetime
 import tkinter as tk
 from tkinter import ttk
 from .SaleDailyTree import SaleDailyTree
 
+from src.sales.services import SaleService
 from src.utils.utils import get_date_for_title
 
 
@@ -14,9 +16,13 @@ class SaleDailyHandler:
         text = get_date_for_title(self.date_entry.get())
         self.title = tk.Label(self.frame, text=text, font=("calibri", 16, "bold"))
         self.title.grid(row=0, pady=(0, 10))
-
+        
+        self.sale_service = SaleService()
+        self.sales = []
+        
         self.sales_tree = SaleDailyTree(self.frame)
         self.sales_tree.frame.grid(row=1)
+        
 
         detail_button = tk.Button(
             self.frame,
@@ -38,6 +44,11 @@ class SaleDailyHandler:
         )
         detail_button.grid(row=2, sticky=tk.W)
         delete_button.grid(row=2, sticky=tk.E)
+        
+    def insert(self, day: datetime):
+        sales = self.sale_service.find_by_date(day)
+        self.sales = sales
+        self.sales_tree.insert(self.sales)
 
     def _open_detail_win(self):
         # TODO:
