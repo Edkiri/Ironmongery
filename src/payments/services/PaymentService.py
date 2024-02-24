@@ -49,3 +49,8 @@ class PaymentService:
             )
             payments.append(payment)
         return payments
+    
+    def delete_many(self, payments: "list[Payment]") -> None:
+        for payment in payments:
+            payment_to_delete = PaymentModel.get(PaymentModel.id == payment.id)
+            payment_to_delete.delete_instance()

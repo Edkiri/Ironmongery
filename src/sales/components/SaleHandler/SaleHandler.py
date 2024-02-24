@@ -98,20 +98,37 @@ class SaleHandler:
             messagebox.showerror("Error", "No hay productos")
             return
         
-        new_sale = Sale(
-            date=datetime.now(),
-            client=self.client_handler.client,
-            description=self.description.get(),
-        )
-        
-        sale = self.sale_service.create(
-            sale=new_sale,
-            orders=self.orders_handler.orders,
-            payments=self.payments_handler.payments,
-        )
-        
-        self.orders_service.create_many(sale, self.orders_handler.orders)
-        self.payments_service.create_many(sale, self.payments_handler.payments)
+        if not self.sale:
+            new_sale = Sale(
+                date=datetime.now(),
+                client=self.client_handler.client,
+                description=self.description.get(),
+            )
+            
+            sale = self.sale_service.create(
+                sale=new_sale,
+                orders=self.orders_handler.orders,
+                payments=self.payments_handler.payments,
+            )
+            
+            self.orders_service.create_many(sale, self.orders_handler.orders)
+            self.payments_service.create_many(sale, self.payments_handler.payments)
+        else:
+            if len(self.payments_handler.payments_to_delete) > 0:
+                self.payments_service.delete_many(self.payments_handler.payments_to_delete)
+                
+            if len(self.orders_handler.orders_to_delete) > 0:
+                self.orders_service.delete_many(self.orders_handler.orders_to_delete)
+                
+            sale_to_update = Sale(
+                id=self.sale.id,
+                client=self.client_handler.client,
+                date=self.sale.date,
+                description=self.sale.description,
+                orders=self.orders_handler.orders,
+                payments=self.payments_handler.payments,
+            )
+            self.sale_service.update(sale_to_update)
         
         self._clear_state()
         

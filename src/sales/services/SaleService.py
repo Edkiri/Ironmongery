@@ -93,6 +93,16 @@ class SaleService:
     def delete(self, sale: Sale) -> None:
         sale_to_delete = SaleModel.get(SaleModel.id == sale.id)
         sale_to_delete.delete_instance(recursive=True)
+        
+    def update(self, sale: Sale) -> None:
+        sale_to_update = SaleModel.get(SaleModel.id == sale.id)
+        
+        sale_to_update.client = sale.client.id if sale.client else None
+        sale_to_update.description = sale.description
+        sale_to_update.date = sale.date
+        sale_to_update.is_finished = self._check_status(sale.orders, sale.payments)
+        sale_to_update.finished_date = datetime.now() if sale_to_update.is_finished else None
+        sale_to_update.save()
 
     def _check_status(self, orders: "list[Order]", payments: "list[Payment]") -> bool:
         epsilon = 0.01

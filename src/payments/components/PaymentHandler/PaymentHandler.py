@@ -27,6 +27,7 @@ class PaymentHandler:
         self.on_change = on_change
 
         self.payments = payments
+        self.payments_to_delete = []
         self.total = 0
         self.total_bs = 0
         self.total_us = 0
@@ -105,9 +106,8 @@ class PaymentHandler:
         selected_id = self.payment_tree.get_selected_id()
         if not selected_id:
             return
-        self.payments = [
-            payment for payment in self.payments if payment.id != selected_id
-        ]
+        self.payments_to_delete.append([payment for payment in self.payments if payment.id == selected_id][0])
+        self.payments = [payment for payment in self.payments if payment.id != selected_id]
         self.payment_tree.insert(self.payments)
         self._calculate_total()
         self.on_change()
@@ -140,7 +140,8 @@ class PaymentHandler:
         
     def clear_state(self):
         self.payments = []
-        self.payment_tree.insert(self.payments)
+        self.payments_to_delete = []
+        self.payment_tree.insert([])
         self._calculate_total()
         self.on_change()
 

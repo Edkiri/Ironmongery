@@ -45,3 +45,8 @@ class OrderService:
             orders.append(order)
             
         return orders
+    
+    def delete_many(self, orders: "list[Order]") -> None:
+        for order in orders:
+            order_to_delete = OrderModel.get(OrderModel.id == order.order_id)
+            order_to_delete.delete_instance()

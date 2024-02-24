@@ -17,6 +17,7 @@ class OrderHandler:
         orders: "list[Order]" = [],
     ) -> None:
         self.orders = orders
+        self.orders_to_delete = []
         self.on_change = on_change
         self.rate_entry = rate_entry
 
@@ -107,7 +108,8 @@ class OrderHandler:
         order_id = self.orders_tree.get_selected_id()
         if not order_id:
             return
-        self.orders = [order for order in self.orders if order.order_id == order_id]
+        self.orders_to_delete.append([order for order in self.orders if order.order_id == order_id][0])
+        self.orders = [order for order in self.orders if order.order_id != order_id]
         self.orders_tree.insert(self.orders)
         self._calculate_total()
         self.on_change()
@@ -127,6 +129,7 @@ class OrderHandler:
         
     def clear_state(self):
         self.orders = []
-        self.orders_tree.insert(self.orders)
+        self.orders_to_delete = []
+        self.orders_tree.insert([])
         self._calculate_total()
         self.on_change()

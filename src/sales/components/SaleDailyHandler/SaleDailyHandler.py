@@ -11,12 +11,12 @@ from src.utils.utils import get_date_for_title
 
 
 class SaleDailyHandler:
-    def __init__(self, parent: tk.Frame, rate_entry: ttk.Entry, date_entry: ttk.Entry, on_delete: Callable) -> None:
+    def __init__(self, parent: tk.Frame, rate_entry: ttk.Entry, date_entry: ttk.Entry, on_change: Callable) -> None:
         self.frame = tk.Frame(parent)
         self.frame.grid(padx=15)
         self.date_entry = date_entry
         self.rate_entry = rate_entry
-        self.on_delete = on_delete
+        self.on_change = on_change
 
         text = get_date_for_title(self.date_entry.get())
         self.title = tk.Label(self.frame, text=text, font=("calibri", 16, "bold"))
@@ -66,9 +66,12 @@ class SaleDailyHandler:
             parent=self.frame,
             date_entry=self.date_entry,
             rate_entry=self.rate_entry,
-            # TODO: Change toyday to current_rate
-            on_save=lambda: self.insert(datetime.today())
+            on_save=self._on_change
         )
+        
+    def _on_change(self) -> None:
+        self.insert(datetime.today())
+        self.on_change()
 
     def _delete(self) -> None:
         sale = self.sales_tree.get_selected()
@@ -76,4 +79,4 @@ class SaleDailyHandler:
         if sale:
             self.sale_service.delete(sale)
         
-        self.on_delete()        
+        self._on_change()        

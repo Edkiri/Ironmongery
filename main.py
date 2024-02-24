@@ -37,8 +37,8 @@ class App:
         self.sale_daily_handler = SaleDailyHandler(
             parent=self.sale_daily_frame, 
             date_entry=self.date_frame.date_entry,
-            rate_entry=self.current_rate, 
-            on_delete=lambda :self.sale_daily_handler.insert(datetime.today())
+            rate_entry=self.current_rate,
+            on_change=lambda: self.sale_daily_handler.insert(datetime.today())
         )
         self.sale_daily_frame.grid(row=3)
 
