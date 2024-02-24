@@ -50,7 +50,6 @@ class SaleDailyTree:
     def insert(self, sales: "list[Sale]") -> None:
         self.tree.delete(*self.tree.get_children())
         for sale in sales:
-            print(sale)
             self.tree.insert(
                 "",
                 index="end",

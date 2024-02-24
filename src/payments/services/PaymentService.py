@@ -41,7 +41,7 @@ class PaymentService:
                 payment_id=paymentResult.id,
                 account=PaymentAccount(paymentResult.account),
                 amount=paymentResult.amount,
-                currency=Currency(paymentResult.currecy),
+                currency=Currency(paymentResult.currency),
                 date=paymentResult.date,
                 method=PaymentMethod(paymentResult.method),
                 payment_type=PaymentType(paymentResult.type),

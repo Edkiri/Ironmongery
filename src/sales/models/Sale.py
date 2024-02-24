@@ -47,7 +47,7 @@ class Sale:
         return SaleState.REFUND
     
     def __str__(self) -> str:
-        return ("""  
+        return (f"""  
             Sale(id={self.id}, date={self.date}, is_finished={self.is_finished}
             finished_date={self.finished_date}, description={self.description}
             client={self.client}
