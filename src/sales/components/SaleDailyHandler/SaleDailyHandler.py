@@ -2,17 +2,20 @@ from datetime import datetime
 import tkinter as tk
 from tkinter import ttk
 from typing import Callable
+
 from .SaleDailyTree import SaleDailyTree
 
+from src.sales.windows import SaleDetailWin
 from src.sales.services import SaleService
 from src.utils.utils import get_date_for_title
 
 
 class SaleDailyHandler:
-    def __init__(self, parent: tk.Frame, date_entry: ttk.Entry, on_delete: Callable) -> None:
+    def __init__(self, parent: tk.Frame, rate_entry: ttk.Entry, date_entry: ttk.Entry, on_delete: Callable) -> None:
         self.frame = tk.Frame(parent)
         self.frame.grid(padx=15)
         self.date_entry = date_entry
+        self.rate_entry = rate_entry
         self.on_delete = on_delete
 
         text = get_date_for_title(self.date_entry.get())
@@ -53,8 +56,19 @@ class SaleDailyHandler:
         self.sales_tree.insert(self.sales)
 
     def _open_detail_win(self):
-        # TODO:
-        pass
+        sale = self.sales_tree.get_selected()
+        
+        if not sale:
+            return
+        
+        SaleDetailWin(
+            sale=sale,
+            parent=self.frame,
+            date_entry=self.date_entry,
+            rate_entry=self.rate_entry,
+            # TODO: Change toyday to current_rate
+            on_save=lambda: self.insert(datetime.today())
+        )
 
     def _delete(self) -> None:
         sale = self.sales_tree.get_selected()

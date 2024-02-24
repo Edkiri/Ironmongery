@@ -47,7 +47,7 @@ class SaleHandler:
 
         # Client
         self.client_frame = tk.Frame(self.frame)
-        self.client_handler = ClientHandler(self.client_frame)
+        self.client_handler = ClientHandler(self.client_frame, client=self.sale.client if (self.sale) and (self.sale.client) else None)
         self.client_frame.grid(row=2, column=0, sticky=tk.W)
 
         # Orders
@@ -56,6 +56,7 @@ class SaleHandler:
             parent=self.orders_frame,
             rate_entry=self.rate_entry,
             on_change=self._handle_on_change_orders,
+            orders=self.sale.orders if (self.sale) and (self.sale.orders) else []
         )
         self.orders_frame.grid(row=3, column=0)
 
@@ -67,6 +68,7 @@ class SaleHandler:
             rate_entry=self.rate_entry,
             order_handler=self.orders_handler,
             on_change=self._handle_on_change_payments,
+            payments=self.sale.payments if (self.sale) and (self.sale.payments) else []
         )
         self.payments_frame.grid(row=4, column=0, sticky=tk.W)
 
@@ -132,6 +134,10 @@ class SaleHandler:
         # Description
         desc_label = tk.Label(frame, text="Descripción", font=("calibri", 15))
         description = ttk.Entry(frame, width=52, font=("calibri", 15))
+        
+        if self.sale:
+            date.insert(0, str(self.sale.date))
+            description.insert(0, self.sale.description if self.sale.description else "")
 
         date_label.grid(row=0, column=0)
         date.grid(row=0, column=1)

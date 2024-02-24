@@ -40,6 +40,8 @@ class OrderHandler:
         # Grid
         title.grid(row=0, column=0, sticky=tk.W + tk.E)
         self.orders_tree.frame.grid(row=1, column=0, sticky=tk.W + tk.E)
+        
+        self.orders_tree.insert(self.orders)
 
     def _create_control_buttons(self) -> None:
         add_button = tk.Button(

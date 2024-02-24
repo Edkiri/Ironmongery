@@ -92,7 +92,7 @@ class SaleService:
     
     def delete(self, sale: Sale) -> None:
         sale_to_delete = SaleModel.get(SaleModel.id == sale.id)
-        sale_to_delete.delete_instance()
+        sale_to_delete.delete_instance(recursive=True)
 
     def _check_status(self, orders: "list[Order]", payments: "list[Payment]") -> bool:
         epsilon = 0.01

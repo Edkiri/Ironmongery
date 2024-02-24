@@ -31,8 +31,10 @@ class PaymentHandler:
         self.total_bs = 0
         self.total_us = 0
         self.payment_tree = PaymentTree(self.frame)
-
+        
         self._display_buttons()
+        self._calculate_total()
+        self.payment_tree.insert(self.payments)
 
     def _display_buttons(self):
         title = tk.Label(self.frame, text="Pagos", font=("calibri", 15, "bold"))
