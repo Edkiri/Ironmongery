@@ -1,5 +1,7 @@
+
 import tkinter as tk
 from tkinter import ttk
+from typing import Union
 
 from src.sales.models import Sale, SaleState
 from src.utils.utils import number_to_str
@@ -10,6 +12,7 @@ class SaleDailyTree:
         self.frame = tk.Frame(parent)
 
         self.tree = self._create_tree()
+        self.sales = []
         self.tree.grid()
 
     def _create_tree(self) -> ttk.Treeview:
@@ -48,6 +51,7 @@ class SaleDailyTree:
         return tree
 
     def insert(self, sales: "list[Sale]") -> None:
+        self.sales = sales
         self.tree.delete(*self.tree.get_children())
         for sale in sales:
             self.tree.insert(
@@ -60,3 +64,15 @@ class SaleDailyTree:
                     number_to_str(sale.get_total()) + " $"
                 ),
             )
+            
+    def get_selected(self) -> Union[Sale, None]:
+        if not self.tree.focus():
+            return None
+        
+        sale_id = self.tree.item(self.tree.focus())["values"][0]
+        sale = [sale for sale in self.sales if sale.id == sale_id]
+        
+        if sale:
+            return sale[0]
+        
+        return

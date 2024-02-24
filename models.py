@@ -32,7 +32,7 @@ class Sale(BaseModel):
 class Payment(BaseModel):
     """Payment Model."""
     id = AutoField(primary_key=True)
-    sale = ForeignKeyField(Sale, backref="payments")
+    sale = ForeignKeyField(Sale, backref="payments", on_delete="CASCADE")
     date = DateField()
     amount = FloatField()
     CURRENCIES = {"Bolívares": 0, "Dólares": 1}
@@ -71,7 +71,7 @@ class Product(BaseModel):
 
 class Order(BaseModel):
     id = AutoField(primary_key=True)
-    product = ForeignKeyField(Product, backref="orders")
+    product = ForeignKeyField(Product, backref="orders", on_delete="CASCADE")
     sale = ForeignKeyField(Sale, backref="orders")
     quantity = FloatField()
     date = DateField()

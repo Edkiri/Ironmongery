@@ -1,6 +1,7 @@
 from datetime import datetime
 import tkinter as tk
 from tkinter import ttk
+from typing import Callable
 from .SaleDailyTree import SaleDailyTree
 
 from src.sales.services import SaleService
@@ -8,10 +9,11 @@ from src.utils.utils import get_date_for_title
 
 
 class SaleDailyHandler:
-    def __init__(self, parent: tk.Frame, date_entry: ttk.Entry) -> None:
+    def __init__(self, parent: tk.Frame, date_entry: ttk.Entry, on_delete: Callable) -> None:
         self.frame = tk.Frame(parent)
         self.frame.grid(padx=15)
         self.date_entry = date_entry
+        self.on_delete = on_delete
 
         text = get_date_for_title(self.date_entry.get())
         self.title = tk.Label(self.frame, text=text, font=("calibri", 16, "bold"))
@@ -54,6 +56,10 @@ class SaleDailyHandler:
         # TODO:
         pass
 
-    def _delete(self):
-        # TODO:
-        pass
+    def _delete(self) -> None:
+        sale = self.sales_tree.get_selected()
+        
+        if sale:
+            self.sale_service.delete(sale)
+        
+        self.on_delete()        

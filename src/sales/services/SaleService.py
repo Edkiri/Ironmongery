@@ -89,6 +89,10 @@ class SaleService:
             finished_date=new_sale.finished_date,
             is_finished=new_sale.is_finished,
         )
+    
+    def delete(self, sale: Sale) -> None:
+        sale_to_delete = SaleModel.get(SaleModel.id == sale.id)
+        sale_to_delete.delete_instance()
 
     def _check_status(self, orders: "list[Order]", payments: "list[Payment]") -> bool:
         epsilon = 0.01
