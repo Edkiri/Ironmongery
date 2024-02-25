@@ -5,7 +5,7 @@ from src.payments.models import PaymentsResume
 from src.utils.utils import DATE_FORMAT, get_weekday, get_summary_payments
 
 
-def get_month_payments(date) -> PaymentsResume:
+def get_month_payments(date: str) -> PaymentsResume:
     year = int(date.split("-")[0])
     month = int(date.split("-")[1])
     day = int(date.split("-")[2])
@@ -23,7 +23,7 @@ def get_month_payments(date) -> PaymentsResume:
     return PaymentsResume("Mes", bs, us, total)
 
 
-def get_week_payments(date) -> PaymentsResume:
+def get_week_payments(date: str) -> PaymentsResume:
     day_date = datetime.strptime(date, DATE_FORMAT)
 
     payments = []
@@ -38,7 +38,7 @@ def get_week_payments(date) -> PaymentsResume:
     return PaymentsResume("Semana", bs, us, total)
 
 
-def get_day_payments(date) -> PaymentsResume:
+def get_day_payments(date: str) -> PaymentsResume:
     payments = Payment.select().where(
         Payment.date == datetime.strptime(date, DATE_FORMAT)
     )
@@ -46,7 +46,7 @@ def get_day_payments(date) -> PaymentsResume:
     return PaymentsResume("Día", bs, us, total)
 
 
-def get_payments_resume(date) -> "list[PaymentsResume]":
+def get_payments_resume(date: str) -> "list[PaymentsResume]":
     month_payments = get_month_payments(date)
     week_payments = get_week_payments(date)
     day_payments = get_day_payments(date)

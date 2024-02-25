@@ -6,6 +6,8 @@ from src.sales.components import SaleHandler, SaleDailyHandler
 from src.common import DateFrame
 from src.menu import Menubar
 from src.payments.components import PaymentsResumeFrame
+from src.payments.functions import get_payments_resume
+from src.utils.utils import DATE_FORMAT
 
 
 class App:
@@ -38,7 +40,7 @@ class App:
             parent=self.sale_daily_frame, 
             date_entry=self.date_frame.date_entry,
             rate_entry=self.current_rate,
-            on_change=lambda: self.sale_daily_handler.insert(datetime.today())
+            on_change=self._on_change
         )
         self.sale_daily_frame.grid(row=3)
 
@@ -48,6 +50,7 @@ class App:
             self.payments_resume_frame, self.date_frame.date_entry
         )
         self.payments_resume_frame.grid(row=4)
+        self.payment_resume_frame.resume_tree.insert(get_payments_resume(datetime.today().strftime(DATE_FORMAT)))
 
         # Sale Handler
         self.sale_handler_frame = tk.Frame(self.root)
@@ -55,7 +58,7 @@ class App:
             parent=self.sale_handler_frame,
             date_entry=self.date_frame.date_entry,
             rate_entry=self.current_rate,
-            on_save=lambda: self.sale_daily_handler.insert(datetime.today()),
+            on_save=self._on_change,
         )
         self.sale_handler_frame.grid(row=0, column=1, rowspan=5)
         
@@ -67,6 +70,13 @@ class App:
         )
         
         self.sale_daily_handler.insert(datetime.today())
+        
+    def _on_change(self):
+        date_string = self.date_frame.date_entry.get()
+        date = datetime.strptime(date_string, DATE_FORMAT)
+        self.sale_daily_handler.insert(date)
+        payments_resume = get_payments_resume(date_string)
+        self.payment_resume_frame.resume_tree.insert(payments_resume)
 
     def _create_rate_entry(self):
         # Title

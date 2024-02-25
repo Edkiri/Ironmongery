@@ -174,7 +174,7 @@ class SaleHandler:
         return date, description
     
     def _clear_state(self):
-        self._create_metadata_frame(self.rate_entry.get())
+        self._create_metadata_frame(self.date_entry.get())
         self.client_handler.clear_state()
         self.orders_handler.clear_state()
         self.payments_handler.clear_state()
