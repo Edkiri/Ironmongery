@@ -1,11 +1,12 @@
 import tkinter as tk
 from tkinter import ttk
-from typing import Callable
+from typing import Callable, Optional
 
 from .OrderTree import OrderTree
 from src.products.windows import ProductDashboardWin
 from src.orders.windows import CreateOrUpdateOrderWin
 from src.orders.models import Order
+from src.sales.models import Sale
 
 
 class OrderHandler:
@@ -15,8 +16,11 @@ class OrderHandler:
         rate_entry: ttk.Entry,
         on_change: Callable,
         orders: "list[Order]" = [],
+        sale: Optional[Sale] = None
     ) -> None:
+        self.sale = sale
         self.orders = orders
+        self.orders_to_create = []
         self.orders_to_delete = []
         self.on_change = on_change
         self.rate_entry = rate_entry
@@ -80,6 +84,8 @@ class OrderHandler:
         delete_button.grid(row=2, column=0, sticky=tk.E)
 
     def _insert(self, order: Order) -> None:
+        if self.sale:
+            self.orders_to_create.append(order)
         self.orders.append(order)
         self.orders_tree.insert(self.orders)
         self._calculate_total()
@@ -129,6 +135,7 @@ class OrderHandler:
         
     def clear_state(self):
         self.orders = []
+        self.orders_to_create = []
         self.orders_to_delete = []
         self.orders_tree.insert([])
         self._calculate_total()

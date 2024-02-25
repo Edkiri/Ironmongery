@@ -12,6 +12,7 @@ from src.clients.components import ClientHandler
 from src.sales.models import Sale
 from src.payments.components import PaymentHandler
 from src.payments.services import PaymentService
+from src.utils.utils import DATE_FORMAT
 
 
 class SaleHandler:
@@ -56,7 +57,8 @@ class SaleHandler:
             parent=self.orders_frame,
             rate_entry=self.rate_entry,
             on_change=self._handle_on_change_orders,
-            orders=self.sale.orders if (self.sale) and (self.sale.orders) else []
+            orders=self.sale.orders if (self.sale) and (self.sale.orders) else [],
+            sale=self.sale
         )
         self.orders_frame.grid(row=3, column=0)
 
@@ -68,6 +70,7 @@ class SaleHandler:
             rate_entry=self.rate_entry,
             order_handler=self.orders_handler,
             on_change=self._handle_on_change_payments,
+            sale=self.sale,
             payments=self.sale.payments if (self.sale) and (self.sale.payments) else []
         )
         self.payments_frame.grid(row=4, column=0, sticky=tk.W)
@@ -78,7 +81,7 @@ class SaleHandler:
 
         self.sale_total_frame.frame.grid(row=4, column=0, sticky=tk.E)
 
-        save_title = "Create Venta" if not self.sale else "Venta" + str(self.sale.id)
+        save_title = "Create Venta" if not self.sale else "Actualizar venta"
         save_button = tk.Button(
             self.frame,
             text=save_title,
@@ -113,24 +116,29 @@ class SaleHandler:
             
             self.orders_service.create_many(sale, self.orders_handler.orders)
             self.payments_service.create_many(sale, self.payments_handler.payments)
+            self._clear_state()
         else:
             if len(self.payments_handler.payments_to_delete) > 0:
                 self.payments_service.delete_many(self.payments_handler.payments_to_delete)
+            
+            if len(self.payments_handler.payments_to_create) > 0:
+                self.payments_service.create_many(self.sale, self.payments_handler.payments_to_create)
                 
             if len(self.orders_handler.orders_to_delete) > 0:
                 self.orders_service.delete_many(self.orders_handler.orders_to_delete)
                 
+            if len(self.orders_handler.orders_to_create) > 0:
+                self.orders_service.create_many(self.sale, self.orders_handler.orders_to_create)
+                
             sale_to_update = Sale(
                 id=self.sale.id,
                 client=self.client_handler.client,
-                date=self.sale.date,
-                description=self.sale.description,
+                date=datetime.strptime(self.date.get(), DATE_FORMAT),
+                description=self.description.get(),
                 orders=self.orders_handler.orders,
                 payments=self.payments_handler.payments,
             )
             self.sale_service.update(sale_to_update)
-        
-        self._clear_state()
         
         self.on_save()
 
@@ -146,7 +154,6 @@ class SaleHandler:
         # Date
         date_label = tk.Label(frame, text="Fecha", font=("calibri", 15))
         date = ttk.Entry(frame, width=10, font=("calibri", 15))
-        date.insert(0, initial_date)
 
         # Description
         desc_label = tk.Label(frame, text="Descripción", font=("calibri", 15))
@@ -155,6 +162,8 @@ class SaleHandler:
         if self.sale:
             date.insert(0, str(self.sale.date))
             description.insert(0, self.sale.description if self.sale.description else "")
+        else:
+            date.insert(0, initial_date)
 
         date_label.grid(row=0, column=0)
         date.grid(row=0, column=1)

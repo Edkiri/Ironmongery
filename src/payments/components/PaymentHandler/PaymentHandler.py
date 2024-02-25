@@ -6,6 +6,8 @@ from src.payments.models import Payment, PaymentType, Currency
 from src.payments.windows import PaymentCreateWin
 from src.orders.components import OrderHandler
 from .PaymentTree import PaymentTree
+from src.sales.models import Sale
+from src.payments.services import PaymentService
 
 
 class PaymentHandler:
@@ -16,18 +18,23 @@ class PaymentHandler:
         date_entry: ttk.Entry,
         order_handler: OrderHandler,
         on_change: Callable,
+        sale: Optional[Sale] = None,
         payments: "list[Payment]" = [],
     ) -> None:
         self.frame = tk.Frame(parent)
         self.frame.grid()
+        
+        self.payments_service = PaymentService()
         
         self.rate_entry = rate_entry
         self.date_entry = date_entry
         self.order_handler = order_handler
         self.on_change = on_change
 
+        self.sale = sale
         self.payments = payments
         self.payments_to_delete = []
+        self.payments_to_create = []
         self.total = 0
         self.total_bs = 0
         self.total_us = 0
@@ -97,6 +104,8 @@ class PaymentHandler:
         )
 
     def add_payment(self, payment: Payment):
+        if self.sale:
+            self.payments_to_create.append(payment)
         self.payments.append(payment)
         self.payment_tree.insert(self.payments)
         self._calculate_total()
@@ -140,6 +149,7 @@ class PaymentHandler:
         
     def clear_state(self):
         self.payments = []
+        self.payments_to_create = []
         self.payments_to_delete = []
         self.payment_tree.insert([])
         self._calculate_total()

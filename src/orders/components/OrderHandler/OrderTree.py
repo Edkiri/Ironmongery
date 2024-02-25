@@ -22,7 +22,7 @@ class OrderTree:
                 "",
                 index=tk.END,
                 values=(
-                    None,
+                    order.order_id,
                     order.product.product_id,
                     order.product.code,
                     order.product.name,
