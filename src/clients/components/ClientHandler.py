@@ -118,9 +118,9 @@ class ClientHandler:
         self.previus_search_frame.grid(row=0, column=1)
 
     def _change_client(self, client: Union[Client, None]):
-        if client:
-            self.client = client
-            self._display_detail_frame(client)
+        self.client = client
+        if self.client:
+            self._display_detail_frame(self.client)
         else:
             self._display_search_frame()
             

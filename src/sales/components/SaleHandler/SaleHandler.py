@@ -37,7 +37,7 @@ class SaleHandler:
         self.frame.grid(row=0, column=0)
 
         # Title
-        text = "Nueva venta" if not self.sale else "Venta " + str(self.sale.id)
+        text = "Nueva venta" if not self.sale else "Venta #" + str(self.sale.id)
         title = tk.Label(self.frame, text=text, font=("calibri", 18, "bold"))
         title.grid(row=0, column=0, sticky=tk.N, pady=(0, 20))
 
