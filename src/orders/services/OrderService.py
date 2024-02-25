@@ -50,3 +50,8 @@ class OrderService:
         for order in orders:
             order_to_delete = OrderModel.get(OrderModel.id == order.order_id)
             order_to_delete.delete_instance()
+            
+            (self.product_model
+                .update({ ProductModel.stock: ProductModel.stock + order.quantity })
+                .where(ProductModel.id == order.product.product_id)
+                .execute())
