@@ -39,9 +39,9 @@ def get_week_payments(date: str) -> PaymentsResume:
 
 
 def get_day_payments(date: str) -> PaymentsResume:
-    payments = Payment.select().where(
+    payments = (Payment.select().where(
         Payment.date == datetime.strptime(date, DATE_FORMAT)
-    )
+    ))
     bs, us, total = get_summary_payments(payments)
     return PaymentsResume("Día", bs, us, total)
 

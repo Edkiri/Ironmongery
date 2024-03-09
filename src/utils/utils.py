@@ -77,15 +77,15 @@ def get_summary_payments(payments: "list[Payment]"):
     total = 0
     for payment in payments:
         rate = payment.rate
-        if payment.currency == Currency.Bolivares:
-            if payment.type == PaymentType.Pago:
+        if payment.currency == Currency.Bolivares.value:
+            if payment.type == PaymentType.Pago.value:
                 bs += payment.amount
                 total += payment.amount / rate
             else:
                 bs -= payment.amount
                 total -= payment.amount / rate
         else:
-            if payment.type == PaymentType.Pago:
+            if payment.type == PaymentType.Pago.value:
                 usd += payment.amount
                 total += payment.amount
             else:
