@@ -1,7 +1,6 @@
-# Utils
+from src.payments.models import Payment, PaymentType, Currency
 from datetime import date, datetime
 
-# Handle dates.
 DATE_FORMAT = "%Y-%m-%d"
 TODAY = date.today().strftime(DATE_FORMAT)
 
@@ -72,21 +71,21 @@ def es_casi_igual(num1, num2):
         return False
 
 
-def get_summary_payments(payments):
+def get_summary_payments(payments: "list[Payment]"):
     bs = 0
     usd = 0
     total = 0
     for payment in payments:
         rate = payment.rate
-        if payment.currency == 0:
-            if payment.type == 0:
+        if payment.currency == Currency.Bolivares:
+            if payment.type == PaymentType.Pago:
                 bs += payment.amount
                 total += payment.amount / rate
             else:
                 bs -= payment.amount
                 total -= payment.amount / rate
         else:
-            if payment.type == 0:
+            if payment.type == PaymentType.Pago:
                 usd += payment.amount
                 total += payment.amount
             else:

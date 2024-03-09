@@ -9,7 +9,6 @@ from src.payments.components import PaymentsResumeFrame
 from src.payments.functions import get_payments_resume
 from src.utils.utils import DATE_FORMAT
 
-
 class App:
     def __init__(self, root):
         # Root Options.
@@ -25,7 +24,7 @@ class App:
         self.current_rate.grid(row=0)
 
         # Date
-        self.date_frame = DateFrame(self.config_frame)
+        self.date_frame = DateFrame(self.config_frame, self._on_date_change)
         self.date_frame.frame.grid(row=1, pady=10)
 
         self.config_frame.grid(padx=15, pady=15)
@@ -50,13 +49,13 @@ class App:
             self.payments_resume_frame, self.date_frame.date_entry
         )
         self.payments_resume_frame.grid(row=4)
-        self.payment_resume_frame.resume_tree.insert(get_payments_resume(datetime.today().strftime(DATE_FORMAT)))
+        self.payment_resume_frame.resume_tree.insert(get_payments_resume(self._get_date()))
 
         # Sale Handler
         self.sale_handler_frame = tk.Frame(self.root)
         self.sale_handler = SaleHandler(
             parent=self.sale_handler_frame,
-            date_entry=self.date_frame.date_entry,
+            initial_date=self._get_date(),
             rate_entry=self.current_rate,
             on_save=self._on_change,
         )
@@ -69,14 +68,18 @@ class App:
             ),
         )
         
-        self.sale_daily_handler.insert(datetime.today())
+        self._on_date_change()
         
     def _on_change(self):
-        date_string = self.date_frame.date_entry.get()
-        date = datetime.strptime(date_string, DATE_FORMAT)
-        self.sale_daily_handler.insert(date)
-        payments_resume = get_payments_resume(date_string)
+        payments_resume = get_payments_resume(self._get_date())
         self.payment_resume_frame.resume_tree.insert(payments_resume)
+        
+        date = datetime.strptime(self._get_date(), DATE_FORMAT)
+        self.sale_daily_handler.insert(date)
+        
+    def _on_date_change(self):
+        self.payment_resume_frame.resume_tree.insert(get_payments_resume(self._get_date()))
+        self.sale_daily_handler.insert(datetime.strptime(self._get_date(), DATE_FORMAT))
 
     def _create_rate_entry(self):
         # Title
@@ -89,6 +92,9 @@ class App:
         rate_entry.grid(row=0, column=0, sticky=tk.W, padx=(50, 0))
 
         return rate_entry
+    
+    def _get_date(self) -> str:
+        return self.date_frame.date_entry.get()
 
 
 if __name__ == "__main__":

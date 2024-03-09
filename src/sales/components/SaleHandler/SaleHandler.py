@@ -19,15 +19,16 @@ class SaleHandler:
     def __init__(
         self,
         parent,
-        date_entry: ttk.Entry,
+        initial_date: str,
         rate_entry: ttk.Entry,
         on_save: Callable,
         sale: Optional[Sale] = None,
     ) -> None:
         self.sale = sale
-        self.date_entry = date_entry
         self.rate_entry = rate_entry
         self.on_save = on_save
+        
+        self.initial_date = initial_date
 
         self.sale_service = SaleService()
         self.orders_service = OrderService()
@@ -43,7 +44,7 @@ class SaleHandler:
 
         # Metadata
         self.metadata_frame = tk.Frame(self.frame)
-        self.date, self.description = self._create_metadata_frame(self.date_entry.get())
+        self.date, self.description = self._create_metadata_frame(initial_date)
         self.metadata_frame.grid(row=1, column=0)
 
         # Client
@@ -66,7 +67,7 @@ class SaleHandler:
         self.payments_frame = tk.Frame(self.frame)
         self.payments_handler = PaymentHandler(
             parent=self.payments_frame,
-            date_entry=self.date_entry,
+            date_entry=self.date,
             rate_entry=self.rate_entry,
             order_handler=self.orders_handler,
             on_change=self._handle_on_change_payments,
@@ -92,8 +93,18 @@ class SaleHandler:
             command=self._save,
         )
         save_button.grid(row=5, sticky=tk.W, pady=(30, 0))
-
-        # TODO: Display clear button
+        
+        clear_sale_frame = tk.Button(
+            self.frame,
+            text="Limpiar Todo",
+            font=('calibri', 15),
+            bd=1,
+            relief=tk.RIDGE,
+            bg='#ffff00',
+            padx=22,
+            command=self._clear_state)
+        if not self.sale:
+            clear_sale_frame.grid(row=5, sticky=tk.S, padx=(400,0))
 
     def _save(self) -> None:
         orders = self.orders_handler.orders
@@ -103,7 +114,7 @@ class SaleHandler:
         
         if not self.sale:
             new_sale = Sale(
-                date=datetime.now(),
+                date=datetime.strptime(self.date.get(), DATE_FORMAT),
                 client=self.client_handler.client,
                 description=self.description.get(),
             )
@@ -174,7 +185,7 @@ class SaleHandler:
         return date, description
     
     def _clear_state(self):
-        self._create_metadata_frame(self.date_entry.get())
+        self._create_metadata_frame(self.initial_date)
         self.client_handler.clear_state()
         self.orders_handler.clear_state()
         self.payments_handler.clear_state()
