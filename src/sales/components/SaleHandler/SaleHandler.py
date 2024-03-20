@@ -20,15 +20,15 @@ class SaleHandler:
         self,
         parent,
         initial_date: str,
-        rate_entry: ttk.Entry,
+        initial_rate: str,
         on_save: Callable,
         sale: Optional[Sale] = None,
     ) -> None:
         self.sale = sale
-        self.rate_entry = rate_entry
         self.on_save = on_save
         
         self.initial_date = initial_date
+        self.initial_rate = initial_rate
 
         self.sale_service = SaleService()
         self.orders_service = OrderService()
@@ -56,7 +56,7 @@ class SaleHandler:
         self.orders_frame = tk.Frame(self.frame)
         self.orders_handler = OrderHandler(
             parent=self.orders_frame,
-            rate_entry=self.rate_entry,
+            initial_rate=self.initial_rate,
             on_change=self._handle_on_change_orders,
             orders=self.sale.orders if (self.sale) and (self.sale.orders) else [],
             sale=self.sale
@@ -67,8 +67,8 @@ class SaleHandler:
         self.payments_frame = tk.Frame(self.frame)
         self.payments_handler = PaymentHandler(
             parent=self.payments_frame,
-            date_entry=self.date,
-            rate_entry=self.rate_entry,
+            initial_date=self.initial_date,
+            initial_rate=self.initial_rate,
             order_handler=self.orders_handler,
             on_change=self._handle_on_change_payments,
             sale=self.sale,
@@ -77,7 +77,7 @@ class SaleHandler:
         self.payments_frame.grid(row=4, column=0, sticky=tk.W)
 
         self.sale_total_frame = SaleTotalFrame(
-            self.frame, self.rate_entry, self.orders_handler, self.payments_handler
+            self.frame, self.initial_rate, self.orders_handler, self.payments_handler
         )
 
         self.sale_total_frame.frame.grid(row=4, column=0, sticky=tk.E)

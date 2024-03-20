@@ -18,30 +18,27 @@ from src.orders.models import Order
 class ProductDashboardWin:
     def __init__(
         self,
-        initial_rate: str,
         on_insert: Callable[[Order], None],
     ):
         try:
-            self.initial_rate = self._validate_rate(initial_rate)
-            self.window = self._create_window()
+            self.window = None
             self.product_tree = ProductTree(self.window)
             self._display_product_tree()
 
             self.on_insert = on_insert
             self._display_filters_frame()
-        
-        
+
         except Exception as err:
             messagebox.showerror("Tasa inválida", "Tasa inválida")
+
     def _validate_rate(self, rate: str) -> float:
         valid_number = float(rate)
         if valid_number == 0:
             raise ValueError()
         return valid_number
-            
 
     # New Order Window
-    def _create_window(self):
+    def create_window(self, initial_rate: str):
         window = tk.Toplevel(width=700, height=700, padx=30, pady=30)
         window.title("Productos")
 
@@ -50,7 +47,7 @@ class ProductDashboardWin:
         rate_label.grid(row=0, columnspan=2, pady=(10, 20), sticky=tk.W)
 
         self.rate_entry = ttk.Entry(window, width=12, font=("calibri", 14))
-        self.rate_entry.insert(0, number_to_str(self.initial_rate))
+        self.rate_entry.insert(0, number_to_str(self._validate_rate(initial_rate)))
         self.rate_entry.grid(row=0, columnspan=2, pady=(10, 20), sticky=tk.W, padx=(50))
 
         # Title.
@@ -228,5 +225,6 @@ class ProductDashboardWin:
         self.product_tree.insert(products, float(self.rate_entry.get()))
 
     def add_order(self, order_product: Order):
-        self.on_insert(order_product)
-        self.window.destroy()
+        if self.window:
+            self.on_insert(order_product)
+            self.window.destroy()

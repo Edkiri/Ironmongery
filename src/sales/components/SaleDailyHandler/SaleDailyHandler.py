@@ -11,14 +11,14 @@ from src.utils.utils import get_date_for_title
 
 
 class SaleDailyHandler:
-    def __init__(self, parent: tk.Frame, rate_entry: ttk.Entry, date_entry: ttk.Entry, on_change: Callable) -> None:
+    def __init__(self, parent: tk.Frame, initial_date: str, initial_rate: str, on_change: Callable) -> None:
         self.frame = tk.Frame(parent)
         self.frame.grid(padx=15)
-        self.date_entry = date_entry
-        self.rate_entry = rate_entry
+        self.initial_date = initial_date
+        self.initial_rate = initial_rate
         self.on_change = on_change
 
-        text = get_date_for_title(self.date_entry.get())
+        text = get_date_for_title(initial_date)
         self.title = tk.Label(self.frame, text=text, font=("calibri", 16, "bold"))
         self.title.grid(row=0, pady=(0, 10))
         
@@ -64,8 +64,8 @@ class SaleDailyHandler:
         SaleDetailWin(
             sale=sale,
             parent=self.frame,
-            date_entry=self.date_entry,
-            rate_entry=self.rate_entry,
+            initial_date=self.initial_date,
+            initial_rate=self.initial_rate,
             on_save=self._on_change
         )
         

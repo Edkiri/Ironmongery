@@ -13,7 +13,8 @@ class OrderHandler:
     def __init__(
         self,
         parent: tk.Frame,
-        rate_entry: ttk.Entry,
+        # rate_entry: ttk.Entry,
+        initial_rate: str,
         on_change: Callable,
         orders: "list[Order]" = [],
         sale: Optional[Sale] = None
@@ -23,7 +24,8 @@ class OrderHandler:
         self.orders_to_create = []
         self.orders_to_delete = []
         self.on_change = on_change
-        self.rate_entry = rate_entry
+        # self.rate_entry = rate_entry
+        self.initial_rate = initial_rate
 
         self.total = 0
         self.total_us = 0
@@ -40,15 +42,19 @@ class OrderHandler:
         self.orders_tree = OrderTree(self.frame)
 
         # Control buttons
-        self._create_control_buttons()
+        self.create_control_buttons()
 
         # Grid
         title.grid(row=0, column=0, sticky=tk.W + tk.E)
         self.orders_tree.frame.grid(row=1, column=0, sticky=tk.W + tk.E)
         
         self.orders_tree.insert(self.orders)
+        
+    def add_order_to_tree(self, initial_rate: str):
+        new_order_win = ProductDashboardWin(on_insert=lambda order: self._insert(order))
+        new_order_win.create_window(initial_rate)
 
-    def _create_control_buttons(self) -> None:
+    def create_control_buttons(self) -> None:
         add_button = tk.Button(
             self.frame,
             text="Agregar(A)",
@@ -56,10 +62,7 @@ class OrderHandler:
             bd=1,
             relief=tk.RIDGE,
             bg="#54bf54",
-            command=lambda: ProductDashboardWin(
-                self.rate_entry.get(),
-                on_insert=lambda order: self._insert(order),
-            ),
+            command=lambda: self.add_order_to_tree(self.initial_rate),
         )
         modify_button = tk.Button(
             self.frame,

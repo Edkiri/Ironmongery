@@ -14,8 +14,8 @@ class PaymentHandler:
     def __init__(
         self,
         parent: tk.Frame,
-        rate_entry: ttk.Entry,
-        date_entry: ttk.Entry,
+        initial_rate: str,
+        initial_date: str,
         order_handler: OrderHandler,
         on_change: Callable,
         sale: Optional[Sale] = None,
@@ -26,8 +26,8 @@ class PaymentHandler:
         
         self.payments_service = PaymentService()
         
-        self.rate_entry = rate_entry
-        self.date_entry = date_entry
+        self.initial_rate = initial_rate
+        self.initial_date = initial_date
         self.order_handler = order_handler
         self.on_change = on_change
 
@@ -95,12 +95,9 @@ class PaymentHandler:
         initial_amount: Optional[float] = None,
     ):
         PaymentCreateWin(
-            initial_date=self.date_entry.get(),
-            initial_rate=self.rate_entry.get(),
-            initial_amount=initial_amount,
-            on_insert=lambda payment: self.add_payment(payment),
-            currency=currency,
-            payment_type=payment_type,
+            initial_date=self.initial_date,
+            initial_rate=self.initial_rate,
+            on_insert=lambda payment: self.add_payment(payment) 
         )
 
     def add_payment(self, payment: Payment):
@@ -162,7 +159,7 @@ class PaymentHandler:
             remaining = self.order_handler.total_us - self.total
             
             if currency == Currency.Bolivares:
-                remaining *= float(self.rate_entry.get())
+                remaining *= float(self.initial_rate)
                 
             payment_type = PaymentType.Pago if remaining > 0 else PaymentType.Vuelto
             self.open_create_payment_window(payment_type, currency, abs(remaining))

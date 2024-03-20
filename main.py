@@ -7,7 +7,7 @@ from src.common import DateFrame
 from src.menu import Menubar
 from src.payments.components import PaymentsResumeFrame
 from src.payments.functions import get_payments_resume
-from src.utils.utils import DATE_FORMAT
+from src.utils.utils import DATE_FORMAT, number_to_str
 
 class App:
     def __init__(self, root):
@@ -20,7 +20,7 @@ class App:
         self.config_frame = tk.Frame()
 
         # Rate
-        self.current_rate = self._create_rate_entry()
+        self.current_rate = self._create_rate_entry(57)
         self.current_rate.grid(row=0)
 
         # Date
@@ -36,9 +36,9 @@ class App:
         # Sale Daily Frame
         self.sale_daily_frame = tk.Frame(root)
         self.sale_daily_handler = SaleDailyHandler(
-            parent=self.sale_daily_frame, 
-            date_entry=self.date_frame.date_entry,
-            rate_entry=self.current_rate,
+            parent=self.sale_daily_frame,
+            initial_date=self.date_frame.date_entry.get(),
+            initial_rate=self.current_rate.get(),
             on_change=self._on_change
         )
         self.sale_daily_frame.grid(row=3)
@@ -56,7 +56,7 @@ class App:
         self.sale_handler = SaleHandler(
             parent=self.sale_handler_frame,
             initial_date=self._get_date(),
-            rate_entry=self.current_rate,
+            initial_rate="57",
             on_save=self._on_change,
         )
         self.sale_handler_frame.grid(row=0, column=1, rowspan=5)
@@ -81,11 +81,12 @@ class App:
         self.payment_resume_frame.resume_tree.insert(get_payments_resume(self._get_date()))
         self.sale_daily_handler.insert(datetime.strptime(self._get_date(), DATE_FORMAT))
 
-    def _create_rate_entry(self):
+    def _create_rate_entry(self, initial_rate: float):
         # Title
         rate_label = ttk.Label(self.config_frame, text="Tasa", font=("calibri", 15))
 
         rate_entry = ttk.Entry(self.config_frame, width=12, font=("calibri", 15))
+        rate_entry.insert(0, number_to_str(initial_rate))
         rate_entry.focus()
 
         rate_label.grid(row=0, column=0, sticky=tk.W)
